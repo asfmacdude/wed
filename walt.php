@@ -21,7 +21,7 @@ include_once('details.php') ;
  * imagineer.php
  *
  * This class is the parent class for all imagineers. They all extend
- * this one and gain sharable methods.
+ * this one and gain sharable methods, even Walt himself.
  *
  */
 include_once('imagineer.php') ;
