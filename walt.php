@@ -1,15 +1,29 @@
 <?php
 
 
-// Nearly every class extends tools.php. It has a good base of methods for everybody to use
-// By extending it from everywhere, you can add methods that everybody can use in one simple
-// step by adding the mthods to the tools class.
-// include_once('tools.php') ;
-
-// imagineer is a class specifically for the imagineers so you can add functionality
-// to only the imagineer classes
+/*
+ * wed_tools.php
+ *
+ * This file is a collection of straight functions that can be called from
+ * anywhere and provide an easy and clean way to access all of the Imagineers
+ *
+ */
 include_once('wed_tools.php') ;
+/*
+ * details.php
+ *
+ * This is a small utility class that is extending from all other detail classes
+ * and provides a singel source of several repeatable methods that are used in all
+ * detail classes.
+ */
 include_once('details.php') ;
+/*
+ * imagineer.php
+ *
+ * This class is the parent class for all imagineers. They all extend
+ * this one and gain sharable methods.
+ *
+ */
 include_once('imagineer.php') ;
 
 
