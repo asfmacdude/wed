@@ -69,8 +69,8 @@ class db_content_connect extends db_common
 		$this->where['BY_CURRENT_SITE'] = ' AND s.site_id = "'.wed_getSystemValue('SITE_ID').'"';
 		
 		// Search by content id or code
-		$this->where['CONTENT_ID']      = ' WHERE a.cnt_id =%ID%';
-		$this->where['CONTENT_CODE']    = ' WHERE a.cnt_code =%CODE%';
+		$this->where['CONTENT_ID']      = ' WHERE a.cnt_id = :id';
+		$this->where['CONTENT_CODE']    = ' WHERE a.cnt_code = :code';
 		
 		// Order statements
 		$this->order['TITLE']      = ' ORDER BY b.cnt_title';
@@ -189,57 +189,33 @@ class db_content_connect extends db_common
     // *******************************************************************
 	public function getArticle($options=array())
     {
-    	$code   = (isset($options['CODE'])) ? $options['CODE'] : null ;
-		$id     = (isset($options['ID'])) ? $options['ID'] : null ;
-		$format = (isset($options['FORMAT'])) ? $options['FORMAT'] : null ;
-		$header = (isset($options['UPDATE_HEADER'])) ? $options['UPDATE_HEADER'] : false ;
-		
-		$specs['QUERY'] = $this->sql['CONTENT_OUTER_JOIN'];
+    	$code   = (isset($options['ARTICLE_CODE'])) ? $options['ARTICLE_CODE'] : null ;
+		$id     = (isset($options['ARTICLE_ID'])) ? $options['ARTICLE_ID'] : null ;
+		$sql    = $this->sql['CONTENT_OUTER_JOIN'];
 		
 		if (!is_null($code))
 		{
-			$specs['WHERE'] = str_replace('%CODE%',$code, $this->where['CONTENT_CODE']);
+			$sql .= $this->where['CONTENT_CODE'];
+			$data = array(':code' => $code);
 		}
 		elseif (!is_null($id))
 		{
-			$specs['WHERE'] = str_replace('%ID%',$code, $this->where['CONTENT_ID']);
+			$sql .= $this->where['CONTENT_ID'];
+			$data = array(':id' => $id);
 		}
 		else
 		{
 			return null;
 		}
 		
-		$query = $specs['QUERY'] . $specs['WHERE'];	    
-	    $data  = $this->dbRow($query);
-	    $html  = '';
-	    
-	    if (($data) && ($this->getValue('cnt_status')=='Publish'))
-	    {
-		    $this->addValues_Data($data);
-		    
-		    if ($header)
-			{
-				wed_addSystemValue('HEADER_1',$this->getFormattedValue('TITLE'));
-			}
-		    
-		    if (is_null($format))
-		    {
-			    // Get Full Article
-			    $html = $this->getFormattedValue('FULLARTICLE');
-		    }
-		    elseif (!is_null($format))
-		    {
-			    // $format looks like this title,excerpt,image_path,link
-			    $format_array = explode(',',$format);
-   
-			    foreach ($format_array as $fmt)
-			    {
-				    $html .= $this->getFormattedValue(strtoupper($fmt));
-			    }    			    
-		    }
-	    }
-	    
-	    return $html;
+		$data  = $this->dbExecute($sql,$data,$all=false);
+		
+		if ($data)
+		{
+			$this->addValues_Data($data);
+		}
+		
+		return (!$data) ? false : true ;
     }
 	
 	// *******************************************************************
@@ -473,6 +449,14 @@ class db_content_connect extends db_common
     public function getFULLARTICLE()
     {
 		return $this->getValue('cnt_fullarticle');
+    }
+    
+    // *******************************************************************
+    // *****  getEXCERPT produces the excerpt content for this record ***
+    // *******************************************************************
+    public function getEXCERPT()
+    {
+		return $this->getValue('cnt_excerpt');
     }
     
     // *******************************************************************

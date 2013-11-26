@@ -174,35 +174,30 @@ function sc_runTime($options=array(), $content='')
 	
 function sc_getArticle($options=array(), $content='')
 {
-	$code      = (isset($options['code'])) ? $options['code'] : false ;
-	$startDate = (isset($options['start_date'])) ? $options['start_date'] : false ;
-	$endDate   = (isset($options['end_date'])) ? $options['end_date'] : false ;
-	$return    = (isset($options['return'])) ? $options['return'] : null ;
-	$detail    = (isset($options['detail'])) ? $options['detail'] : null ;
-	$notitle   = (isset($options['notitle'])) ? $options['notitle'] : 0 ;
-	$title     = (isset($options['title'])) ? $options['title'] : 1 ;
-	$update_header = (isset($options['update_header'])) ? $options['update_header'] : false ;
-	$search_id = false;
-	
-	if (!$code)
+	if (!wed_getMomentInTime($options))
 	{
 		return null;
 	}
 	
-	if (!calulateRunDate($startDate, $endDate))
+	$specs['ARTICLE_CODE'] = (isset($options['code'])) ? $options['code'] : null ;
+	$specs['ARTICLE_ID']   = (isset($options['id'])) ? $options['id'] : null ;
+	$specs['FORMAT']       = (isset($options['format'])) ? $options['format'] : null ;
+	$specs['DETAIL']       = (isset($options['detail'])) ? $options['detail'] : null ;
+	$specs['TYPE']         = 'article';
+	
+	if ((is_null($specs['ARTICLE_CODE'])) && (is_null($specs['ARTICLE_ID'])))
 	{
 		return null;
 	}
 	
-	if ( ($code==='URL') || ($code==='URL-ID') )
+	if ( ($specs['ARTICLE_CODE']==='URL') || ($specs['ARTICLE_CODE']==='URL-ID') )
 	{
-		$search_id = ($code==='URL-ID') ? true : false ;
-		
 		$call_parts = wed_getSystemValue('CALL_PARTS');
 		
 		if ((isset($call_parts[1])) && (!empty($call_parts[1])))
 		{
-			$code = $call_parts[1];
+			$specs['ARTICLE_CODE'] = ($specs['ARTICLE_CODE']==='URL') ? $call_parts[1] : null;
+			$specs['ARTICLE_ID']   = ($specs['ARTICLE_CODE']==='URL-ID') ? $call_parts[1] : null;
 			$update_header = true;
 		}
 		else
@@ -212,37 +207,9 @@ function sc_getArticle($options=array(), $content='')
 	}
 	
 	global $walt;
-	$screen = $walt->getImagineer('screenwriter');
-	$screen->newArticle($code,$search_id);
-	
-	$html= '';
-	
-	switch ($return)
-	{
-		case 'title':
-			$html .= $screen->getTitle($code);
-			break;
-		case 'excerpt':
-			$html .= $screen->getExcerpt($code);
-			break;
-		case 'detail':
-			$html .= $screen->getDetail($code,$detail);
-			break;
-		default:
-			if (!$notitle)
-			{	
-				$html .= '<h'.$title.'>'.$screen->getTitle($code).'</h'.$title.'>';
-			}
-			
-			$html .= $screen->getFullArticle($code);
-	}
-	
-	if ($update_header)
-	{
-		wed_addSystemValue('HEADER_1',$screen->getTitle($code));
-	}
-	
-	return $html;
+	$article  = $walt->getImagineer('presentations');
+	$id       = $article->newPresentation($specs);
+	return $article->getHTML(array('ID'=>$id));
 }
 		
 function sc_getData_Table($options=array(), $content='')

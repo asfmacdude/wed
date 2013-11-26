@@ -11,7 +11,9 @@ class article_tools extends details
 	{
 		If (is_null($this->options['ARTICLE']))
 		{
-			$article = $this->db->loadDBObject('content_main');
+			$article = wed_getDBObject('content_connect');
+			
+			// $article = $this->db->loadDBObject('content_main');
 			$status  = (!is_null($this->ID)) ? $article->loadArticleID($this->ID) : $article->loadArticle($this->CODE);
 			
 			if (!$status)
