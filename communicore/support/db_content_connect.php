@@ -184,6 +184,79 @@ class db_content_connect extends db_common
 		return $fields;
 	}
 	
+	
+	// *******************************************************************
+    // ********  getContent **********************************************
+    // *******************************************************************
+	/*
+	 * This will replace all getArticle functions
+	 *
+	 *
+	 */
+	public function getContent($options=array())
+	{
+		/*
+		 * Options
+		 *
+		 * We are looking at three things here:
+		 * CODE
+		 * ID
+		 * ACTUAL_CONTENT
+		 *
+		 */
+		$code      = (isset($options['CODE'])) ? $options['CODE'] : null ;
+		$id        = (isset($options['ID'])) ? $options['ID'] : null ;
+		$code_list = (isset($options['CODE_LIST'])) ? $options['CODE_LIST'] : null ;
+		$sql       = $this->sql['CONTENT_OUTER_JOIN'];
+		$data      = array();
+		$all       = false;
+		
+		if (!is_null($code))
+		{
+			$sql .= $this->where['CONTENT_CODE'];
+			$data = array(':code' => $code);
+			$all  = false;
+		}
+		elseif (!is_null($id))
+		{
+			$sql .= $this->where['CONTENT_ID'];
+			$data = array(':id' => $id);
+			$all  = false;
+		}
+		elseif (!is_null($code_list))
+		{
+			$where_arr = array();
+			$all       = true;
+			
+			foreach ($code_list as $code)
+			{
+				$where_arr[] = 'a.cnt_code = '.$code;
+			}
+		
+			$sql .= ' WHERE '.implode(' OR ', $where_arr);
+		}
+				
+		$data  = $this->dbExecute($sql,$data,$all);
+		
+		if ($data)
+		{
+			$this->addValues_Data($data);
+			
+			if ($all)
+			{
+				$this->record_list = $data;
+			}
+			else
+			{
+				$this->record_list[] = $data;
+			}
+		}
+		
+		return (!$data) ? false : true ;
+	}
+	
+	
+	
 	// *******************************************************************
     // ********  getArticle - replaces screenwriter **********************
     // *******************************************************************
@@ -213,6 +286,28 @@ class db_content_connect extends db_common
 		if ($data)
 		{
 			$this->addValues_Data($data);
+		}
+		
+		return (!$data) ? false : true ;
+    }
+    
+    
+    // *******************************************************************
+    // **  getArticlePrefix - gets a list of articles based on a prefix **
+    // *******************************************************************
+	public function getArticlePrefix($options=array())
+    {
+    	$code      = (isset($options['CODE'])) ? $options['CODE'] : null ;
+		$sql       = $this->sql['CONTENT_OUTER_JOIN'];
+		$data      = array();
+		
+		$where = 'WHERE a.cnt_code LIKE "%'.$code.'%"';
+		
+		$data  = $this->dbExecute($sql,$data,$all=true);
+		
+		if ($data)
+		{
+			$this->record_list = $data;
 		}
 		
 		return (!$data) ? false : true ;

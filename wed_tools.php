@@ -375,6 +375,19 @@ function wed_getKeysMerge($html)
 }
 
 // *******************************************************************
+// ********  SHORTCODE OPTIONS ***************************************
+// *******************************************************************
+function wed_renderContent($content=null,$pre=false)
+{
+	global $walt;
+	$sc              = $walt->getImagineer('shortcodes');	
+	$content         = trim($content);
+	$options['HTML'] = $content;
+	$options['PRE']  = $pre;
+	return $sc->getHTML($options);
+}
+
+// *******************************************************************
 // ********  TRAFFIC_MANAGER OPTIONS *********************************
 // *******************************************************************
 function wed_trafficReports()

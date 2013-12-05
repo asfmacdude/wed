@@ -29,19 +29,11 @@ include_once('imagineer.php') ;
 
 
 /*
- * New Addition
+ * Walt
  *
- * 1/22/2013
+ * Walt becomes a class handling all thing Imagineers. Walt only load the Imagineers as 
+ * they are needed rather than loading them all.
  *
- * Walt becomes a class handling all thing Imagineers. My vision is to have Walt
- * only load the Imagineers as they are needed rather than loading them all regardless
- * of whether they are needed or not. Hopefully this will make WED more efficient and faster.
- *
- * We can accomplish this two ways, either has a base set of Imagineers that load each time or
- * actually load each as needed. The latter is more favorable, but will take a bit more thought
- * because certain Imagineers have dependencies on other Imagineers and they cannot load or function
- * without them. Thus, we have to add a dependency list to each Imagineer and have Walt check that list
- * and make sure all are loaded.
  *
  */
 

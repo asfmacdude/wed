@@ -43,9 +43,11 @@ class connect_list_detail extends details
 		$this->options['CONTROL']           = null;  // Search by CONTROL
 		$this->options['CONTROL_ID']        = null;  // Search by CONTROL_ID
 		$this->options['CODE']              = null;  // Search by CODE
+		$this->options['CODE_PREFIX']       = null;  // Search by CODE_PREFIX
 		$this->options['TAG']               = false; // Search by TAG
 		$this->options['KEYWORD']           = false; // Search by KEYWORD
 		$this->options['TYPE_ID']           = false; // Search by TYPE_ID
+		$this->options['ARTICLE_LIST']      = false; // Search by ARTICLE_LIST
 		
 		$this->addOptions($options);
 	}
@@ -81,6 +83,36 @@ class connect_list_detail extends details
 		
 		// Run JOIN here that joins connect,content and groups
 		if ( (!is_null($this->options['GROUP_ID'])) && ($connect_db->selectByGroupJoinContent($this->options['GROUP_ID'])) )
+		{
+			$this->options['LIST_OBJECT'] = $connect_db;
+			$status = true;
+		}
+		
+		return $status;
+	}
+	
+	private function loadList_ARTICLES()
+	{
+		$status     = false;
+		$connect_db = wed_getDBObject('content_connect');
+		
+		// Run JOIN here that joins connect,content and groups
+		if ( (!is_null($this->options['ARTICLE_LIST'])) && ($connect_db->getArticleList($this->options) )
+		{
+			$this->options['LIST_OBJECT'] = $connect_db;
+			$status = true;
+		}
+		
+		return $status;
+	}
+	
+	private function loadList_CODE_PREFIX()
+	{
+		$status     = false;
+		$connect_db = wed_getDBObject('content_connect');
+		
+		// Run JOIN here that joins connect,content and groups
+		if ( (!is_null($this->options['CODE_PREFIX'])) && ($connect_db->getArticlePrefix($this->options) )
 		{
 			$this->options['LIST_OBJECT'] = $connect_db;
 			$status = true;

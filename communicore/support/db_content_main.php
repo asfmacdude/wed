@@ -105,6 +105,13 @@ class db_content_main extends db_common
 			'INSTRUCT' => 'This is the unique code that the system uses to index this article.',
 			'DEFAULT'  => 'Enter a code'
 			);
+		
+		$fields['order'] = array(
+			'LABEL'    => 'Content Order',
+			'DB_FIELD' => 'cnt_content_order',
+			'INSTRUCT' => 'This is used to sort certain grouped content records.',
+			'DEFAULT'  => 'zzzz'
+			);
 			
 		$fields['status'] = array(
 			'LABEL'    => 'Status',
@@ -234,6 +241,52 @@ class db_content_main extends db_common
 		return (!$data) ? false : $data ;
     }
     
+    public function selectByCodePrefix($options)
+    {
+		$code  = (isset($options['CODE'])) ? $options['CODE'] : null;
+		$id    = (isset($options['ID'])) ? $options['ID'] : null;
+		$keys  = (isset($options['KEYS'])) ? $options['KEYS'] : null;
+		$order = (isset($options['ORDER'])) ? $options['ORDER'] : 'title';
+		
+		$table     = $this->options['TABLE_NAME'];
+		$where_str = ' WHERE ';
+		$data      = array();
+		
+		if (!is_null($id))
+		{
+			$where_str .= $this->options['FIELDS']['typeid']['DB_FIELD'].' = ":id" AND ';
+			$data['typeid'] = $id;
+		}
+		
+		if (!is_null($keys))
+		{
+			// $keys should be an array
+			if (is_array($keys))
+			{
+				foreach ($key as $keyword)
+				{
+					$where_str .= $this->options['FIELDS']['syskeywords']['DB_FIELD'].' LIKE "%'.$keyword.'%" AND ';
+				}
+			}
+		}
+		
+		$where_str .= $this->options['FIELDS']['code']['DB_FIELD'].' LIKE "'.$code.'%"';
+		// $data['code'] = $code.'%';
+		
+		$order_str = ' ORDER BY '.$this->options['FIELDS'][$order]['DB_FIELD'];
+
+		$sql = 'SELECT * FROM '.$table.$where_str.$order_str;
+		
+		$data  = $this->dbExecute($sql,$data,$all=true);
+		
+		if ($data)
+		{
+			$this->record_list = $data;
+		}
+			
+		return (!$data) ? false : $data ;
+    }
+    
     public function getDetail($detail,$default=null)
     {
 	    $detail_field = $this->getValue('details');
@@ -312,6 +365,14 @@ class db_content_main extends db_common
     public function getTITLE()
     {
 		return $this->getValue('title');
+    }
+    
+    // *******************************************************************
+    // *****  getTAB_HEADER produces the tab header for this record ***
+    // *******************************************************************
+    public function getTAB_HEADER()
+    {
+		return $this->getDetail('TAB_HEADER',$this->getValue('title'));
     }
     
     // *******************************************************************

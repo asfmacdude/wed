@@ -34,6 +34,7 @@ class content_list_detail extends details
 		$this->options['TABLE']             = 'content_main'; //
 		$this->options['DETAIL_ID']         = null; // this is assigned by List Manager
 		$this->options['LIST_OBJECT']       = null; // The actual list db object is loaded here
+		$this->options['ORDER']             = 'title';
 		
 		// Search Options
 		$this->options['SEARCH']            = null;  // Search types: tagid
@@ -42,6 +43,7 @@ class content_list_detail extends details
 		$this->options['CODE']              = null;  // Search by CODE
 		$this->options['TAG']               = false; // Search by TAG
 		$this->options['KEYWORD']           = false; // Search by KEYWORD
+		$this->options['KEYS']              = false; // Search by SYSTEM KEYS
 		$this->options['TYPE_ID']           = false; // Search by TYPE_ID
 		
 		$this->addOptions($options);
@@ -56,6 +58,23 @@ class content_list_detail extends details
 		$options['ID']  = $this->options['TYPE_ID'];
 		
 		if ($content_db->selectByTagID($options))
+		{
+			$this->options['LIST_OBJECT'] = $content_db;
+			$status = true;
+		}
+		
+		return $status;
+	}
+	
+	public function loadList_CODE_PREFIX($args=array())
+	{
+		$status     = false;
+		$content_db = wed_getDBObject('content_main');
+		
+		$options['CODE']  = $this->options['CODE'];
+		$options['ORDER'] = $this->options['ORDER'];
+		
+		if ($content_db->selectByCodePrefix($options))
 		{
 			$this->options['LIST_OBJECT'] = $content_db;
 			$status = true;

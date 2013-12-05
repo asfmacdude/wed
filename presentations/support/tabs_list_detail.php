@@ -116,6 +116,7 @@ class tabs_list_detail extends details
 			// way you can do timed schedules on certain content and instead
 			// of showing an empty tab, none shows at all and it is skipped.
 			$content = $connect_db->getFormattedValue('FULLARTICLE');
+			
 			$content = $shortcodes->getHTML(array('HTML'=>$content));
 			
 			if (!empty($content))
@@ -134,6 +135,8 @@ class tabs_list_detail extends details
 				$header_html = str_replace('%ICON%', $icon_html, $header_html);
 				$header_html = str_replace('%ACTIVE%', $active_class, $header_html);
 				$h_html     .= $header_html;
+				
+				dbug($header_html);
 			
 				// format the content
 				$content_html = str_replace('%TAB_ID%', $tab_id, $this->options['TAB_CONTENT_PANE_WRAP']);
