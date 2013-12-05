@@ -69,14 +69,15 @@ class content_detail extends details
 		$this->options['CODE_LIST'] = (!is_null($this->options['ACTUAL_CONTENT'])) ? explode(',', $this->options['ACTUAL_CONTENT']) : null;
 		
 		// This will capture the content code in the URL if  so desired.
-		if ( ($this->options['CODE']==='URL') || ($this->options['CODE']==='URL-ID') )
+		if ( ($this->options['CODE']==='URL') || ($this->options['CODE']==='URL-ID') || ($this->options['CODE']==='URL_overview') )
 		{
 			$call_parts = wed_getSystemValue('CALL_PARTS');
 			
 			if ((isset($call_parts[1])) && (!empty($call_parts[1])))
 			{
-				$this->options['CODE'] = ($this->options['CODE']==='URL') ? $call_parts[1] : null;
-				$this->options['ID']   = ($this->options['CODE']==='URL-ID') ? $call_parts[1] : null;
+				$this->options['CODE'] = ($this->options['CODE']==='URL') ? $call_parts[1] : $this->options['CODE'];
+				$this->options['CODE'] = ($this->options['CODE']==='URL_overview') ? $call_parts[1] . '_overview' : $this->options['CODE'];
+				$this->options['ID']   = ($this->options['CODE']==='URL-ID') ? $call_parts[1] : $this->options['ID'];
 			}
 			else
 			{

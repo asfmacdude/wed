@@ -201,7 +201,7 @@ class db_content_connect extends db_common
 		 * We are looking at three things here:
 		 * CODE
 		 * ID
-		 * ACTUAL_CONTENT
+		 * CODE_LIST
 		 *
 		 */
 		$code      = (isset($options['CODE'])) ? $options['CODE'] : null ;
@@ -228,13 +228,17 @@ class db_content_connect extends db_common
 			$where_arr = array();
 			$all       = true;
 			
+			dbug($code_list);
+			
 			foreach ($code_list as $code)
 			{
-				$where_arr[] = 'a.cnt_code = '.$code;
+				$where_arr[] = 'a.cnt_code = "'.$code.'"';
 			}
 		
 			$sql .= ' WHERE '.implode(' OR ', $where_arr);
 		}
+		
+		dbug($sql);
 				
 		$data  = $this->dbExecute($sql,$data,$all);
 		
@@ -244,7 +248,24 @@ class db_content_connect extends db_common
 			
 			if ($all)
 			{
-				$this->record_list = $data;
+				/*
+				 * NOTE: Weird thing happens when you do a SELECT with no ORDER
+				 * Records come back the way they were inserted which will not always be
+				 * what you want. Thus, I had to write the lines below to make the SQL data
+				 * reflect the order of the code_list.
+				 *
+				 */
+				foreach ($code_list as $code)
+				{
+					foreach ($data as $record)
+					{
+						if ($record['cnt_code'] == $code)
+						{
+							$this->record_list[] = $record;
+							break;
+						}
+					}
+				}
 			}
 			else
 			{
