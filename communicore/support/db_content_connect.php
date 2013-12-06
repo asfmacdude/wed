@@ -228,8 +228,6 @@ class db_content_connect extends db_common
 			$where_arr = array();
 			$all       = true;
 			
-			dbug($code_list);
-			
 			foreach ($code_list as $code)
 			{
 				$where_arr[] = 'a.cnt_code = "'.$code.'"';
@@ -237,8 +235,6 @@ class db_content_connect extends db_common
 		
 			$sql .= ' WHERE '.implode(' OR ', $where_arr);
 		}
-		
-		dbug($sql);
 				
 		$data  = $this->dbExecute($sql,$data,$all);
 		
@@ -255,16 +251,16 @@ class db_content_connect extends db_common
 				 * reflect the order of the code_list.
 				 *
 				 */
+				$code_key_array = array();
+				
+				foreach ($data as $record)
+				{
+					$code_key_array[$record['cnt_code']] = $record;
+				}
+				
 				foreach ($code_list as $code)
 				{
-					foreach ($data as $record)
-					{
-						if ($record['cnt_code'] == $code)
-						{
-							$this->record_list[] = $record;
-							break;
-						}
-					}
+					$this->record_list[] = $code_key_array[$code];
 				}
 			}
 			else
@@ -590,6 +586,11 @@ class db_content_connect extends db_common
     {
 		return $this->getDetail('TAB_HEADER',$this->getValue('cnt_title'));
     }
+
+    public function getTAB_SUBHEAD()
+    {
+		return $this->getDetail('TAB_SUBHEAD');
+    } 
     
     // *******************************************************************
     // *****  getMENU_TITLE produces the Menu Title for this record ******

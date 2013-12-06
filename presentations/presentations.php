@@ -66,13 +66,14 @@ class presentations extends imagineer
 	public function newPresentation($options=array())
 	{
 		$id_return = false;
+		
+		// Here we standardize all data pair arrays where the KEYS are always in ALL CAPS
 		$options   = wed_standardKeys($options);
 		
 		if (isset($options['TYPE']))
 		{
 			$obj_class     = $options['TYPE'] . '_detail';
 			$id            = $this->getNextID($options['TYPE']);
-			// $options['ID'] = $id; // make sure the detail object has the assigned id
 			
 			if (class_exists($obj_class))
 			{

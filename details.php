@@ -7,6 +7,8 @@
 
 abstract class details
 {		
+	public $component_object = null;
+	
 	public function __get($name)
 	{
 		return  (isset($this->options[$name])) ? $this->options[$name] : null;
@@ -55,6 +57,28 @@ abstract class details
     public function getSystemValue($name,$default=null)
     {
 	    return wed_getSystemValue($name,$default,$this->options['CLASS_NAME']);
+    }
+    
+    // *******************************************************************
+    // ********  COMPONENTS OPTIONS **************************************
+    // *******************************************************************
+    public function loadComponent($options=array())
+    {
+	    if (!is_null($this->options['COMPONENT']))
+	    {
+		    $index_file = COMPONENT_BASE . $this->options['COMPONENT'] . DS . 'index.php';
+		    
+		    if (file_exists($index_file))
+		    {
+			    include_once($index_file);
+			    $this->component_object = new $this->options['COMPONENT']($options);
+			    
+			    if (method_exists($this->component_object,'uploadOptions'))
+			    {
+				    $this->addOptions($this->component_object->uploadOptions());
+			    }
+		    }
+	    }
     }
     
     // *******************************************************************

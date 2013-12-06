@@ -41,8 +41,6 @@ $postcodes = array(
 	'clear'        => 'sc_divClear',
 	'data_table'   => 'sc_getData_Table',
 	'runtime'      => 'sc_runTime',
-	'tabs'         => 'sc_tabPresentation',
-	'tabs_list'    => 'sc_tabListPresentation',
 	'tabs_group'   => 'sc_tabGroupPresentation',
 	'accordion'    => 'sc_accordionPresentation',
 	'accordion_faq' => 'sc_accordionFaqPresentation',
@@ -269,84 +267,6 @@ function sc_Presentations($options=array(), $content='')
 	return (!$id) ? null : $present->getHTML(array('ID'=>$id));
 }
 
-
-// *******************************************************************
-// *****  sc_tabPresentation *****************************************
-// *******************************************************************
-function sc_tabPresentation($options=array(), $content='')
-{
-	
-	$html      = '';
-	$type      = (isset($options['type'])) ? $options['type'] : 'tabs' ;
-	$style     = (isset($options['style'])) ? $options['style'] : 'tabs_horizontal' ;
-	$content   = (isset($options['content'])) ? $options['content'] : null ;
-	
-	if (!is_null($content))
-	{
-		$content = wed_getKeysMerge($content);
-		// content should be in this format:
-		// tab head1|content_code;tab head2|content_code
-		$panes     = explode(';', $content);
-		$cnt_array = array();
-		
-		foreach ($panes as $value)
-		{
-			$split = explode('|', $value);
-			$build_array = array();
-			$build_array['CONTENT_CODE'] = $split[1];
-			
-			if (isset($split[2]))
-			{
-				$build_array['ICON_CLASS'] = $split[2];
-			}
-			
-			$cnt_array[$split[0]] = $build_array;
-		}
-		
-		$options['TYPE']    = $type;
-		$options['STYLE']   = $style;
-		$options['CONTENT'] = $cnt_array;
-		
-		global $walt;
-		$tab  = $walt->getImagineer('presentations');
-		$id   = $tab->newPresentation($options);
-		$html = $tab->getHTML(array('ID'=>$id));
-	}
-	
-	return $html;
-}
-
-// *******************************************************************
-// *****  sc_tabListPresentation *************************************
-// *******************************************************************
-function sc_tabListPresentation($options=array(), $content='')
-{
-	$html      = '';
-	$type      = (isset($options['type'])) ? $options['type'] : 'tabs_list' ;
-	$setup     = (isset($options['setup'])) ? $options['setup'] : 'tabs_vertical' ;
-	
-	$list      = (isset($options['list'])) ? $options['list'] : null ;
-	
-	$list_object = wed_getList($list);
-	
-	if (!is_null($list_object))
-	{
-		$specs['TYPE']        = $type;
-		$specs['SETUP_CODE']  = $setup;
-		$specs['LIST_OBJECT'] = $list_object;
-		
-		global $walt;
-		$tab  = $walt->getImagineer('presentations');
-		$id   = $tab->newPresentation($specs);
-		$html = $tab->getHTML(array('ID'=>$id));
-	}
-	else
-	{
-		$html = SYS_ERR_NO_INFO;
-	}
-	
-	return $html;
-}
 
 // *******************************************************************
 // *****  sc_tabGroupPresentation *************************************

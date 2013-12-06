@@ -312,6 +312,20 @@ function wed_getCSS($css_array=array())
 	$css->CSS_ASSETS = $css_array;
 }
 
+function wed_addCSSAsset($css_array=array())
+{
+	global $walt;
+	$css = $walt->getImagineer('cssdirector');
+	$css->addCSSAsset($css_array);
+}
+
+function wed_loadCSSAssets($css_array=array())
+{
+	global $walt;
+	$css_director  = $walt->getImagineer('cssdirector');
+	$css_director->loadCSSAssets($css_array);
+}
+
 // *******************************************************************
 // ********  JS DIRECTOR OPTIONS *************************************
 // *******************************************************************

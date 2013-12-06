@@ -56,6 +56,7 @@ class tab_detail extends details
 		$this->options['CLASS_NAME']        = __CLASS__;
 		$this->options['LOCAL_PATH']        = dirname(__FILE__);
 		$this->options['ACTUAL_CONTENT']    = null;
+		$this->options['COMPONENT']         = null;  // Components are system wide modules found in the components directory
 		$this->options['NAME']              = null;   // NOT SURE what name does??
 		$this->options['SETUP']             = null;  // code for the presentation_setups db
 		$this->options['SETUP_DB']          = false; // presentation_setups db object
@@ -76,6 +77,7 @@ class tab_detail extends details
 		$this->options['TAB_WRAP']              = '%CONTENT%';
 		$this->options['TAB_HEADERS_WRAP']      = '';
 		$this->options['TAB_HEAD_WRAP']         = '';
+		$this->formats['TAB_SUBHEAD']           = '';	
 		$this->options['TAB_HEAD_ICON']         = '';
 		$this->options['TAB_CONTENT_WRAP']      = '';
 		$this->options['TAB_CONTENT_PANE_WRAP'] = '';
@@ -96,7 +98,14 @@ class tab_detail extends details
 			return null;
 		}
 		
+		// This will load a component file if that is what we are using to create this presentation
+		$this->loadComponent();
+		
+		// This is a database object that holds the records for whatever content we are displaying
 		$connect_db   = $this->options['CONTENT_OBJ'];
+		
+		// The html here has to be built in two sections, the header, and the actual content.
+		// The header is used by the tab interface to form the actual tabs.
 		$header_html  = '';
 		$h_html       = '';
 		$content_html = '';
@@ -135,11 +144,18 @@ class tab_detail extends details
 				// format the header and put it in a separate html var
 				$header_html = str_replace('%TAB_ID%', $tab_id, $this->options['TAB_HEAD_WRAP']);
 				$header_html = str_replace('%CONTENT%', $connect_db->getFormattedValue('TAB_HEADER'), $header_html);
+				
+				$sub_head    = $connect_db->getFormattedValue('TAB_SUBHEAD');
+				
+				if (!is_null($sub_head))
+				{
+					$sub_head = str_replace('%CONTENT%', $sub_head, $this->options['TAB_SUBHEAD']);
+				}
+				
+				$header_html = str_replace('%SUBHEAD%', $sub_head, $header_html);	
 				$header_html = str_replace('%ICON%', $icon_html, $header_html);
 				$header_html = str_replace('%ACTIVE%', $active_class, $header_html);
 				$h_html     .= $header_html;
-				
-				dbug($header_html);
 			
 				// format the content
 				$content_html = str_replace('%TAB_ID%', $tab_id, $this->options['TAB_CONTENT_PANE_WRAP']);
@@ -171,8 +187,17 @@ class tab_detail extends details
 		// Finally the main outer wrap which is optional
 		$html = str_replace('%CONTENT%', $html, $this->options['MAIN_OUTER_WRAP']);
 		
+		$data_options = $this->getDataOptions();
+		
+		$html = str_replace('%DATA_OPTIONS%', $data_options, $html);
+		
+		// Adding the Data Options for the Zozo Tabs
+		// {"theme": "silver", "orientation": "horizontal", "animation": {"duration": 800, "effects": "slideH"}}
+		
 		// Add the CSS Style Section before the Presentaion
 		$html = $this->options['SETUP_CSS'] . $html;
+		
+		$this->loadCSSAssets();
 			
 		// Add any necessary javscript code
 		$this->loadJavascript();
@@ -195,13 +220,15 @@ class tab_detail extends details
 		
 		if ($setup_db->loadSetupCode($this->options['SETUP']))
 		{	
-			$this->options['SETUP_DB']        = $setup_db;
-			$this->options['SETUP_ID']        = $setup_db->getValue('id');
-			$this->options['SETUP_MAX']       = $setup_db->getValue('max');
-			$this->options['SETUP_ACTIVE']    = $setup_db->getValue('active');
-			$this->options['SETUP_CSS']       = $setup_db->getValue('css');
-			$this->options['SETUP_JS']        = $setup_db->getValue('js');
-			$this->options['SETUP_JS_ASSETS'] = $setup_db->getDetail('JS_ASSETS');
+			$this->options['SETUP_DB']         = $setup_db;
+			$this->options['COMPONENT']        = $setup_db->getDetail('COMPONENT');
+			$this->options['SETUP_ID']         = $setup_db->getValue('id');
+			$this->options['SETUP_MAX']        = $setup_db->getValue('max');
+			$this->options['SETUP_ACTIVE']     = $setup_db->getValue('active');
+			$this->options['SETUP_CSS']        = $setup_db->getValue('css');
+			$this->options['SETUP_JS']         = $setup_db->getValue('js');
+			$this->options['SETUP_JS_ASSETS']  = $setup_db->getDetail('JS_ASSETS');
+			$this->options['SETUP_CSS_ASSETS'] = $setup_db->getDetail('CSS_ASSETS');
 			$this->options['MAIN_OUTER_WRAP']       = $setup_db->getDetail('MAIN_OUTER_WRAP',$this->options['MAIN_OUTER_WRAP']);
 			$this->options['TAB_WRAP']              = $setup_db->getDetail('TAB_WRAP',$this->options['TAB_WRAP']);
 			$this->options['TAB_HEADERS_WRAP']      = $setup_db->getDetail('TAB_HEADERS_WRAP',$this->options['TAB_HEADERS_WRAP']);
@@ -257,11 +284,50 @@ class tab_detail extends details
 	
 	private function loadJavascriptAssets()
 	{
-		if (!is_null($this->options['SETUP_JS_ASSETS']))
+		if (!is_null($this->component_object))
+		{
+			$js_array = $this->component_object->loadJSAssets();
+			
+			foreach ($js_array as $asset)
+			{
+				wed_addNewJavascriptAsset($asset);
+			}
+		}
+		elseif (!is_null($this->options['SETUP_JS_ASSETS']))
 		{
 			$js_array = explode(',', $this->options['SETUP_JS_ASSETS']);
 			wed_loadJavascriptAssets($js_array);
 		}
+	}
+	
+	private function loadCSSAssets()
+	{
+		if (!is_null($this->component_object))
+		{
+			$css_array = $this->component_object->loadCSSAssets();
+			
+			foreach ($css_array as $asset)
+			{
+				wed_addCSSAsset($asset);
+			}
+		}
+		elseif (!is_null($this->options['SETUP_CSS_ASSETS']))
+		{
+			$css_array = explode(',', $this->options['SETUP_CSS_ASSETS']);
+			wed_loadCSSAssets($css_array);
+		}
+	}
+	
+	private function getDataOptions()
+	{
+		$options = null;
+		
+		if ( (!is_null($this->component_object)) && method_exists($this->component_object,'getDataOptions') )
+		{
+			$options = $this->component_object->getDataOptions();
+		}
+		
+		return $options;
 	}
 	
 	public function setHTML($options=null)
