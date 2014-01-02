@@ -87,6 +87,18 @@ class animation_cell extends details
 		return $html;
 	}
 	
+	private function formatLink()
+	{
+		$html = '';
+		
+		if (isset($this->options['LINK']))
+		{
+			$html = '<a href="'.$this->options['LINK'].'" class="ls-link"></a>';
+		}
+		
+		return $html;
+	}
+	
 	private function wrapLayer($content)
 	{
 		$html  = '';
@@ -106,6 +118,7 @@ class animation_cell extends details
 		
 		$html .= '<div class="'.$this->LAYER_CLASS.'" style="'.$style.'">'.LINE1;
 		$html .= $content;
+		$html .= $this->formatLink();
 		$html .= '</div>'.LINE1;
 		
 		return $html;

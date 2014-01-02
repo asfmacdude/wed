@@ -33,7 +33,15 @@ abstract class details
 	
 	public function addOptions($options)
 	{
-		$this->options = array_merge( $this->options, $options);
+		if (is_array($options))
+		{
+			$this->options = array_merge( $this->options, $options);
+		}
+		else
+		{
+			dbug($options);
+		}
+		
 	}
 	
 	public function setHTML($options=null)

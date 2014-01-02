@@ -162,7 +162,6 @@ class keys extends imagineer
 	     *
 	     * Example: {{MERGE_KEY}}
 	     */
-	    
 	    $reg_expression = '#\{\{(.*)\}\}#iU';
 	    // [0] => {{FIRST_LINE}}
 	    // [1] => FIRST_LINE

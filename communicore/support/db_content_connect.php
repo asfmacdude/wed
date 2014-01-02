@@ -277,6 +277,7 @@ class db_content_connect extends db_common
 	// *******************************************************************
     // ********  getArticle - replaces screenwriter **********************
     // *******************************************************************
+    // DEPRECATNG THIS SOON!
 	public function getArticle($options=array())
     {
     	$code   = (isset($options['ARTICLE_CODE'])) ? $options['ARTICLE_CODE'] : null ;
@@ -312,6 +313,7 @@ class db_content_connect extends db_common
     // *******************************************************************
     // **  getArticlePrefix - gets a list of articles based on a prefix **
     // *******************************************************************
+    // DEPRECATNG THIS SOON!
 	public function getArticlePrefix($options=array())
     {
     	$code      = (isset($options['CODE'])) ? $options['CODE'] : null ;
@@ -711,7 +713,7 @@ class db_content_connect extends db_common
 	    }
 	    elseif ($type=='image')
 	    {
-		    $link = $this->getDetail('IMAGE_LINK');
+		    $link = FILE_BASE_WEB . 'images' . DS . $this->getDetail('IMAGE_PATH');
 	    }
 	    elseif ($type=='extlink')
 	    {

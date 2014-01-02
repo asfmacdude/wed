@@ -97,7 +97,7 @@ class connect_list_detail extends details
 		$connect_db = wed_getDBObject('content_connect');
 		
 		// Run JOIN here that joins connect,content and groups
-		if ( (!is_null($this->options['ARTICLE_LIST'])) && ($connect_db->getArticleList($this->options) )
+		if ( (!is_null($this->options['ARTICLE_LIST'])) && ($connect_db->getArticleList($this->options)) )
 		{
 			$this->options['LIST_OBJECT'] = $connect_db;
 			$status = true;
@@ -112,7 +112,7 @@ class connect_list_detail extends details
 		$connect_db = wed_getDBObject('content_connect');
 		
 		// Run JOIN here that joins connect,content and groups
-		if ( (!is_null($this->options['CODE_PREFIX'])) && ($connect_db->getArticlePrefix($this->options) )
+		if ( (!is_null($this->options['CODE_PREFIX'])) && ($connect_db->getArticlePrefix($this->options)) )
 		{
 			$this->options['LIST_OBJECT'] = $connect_db;
 			$status = true;

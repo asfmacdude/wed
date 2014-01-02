@@ -47,7 +47,7 @@ class content_detail extends details
 			'TITLE'    => wed_getSystemValue('THEME_TITLE','<h1>%TITLE%</h1>'),
 			'SUBTITLE' => wed_getSystemValue('THEME_SUBTITLE','<h3>%SUBTITLE%</h3>'),
 			'VIDEO'    => wed_getSystemValue('THEME_VIDEO','<iframe width="%WIDTH%" height="%HEIGHT%" src="//www.youtube.com/embed/%CODE%" frameborder="0" allowfullscreen></iframe>'),
-			'IMAGE'    => wed_getSystemValue('THEME_IMAGE',''),
+			'IMAGE'    => wed_getSystemValue('THEME_IMAGE','<img src="%IMAGE_PATH%" style="padding-bottom:20px;" />'),
 			'ARTICLE'  => wed_getSystemValue('THEME_ARTICLE','%ARTICLE%'),
 			'EXCERPT'  => wed_getSystemValue('THEME_EXCERPT','%EXCERPT%')
 			);
@@ -209,7 +209,10 @@ class content_detail extends details
 		}
 		elseif ( (!is_null($image_path)) || (!is_null($image_category)) )
 		{
-			return $this->getImagePath($size);
+			$search    = array('%IMAGE_PATH%');
+			$size_code = $this->options['IMAGE_SIZES'][$size];
+			$replace[] = $this->getImagePath($size_code);
+			return str_replace($search,$replace,$this->options['HTML_FORMATS']['IMAGE']);
 		}
 
 		return $html;

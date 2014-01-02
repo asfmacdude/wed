@@ -36,29 +36,28 @@ class css_detail extends details
 		$this->options['LINK_TEXT']    = '<link href="%s" media="%s" rel="stylesheet" />'.LINE1;
 	}
 	
+	private function formatHTML($html)
+	{
+		$media = $this->options['MEDIA'];
+		return sprintf($this->options['LINK_TEXT'], $html , $media);
+	}
+	
 	public function setHTML($options=null)
 	{
-		$html = '';
-	
-		if ($this->options['TYPE'] === 'NORMAL')
-		{
-			$href  = $this->options['BASE_PATH'] . $this->options['PATH'];
-			$media = $this->options['MEDIA'];
-			$html  = sprintf($this->options['LINK_TEXT'], $href , $media);
-		}
-		elseif ($this->options['TYPE'] === 'CDN')
-		{
-			$href  = $this->options['PATH'];
-			$media = $this->options['MEDIA'];
-			$html  = sprintf($this->options['LINK_TEXT'], $href , $media);
-		}
-		elseif ($this->options['TYPE'] === 'STYLE_STRING')
+		$html               = '';		
+		$paths              = array();
+		$paths['NORMAL']    = $this->options['BASE_PATH'] . $this->options['PATH'];
+		$paths['CDN']       = $this->options['PATH'];
+		$paths['LIBRARY']   = LIBRARY_BASE_WEB . $this->options['PATH'];
+		$paths['COMPONENT'] = COMPONENT_BASE_WEB . $this->options['PATH'];
+		
+		if ($this->options['TYPE'] === 'STYLE_STRING')
 		{
 			$html  = $this->options['STYLE_STRING'];
 		}
 		else
 		{
-			$html  = $this->options['LINK_TEXT'];
+			$html = $this->formatHTML( $paths[$this->options['TYPE']] );
 		}
 		
 		return $html;

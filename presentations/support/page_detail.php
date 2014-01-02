@@ -155,7 +155,7 @@ class page_detail extends details
 		$shortcodes = $walt->getImagineer('shortcodes');
 		$css        = $walt->getImagineer('cssdirector');
 		$javascript = $walt->getImagineer('jsdirector');
-		
+
 		// Order below is very important because keys and shortcodes
 		// can add css and javascript along the way so those must be
 		// added last.

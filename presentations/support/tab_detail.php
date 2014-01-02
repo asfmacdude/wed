@@ -73,11 +73,12 @@ class tab_detail extends details
 		$this->options['SCHEDULE_RESULT']   = null;
 
 		// Default Tab Styles
+		$this->options['STYLE']                 = null;
 		$this->options['MAIN_OUTER_WRAP']       = '%CONTENT%';
 		$this->options['TAB_WRAP']              = '%CONTENT%';
 		$this->options['TAB_HEADERS_WRAP']      = '';
 		$this->options['TAB_HEAD_WRAP']         = '';
-		$this->formats['TAB_SUBHEAD']           = '';	
+		$this->options['TAB_SUBHEAD']           = '';	
 		$this->options['TAB_HEAD_ICON']         = '';
 		$this->options['TAB_CONTENT_WRAP']      = '';
 		$this->options['TAB_CONTENT_PANE_WRAP'] = '';

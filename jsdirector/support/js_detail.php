@@ -42,37 +42,37 @@ class js_detail extends details
 		$this->options['VERSION']    = null;
 	}
 	
+	private function formatHTML($href)
+	{
+		$html = sprintf($this->options['SCRIPT_FILE_TEXT'], $href );
+		return sprintf($this->options['WRAP'], $html );
+	}
+	
 	public function setHTML($options=null)
 	{
-		$html = '';
-	
-		if ($this->options['TYPE'] === 'LIST')
+		$html               = '';		
+		$paths              = array();
+		$paths['FILE']      = $this->options['BASE_PATH'] . $this->options['PATH'];
+		$paths['CDN']       = $this->options['PATH'];
+		$paths['LIBRARY']   = LIBRARY_BASE_WEB . $this->options['PATH'];
+		$paths['COMPONENT'] = COMPONENT_BASE_WEB . $this->options['PATH'];
+		
+		switch ($this->options['TYPE'])
 		{
-			if (isset($this->options['JS_LIST'][$this->options['TAG']]))
-			{
-				// This adds the version on items that version may vary from theme to theme
-				$html = sprintf($this->options['JS_LIST'][$this->options['TAG']], $this->options['VERSION']);
-			}
-		}
-		elseif ($this->options['TYPE'] === 'FILE')
-		{
-			$href  = $this->options['BASE_PATH'] . $this->options['PATH'];
-			$html  = sprintf($this->options['SCRIPT_FILE_TEXT'], $href );
-			$html  = sprintf($this->options['WRAP'], $html );
-		}
-		elseif ($this->options['TYPE'] === 'CDN')
-		{
-			$href  = $this->options['PATH'];
-			$html  = sprintf($this->options['SCRIPT_FILE_TEXT'], $href );
-			$html  = sprintf($this->options['WRAP'], $html );
-		}
-		elseif ($this->options['TYPE'] === 'SCRIPT')
-		{
-			$html = '<script type="text/javascript">' . $this->options['SCRIPT'] . '</script>';
-		}
-		elseif ($this->options['TYPE'] === 'JS_READY_CODE')
-		{
+			case 'LIST':
+				if (isset($this->options['JS_LIST'][$this->options['TAG']]))
+				{
+					// This adds the version on items that version may vary from theme to theme
+					$html = sprintf($this->options['JS_LIST'][$this->options['TAG']], $this->options['VERSION']);
+				}
+				break;
+				
+			case 'SCRIPT':
+				$html = '<script type="text/javascript">' . $this->options['SCRIPT'] . '</script>';
+				break;
 			
+			default;
+				$html = $this->formatHTML($paths[$this->options['TYPE']]);	
 		}
 		
 		return $html;

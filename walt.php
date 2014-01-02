@@ -142,7 +142,7 @@ class walt extends imagineer
 	*
 	*/
 	public function startShow()
-	{
+	{	
 		// Loads basic settings, system and site, loads clean_path
 		$this->loadProfessor();
 		

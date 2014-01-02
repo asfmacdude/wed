@@ -98,9 +98,11 @@ class jsdirector extends imagineer
 	{
 		foreach ($this->JS_ASSETS as $key=>$value)
 		{
-			if ( (isset($value['LOAD'])) && ($value['LOAD']) )
+			// Here we check the LOAD value to make sure it is TRUE
+			// And we check to see if the same asset with the same ID has already been loaded
+			if ( (isset($value['LOAD'])) && ($value['LOAD']) && (!isset($this->options['JS'][$value['ID']])) )
 			{
-				$this->options['JS'][] = new js_detail($value);
+				$this->options['JS'][$value['ID']] = new js_detail($value);
 			}
 		}
 	}
