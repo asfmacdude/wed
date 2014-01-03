@@ -1,7 +1,4 @@
 <?php
-ini_set( 'display_errors', 1 );
-error_reporting( E_ALL );
-
 /*
  * @version		$Id: animation.php 1.0 2009-03-03 $
  * @package		DreamWish

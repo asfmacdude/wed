@@ -43,7 +43,7 @@ class results_detail extends details
 		$this->options['GROUP_ID']          = null;  // Group ID
 		$this->options['GROUP_TITLE']       = null;  // Group Title
 		
-		$this->options['YEAR']              = date("Y");  // Search by YEAR
+		$this->options['YEAR']              = null;  // date("Y");  // Search by YEAR
 		$this->options['EVENT']             = null;  // Search by GROUP
 		$this->options['ACTIVITY_ID']       = null;  // Search by GROUP_ID
 		
@@ -74,7 +74,7 @@ class results_detail extends details
 			
 			$fields = array('rslt_year','rslt_sport','rslt_event','rslt_results','rslt_title','rslt_score','rslt_city');
 			
-			$html .= '<div id="results">'.LINE1;
+			$html .= '<div id="results_wrap">'.LINE1;
 			
 			while ($list_db->moveRecordList($item))
 			{	
@@ -95,11 +95,14 @@ class results_detail extends details
 		            if ($first_year)
 		            {
 		                $html .= str_replace('%CONTENT%', $year, $this->options['YEAR_HEADING']);
+		                $html .= '<div id="results">'.LINE1;
 		            }
 		            else
 		            {
-		                $html .= '</ul>'.LINE1;
+		                $html .= '</ul></div></div>'.LINE1; // Close the results div and the results_wrap div
+		                $html .= '<div id="results_wrap">'.LINE1; // Open a new results_wrap div
 		                $html .= str_replace('%CONTENT%', $year, $this->options['YEAR_HEADING']);
+		                $html .= '<div id="results">'.LINE1; // Open a new results div
 		            }
 		
 		            $currentYear = $year;
@@ -155,7 +158,7 @@ class results_detail extends details
 				$item++;
 			}
 			
-			$html .= '</ul></div>'.LINE1;
+			$html .= '</ul></div></div>'.LINE1; // Close the results div and the results_wrap div
 			
 		}
 		

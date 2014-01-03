@@ -127,8 +127,6 @@ class search_detail extends details
 			
 			$replace    = $search_db->getFormattedValue($field_values,$formats); // returns an array
 			
-			dbug($replace);
-			
 			if (!empty($replace['IMAGE_PATH']))
 			{
 				$item_html = str_replace('%IMAGE%', $image_html, $item_html);

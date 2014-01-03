@@ -27,7 +27,8 @@ class css_detail extends details
 		$this->options['CLASS_NAME']   = __CLASS__;
 		$this->options['LOCAL_PATH']   = dirname(__FILE__);
 		$this->options['BASE_PATH']    = THEME_BASE_WEB;
-		$this->options['CSS_DIR']      = DS . 'css' .DS;	
+		$this->options['CSS_DIR']      = DS . 'css' .DS;
+		$this->options['LOAD']         = false;	
 		$this->options['FILE']         = 'styles.css';
 		$this->options['MEDIA']        = 'screen';
 		$this->options['PATH']         = '';
@@ -44,20 +45,24 @@ class css_detail extends details
 	
 	public function setHTML($options=null)
 	{
-		$html               = '';		
-		$paths              = array();
-		$paths['NORMAL']    = $this->options['BASE_PATH'] . $this->options['PATH'];
-		$paths['CDN']       = $this->options['PATH'];
-		$paths['LIBRARY']   = LIBRARY_BASE_WEB . $this->options['PATH'];
-		$paths['COMPONENT'] = COMPONENT_BASE_WEB . $this->options['PATH'];
+		$html = '';
 		
-		if ($this->options['TYPE'] === 'STYLE_STRING')
-		{
-			$html  = $this->options['STYLE_STRING'];
-		}
-		else
-		{
-			$html = $this->formatHTML( $paths[$this->options['TYPE']] );
+		if ($this->options['LOAD'])
+		{	
+			$paths              = array();
+			$paths['NORMAL']    = $this->options['BASE_PATH'] . $this->options['PATH'];
+			$paths['CDN']       = $this->options['PATH'];
+			$paths['LIBRARY']   = LIBRARY_BASE_WEB . $this->options['PATH'];
+			$paths['COMPONENT'] = COMPONENT_BASE_WEB . $this->options['PATH'];
+			
+			if ($this->options['TYPE'] === 'STYLE_STRING')
+			{
+				$html  = $this->options['STYLE_STRING'];
+			}
+			else
+			{
+				$html = $this->formatHTML( $paths[$this->options['TYPE']] );
+			}
 		}
 		
 		return $html;
