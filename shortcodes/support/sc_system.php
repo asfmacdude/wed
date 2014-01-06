@@ -505,6 +505,7 @@ function sc_scheduleEvent($options=array(), $content='')
 	$options['TYPE'] = 'schedule';
 	
 	$options['PREFIX'] = (isset($options['PREFIX'])) ? $options['PREFIX'] : null ;
+	$options['SUFFIX'] = (isset($options['SUFFIX'])) ? $options['SUFFIX'] : null ;
 	$options['PRINT']  = (isset($options['PRINT'])) ? $options['PRINT'] : null ;
 	
 	global $walt;
@@ -528,10 +529,14 @@ function sc_scheduleEvent($options=array(), $content='')
 	{
 		$content = $detail->printToday($options['PREFIX']);
 	}
+	elseif ($options['PRINT'] === 'TimeLeft')
+	{
+		$content = $detail->printTimeLeft($options['PREFIX']);
+	}
 	
 	if ($detail->runSchedule())
 	{
-		return $content;
+		return $content . $options['SUFFIX'];
 	}
 }
 

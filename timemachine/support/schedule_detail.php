@@ -141,6 +141,21 @@ class schedule_detail extends time_tools
 		return $html;
 	}
 	
+	public function printTimeLeft($prefix=null)
+	{
+		$html = '';
+		
+		if ($this->setupSchedule())
+		{
+			// An example of the prefix might be 'Registration ends in '
+			$start = $this->options['SCHEDULE_NOW'];
+			$end   = new DateTime($this->options['SCHEDULE_END']);
+			$html  = $prefix . $this->getDateDifference($start,$end);
+		}
+		
+		return $html;
+	}
+	
 	public function printToday($prefix=null)
 	{
 		$html = '';
