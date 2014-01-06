@@ -41,6 +41,17 @@ abstract class imagineer
 	{
 		return null;
 	}
+	
+	public function getDetailObject($id=null)
+	{
+		// This function returns the actual detail object. In some cases
+		// this is needed because certain detail objects don't really generate
+		// HTML.
+		if ( (!is_null($id)) && (isset($this->options['DETAILS'][$id])) )
+		{
+			return $this->options['DETAILS'][$id];
+		} 
+	}
     
     // *******************************************************************
     // ********  PROFESSOR OPTIONS ***************************************

@@ -16,6 +16,16 @@
 defined( '_GOOFY' ) or die();
 /*
  * timemachine.php
+ *
+ * Basically timemachine handles scheduled events such as holidays and other deadlines.
+ * I created it because I wanted a centralized way to enter dates and times for specific
+ * events once and not have to enter it on numerous pages and such. This way, a script can call
+ * an event by name such as "Christmas" and it would decide whether to run holiday images or videos
+ * on certain pages. It can control any number of events such as registration deadlines for specific events
+ * and the dates would only have to be entered in one location.
+ 
+ * I also want timemachine to handle queued events that will be fired through a cron job from the server.
+ * These events could range from sending out emails to deleting old records in a database.
  * 
  */
 
@@ -51,11 +61,11 @@ class timemachine extends imagineer
 	{
 		$this->options['CLASS_NAME']         = __CLASS__;
 		$this->options['LOCAL_PATH']         = dirname(__FILE__);
-		$this->options['DETAILS']      = array();
+		$this->options['DETAILS']            = array();
 		$this->options['CURRENT_ID']         = 0;
 	}
 	
-	public function newPresentation($options=array())
+	public function newSchedule($options=array())
 	{
 		$id_return = false;
 		

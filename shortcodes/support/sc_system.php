@@ -49,7 +49,8 @@ $postcodes = array(
 	'search'       => 'sc_searchManager',
 	'template'     => 'sc_getTemplate',
 	'system_error' => 'sc_systemError',
-	'event_results' => 'sc_eventResults'
+	'event_results' => 'sc_eventResults',
+	'schedule'      => 'sc_scheduleEvent'
 );
 
 global $walt;
@@ -494,6 +495,44 @@ function sc_systemError($options=array(), $content='')
 {
 	$code = (isset($options['code'])) ? $options['code'] : 'GENERAL ERROR' ;
 	wed_changeSystemErrorCode($code);
+}
+
+function sc_scheduleEvent($options=array(), $content='')
+{
+	$options = wed_standardKeys($options);
+	
+	// Detail Object for running scheduled events
+	$options['TYPE'] = 'schedule';
+	
+	$options['PREFIX'] = (isset($options['PREFIX'])) ? $options['PREFIX'] : null ;
+	$options['PRINT']  = (isset($options['PRINT'])) ? $options['PRINT'] : null ;
+	
+	global $walt;
+	$time   = $walt->getImagineer('timemachine');	
+	$id     = $time->newSchedule($options);
+	$detail = $time->getDetailObject($id);
+	
+	if ($options['PRINT'] === 'Deadline')
+	{
+		$content = $detail->printDeadline($options['PREFIX']);
+	}
+	elseif ($options['PRINT'] === 'Start')
+	{
+		$content = $detail->printStart($options['PREFIX']);
+	}
+	elseif ($options['PRINT'] === 'Schedule')
+	{
+		$content = $detail->printSchedule($options['PREFIX']);
+	}
+	elseif ($options['PRINT'] === 'Today')
+	{
+		$content = $detail->printToday($options['PREFIX']);
+	}
+	
+	if ($detail->runSchedule())
+	{
+		return $content;
+	}
 }
 
 // **********************************************************************

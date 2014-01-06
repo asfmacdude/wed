@@ -89,8 +89,7 @@ class cssdirector extends imagineer
 	/*
 	 * addCSSAsset
 	 *
-	 * Here we add one ASSET array to the CSS_ASSETS array. It is PUSHED onto the 
-	 * end of the CSS_ASSET array
+	 * Here we add one ASSET array to the DETAILS array.
 	 *
 	 */
 	public function addCSSAsset($asset)
@@ -104,9 +103,8 @@ class cssdirector extends imagineer
 	/*
 	 * loadCSSAssets
 	 *
-	 * Here we look through the existing CSS_ASSETS for a certain KEY and
-	 * make sure that KEY is turned on to LOAD. This is handy for dynamically loading
-	 * certain CSS files for certain modules.
+	 * Here we look through the list of IDs passed and check to see if that CSS ASSET
+	 * exists already and if so, reset LOAD to true
 	 *
 	 */
 	public function loadCSSAssets($list=array())

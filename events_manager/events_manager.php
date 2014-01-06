@@ -54,7 +54,7 @@ class events_manager extends imagineer
 	{
 		$this->options['CLASS_NAME']         = __CLASS__;
 		$this->options['LOCAL_PATH']         = dirname(__FILE__);
-		$this->options['LISTS']              = array();
+		$this->options['DETAILS']              = array();
 		$this->options['CURRENT_ID']         = 0;
 	}
 	
@@ -72,9 +72,9 @@ class events_manager extends imagineer
 			{
 				$object    = new $obj_class($options);
 				
-				if (!isset($this->options['LISTS'][$id]))
+				if (!isset($this->options['DETAILS'][$id]))
 				{
-					$this->options['LISTS'][$id] = $object;
+					$this->options['DETAILS'][$id] = $object;
 				}
 			}
 			
@@ -92,10 +92,10 @@ class events_manager extends imagineer
 	
 	public function setHTML($options=array())
 	{
-		if ( (isset($options['ID'])) && (isset($this->options['LISTS'][$options['ID']])) )
+		if ( (isset($options['ID'])) && (isset($this->options['DETAILS'][$options['ID']])) )
 		{
 			// We are calling a method in the class?_detail object
-			return $this->options['LISTS'][$options['ID']]->getHTML($options);
+			return $this->options['DETAILS'][$options['ID']]->getHTML($options);
 		} 
 	}
 }

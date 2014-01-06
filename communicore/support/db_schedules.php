@@ -1,21 +1,24 @@
 <?php
 /*
- * db_sites
+ * db_schedules
  *
- * Database object for the sites listing
+ * Database object for the online database schedules
+ *
  *
  */
 defined( '_GOOFY' ) or die();
 
 include_once('db_common.php');
 
-class db_sites extends db_common
+class db_schedules extends db_common
 {
 	public $options;
 	public $db;
 	
 	public function __construct($options=array())
 	{
+		global $walt;
+		$this->db     = $walt->getImagineer('communicore');
 		$this->setOptions($options);
 	}
 	
@@ -23,11 +26,10 @@ class db_sites extends db_common
 	{
 		$this->options['CLASS_NAME']     = __CLASS__;
 		$this->options['LOCAL_PATH']     = dirname(__FILE__);
-		$this->options['TABLE_NAME']     = 'sites';
-		$this->options['TABLE_ID_FIELD'] = 'site_id';
+		$this->options['TABLE_NAME']     = 'schedules';
+		$this->options['TABLE_ID_FIELD'] = 'schd_id';
 		
 		$this->options['FIELDS']         = $this->setFields();
-		$this->options['SITE_LIST']      = $this->getSiteList();
 		$this->addOptions($options);
 	}
 	
@@ -60,91 +62,76 @@ class db_sites extends db_common
 		 *
 		 * NOTE: Other values can be added as needed.
 		 */
-		$fields = array();
+		$fields     = array();
+		$today_date = wed_getDateToday();
 		
 		$fields['id'] = array(
 			'TITLE'     => 'ID',
-			'DB_FIELD'  => 'site_id',
+			'DB_FIELD'  => 'schd_id',
 			'NO_UPDATE' => 1
 			);
 		
+		$fields['modified'] = array(
+			'TITLE'     => 'Modified',
+			'DB_FIELD'  => 'schd_modified',
+			'NO_UPDATE' => 1
+			);
+			
 		$fields['name'] = array(
-			'TITLE'    => 'Site Name',
+			'TITLE'     => 'Schedule Name',
+			'DB_FIELD'  => 'schd_name'
+			);
+			
+		$fields['active'] = array(
+			'TITLE'    => 'Active',
+			'DB_FIELD' => 'schd_active',
+			'DEFAULT'  => 'Y'
+			);
+		
+		$fields['start'] = array(
+			'TITLE'    => 'Start Date',
 			'VALIDATE' => 'isRequired',
-			'MESSAGE'  => 'The site name is a required field',
-			'DB_FIELD' => 'site_name'
+			'MESSAGE'  => 'The start date is a required field',
+			'DB_FIELD' => 'schd_start_date',
+			'DEFAULT'  => $today_date
 			);
 			
-		$fields['title'] = array(
-			'TITLE'    => 'Site Title',
-			'DB_FIELD' => 'site_title',
-			);
-			
-		$fields['description'] = array(
-			'TITLE'    => 'Site Description',
-			'DB_FIELD' => 'site_description',
-			);
-			
-		$fields['url'] = array(
-			'TITLE'    => 'Site URL',
-			'DB_FIELD' => 'site_url',
-			);
-			
-		$fields['theme'] = array(
-			'TITLE'    => 'Site Theme',
-			'DB_FIELD' => 'site_theme',
+		$fields['end'] = array(
+			'TITLE'    => 'End Date',
+			'DB_FIELD' => 'schd_end_date',
+			'DEFAULT'  => null
 			);
 			
 		$fields['details'] = array(
 			'LABEL'    => 'Details',
-			'DB_FIELD' => 'site_details',
-			'INSTRUCT' => 'Details are various options for this site. Example:  SITE_TITLE| ASF Foundation;'
-			);	
-						
+			'DB_FIELD' => 'schd_details',
+			'INSTRUCT' => 'Details are various options for this schedule. Example:  LINK| apple.com;'
+			);
+			
 		return $fields;
 	}
 	
-	public function loadSite($site=null)
-	{
-		$data = $this->selectBySite($site);
-		$this->addValues_Data($data);	
-		return (!$data) ? false : true ;
-	}
-	
-	public function selectBySite($site=null)
+	public function selectByName($name=null)
     {
-        if (is_null($site))
+        if (is_null($name))
         {
             return false;
         }
         
-        $table     = $this->options['TABLE_NAME'];
-        
-        $where_str  = ' WHERE ';
-        $where_str .= $this->options['FIELDS']['name']['DB_FIELD'].'="'.$site.'"';
-
-        $sql = 'SELECT * FROM '.$table.$where_str;
-        
-        return $this->dbRow($sql);
+        $table  = $this->options['TABLE_NAME'];	
+		$pairs  = array( 'name'=> $name );	
+		$data   = $this->selectByPairs($pairs,null,false);
+		$this->addValues_Data($data);	
+		return (!$data) ? false : true ;
     }
-	
-	public function getSiteList()
-	{
-		$list   = array();
-		$fields = 'site_id,site_name';
-		$order  = 'site_name';
-		$data   = $this->selectAllForList($fields,$order);
-		
-		if ($data)
-		{
-			foreach ($data as $row=>$fields)
-			{
-				$list[$fields['site_id']] = $fields['site_name'];
-			}
-		}
-			
-		return $list;
-	}
+    
+    public function getDetail($detail,$default=null)
+    {
+	    $detail_field = $this->getValue('details');
+	    $detail_array = wed_getOptionsFromString($detail_field);
+	    
+	    return (isset($detail_array[$detail])) ? $detail_array[$detail] : $default;
+    }
 	
 }
 ?>

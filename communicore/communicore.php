@@ -52,7 +52,6 @@ class communicore extends imagineer
 	{
 		$this->options['CLASS_NAME'] = __CLASS__;
 		$this->options['LOCAL_PATH'] = dirname(__FILE__);
-		$this->options['LOG']        = array();
 		$this->options['COUNT']      = 0;
 	}
 	
@@ -62,25 +61,10 @@ class communicore extends imagineer
 		
 		if (class_exists($object_name))
 		{
-			$this->logDBObject($name,$class);
 			return new $object_name();
 		}
 		
 		return false;
-	}
-	
-	private function logDBObject($name,$class)
-	{
-		$name = $name . '_' . $this->options['COUNT']++;
-		
-		if (isset($this->options['LOG'][$class]))
-		{
-			$this->options['LOG'][$class] = $this->options['LOG'][$class] . ',' . $name;
-		}
-		else
-		{
-			$this->options['LOG'][$class] = $name;
-		}
 	}
 }
 
