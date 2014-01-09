@@ -78,7 +78,7 @@ class animation_detail extends details
 			$html .= $cell_object->getHTML();
 		}
 		
-		// Draw draw empty <div> on the screen. If there is no content, don't draw anything
+		// Don't draw empty <div> on the screen. If there is no content, don't draw anything
 		if (!is_null($html))
 		{
 			$style = $this->options['SLIDER_STYLE'];

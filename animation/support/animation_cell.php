@@ -36,7 +36,7 @@ class animation_cell extends details
 		$this->options['CLASS_NAME']            = __CLASS__;
 		$this->options['LOCAL_PATH']            = dirname(__FILE__);
 		$this->options['SLIDER_ID']             = 'layerslider'; // this can change depending on how many sliders are on a page
-		$this->options['LAYER_CLASS']           = 'ls-layer'; // class for each layer of the animation
+		$this->options['LAYER_CLASS']           = 'ls-slide'; // class for each layer of the animation
 		$this->options['LAYER_BG_CLASS']        = 'ls-bg'; // Each layer has one background image with this class
 		$this->options['IMAGE_BG']              = null; // this is the main image that serves as the background of the cell
 		$this->options['LAYER_STYLE']           = array('transition3d: all;','transition2d: all;'); // base style which can be replaced
@@ -116,7 +116,7 @@ class animation_cell extends details
 			$style = implode('', $this->options['LAYER_STYLE']);
 		}
 		
-		$html .= '<div class="'.$this->LAYER_CLASS.'" style="'.$style.'">'.LINE1;
+		$html .= '<div class="'.$this->LAYER_CLASS.'" data-ls="'.$style.'">'.LINE1;
 		$html .= $content;
 		$html .= $this->formatLink();
 		$html .= '</div>'.LINE1;

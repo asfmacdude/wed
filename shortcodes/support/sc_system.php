@@ -341,41 +341,6 @@ function sc_accordionPresentation($options=array(), $content='')
 	return $html;
 }
 
-// *******************************************************************
-// *****  sc_accordionFaqPresentation *************************
-// *******************************************************************
-function sc_accordionFaqPresentation($options=array(), $content='')
-{
-	// Common Shortcode: [accordion_faq setup="accordion_one" heading="General Questions" key="general" /]
-	$html      = '';
-	$options['TYPE']       = (isset($options['type'])) ? $options['type'] : 'accordion' ;
-	$options['SETUP_CODE'] = (isset($options['setup'])) ? $options['setup'] : 'accordion_one' ;
-	$options['HEADING']    = (isset($options['heading'])) ? $options['heading'] : 'Frequently Asked Questions' ;
-	$options['KEY']        = (isset($options['key'])) ? $options['key'] : 'general' ;
-	
-	$data['ORDER']  = (isset($options['order'])) ? $options['order'] : 'order' ;
-	$data['TYPE']   = 'content_list';
-	$data['SEARCH'] = 'code_prefix';
-	$data['CODE']   = 'faq_';
-	$data['KEYS']   = explode(',', $options['KEY']); // break out comma delimited list
-	
-	$options['LIST_OBJECT'] = wed_getList($data);
-	
-	if (!is_null($options['LIST_OBJECT']))
-	{
-		global $walt;
-		$tab  = $walt->getImagineer('presentations');
-		$id   = $tab->newPresentation($options);
-		$html = $tab->getHTML(array('ID'=>$id));
-	}
-	else
-	{
-		$html = SYS_ERR_NO_INFO;
-	}
-
-	return $html;
-}
-
 
 function sc_galleryPresentation($options=array(), $content='')
 {

@@ -265,11 +265,11 @@ class db_sites_connect extends db_common
 	    
 	    $details['IMAGE_PATH'] = $this->getSiteDetail('IMAGE_PATH');
 	    $details['CATEGORY']   = $this->getSiteDetail('CATEGORY');
-	    $details['SIZE']       = $this->getSiteDetail('SIZE');
+	    $details['IMAGE_SIZE'] = $this->getSiteDetail('IMAGE_SIZE');
 	    
-	    if (isset($formats['IMAGE_SIZE']))
+	    if (!is_null($details['IMAGE_SIZE']))
 	    {
-		    $sz = explode('_', $formats['IMAGE_SIZE']);
+		    $sz = explode('_', $details['IMAGE_SIZE']);
 		    $sizes['WIDTH']  = (isset($sz[0])) ? $sz[0] : null;
 		    $sizes['HEIGHT'] = (isset($sz[1])) ? $sz[1] : null;
 	    }

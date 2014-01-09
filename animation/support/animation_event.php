@@ -40,6 +40,7 @@ class animation_event extends details
 		$this->options['TYPE']                  = 'img'; // used to add a logo to each image
 		$this->options['IMG_SRC']               = null;
 		$this->options['CLASS']                 = null;
+		$this->options['STYLE']                 = null; // version 5 of layerslider requires css style to be separate from settings
 		$this->options['SETTINGS']              = null;
 		$this->options['TEXT']                  = null; // used to add a logo to each image
 		
@@ -49,44 +50,46 @@ class animation_event extends details
 	private function formatEvent()
 	{
 		$this->processEventCode(); // sets SETTINGS in the case that a code is passed
-		$html     = '';
-		$type     = (isset($this->options['TYPE']))  ? $this->options['TYPE']  : null ;
-		$src      = (isset($this->options['IMG_SRC'])) ? $this->options['IMG_SRC'] : null ;
-		$class    = (isset($this->options['CLASS'])) ? $this->options['CLASS'] : null ;
-		$settings = (isset($this->options['SETTINGS'])) ? $this->options['SETTINGS'] : null ;
-		$text     = (isset($this->options['TEXT']))  ? $this->options['TEXT']  : null ;
-		$style    = $this->styleToString($settings);
-		
+		$html         = '';
+		$type         = (isset($this->options['TYPE']))  ? $this->options['TYPE']  : null ;
+		$src          = (isset($this->options['IMG_SRC'])) ? $this->options['IMG_SRC'] : null ;
+		$class        = (isset($this->options['CLASS'])) ? $this->options['CLASS'] : null ;
+		$style        = (isset($this->options['STYLE'])) ? $this->options['STYLE'] : null ;
+		$settings     = (isset($this->options['SETTINGS'])) ? $this->options['SETTINGS'] : null ;
+		$text         = (isset($this->options['TEXT']))  ? $this->options['TEXT']  : null ;
+		$style_str    = $this->dataToString($style);
+		$settings_str = $this->dataToString($settings);
+			
 		// Events will have a TYPE associated with it. They can be images (img tag) or different
 		// level headers (h1,h2,h3,h4). Some items will have a style list, but not all of them. For example,
 		// each layer begins with a background image that generally has no style listing.
 		if ($type === 'img')
 		{
 			// process image tag here
-			$html .= '<img src="'.$src.'" class="'.$class.'" style="'.$style.'">';
+			$html .= '<img src="'.$src.'" class="'.$class.'" style="'.$style_str.'">';
 		}
 		elseif ( ($type === 'h1') || ($type === 'h2') || ($type === 'h3') || ($type === 'h4') )
 		{
 			// process h1,h2,h3,h4 tags
-			$html .= '<' .$type .' class="'.$class.'" style="'.$style.'" >'.$text.'</'.$type.'>';
+			$html .= '<' .$type .' class="'.$class.'" style="'.$style_str.'" data-ls="'.$settings_str.'" >'.$text.'</'.$type.'>';
 		}
 		
 		return $html;
 	}
 	
-	private function styleToString($settings)
+	private function dataToString($settings)
 	{
-		$style    = '';
+		$string    = '';
 		
 		if ( (!is_null($settings)) && (is_array($settings)) )
 		{
 			foreach ($settings as $key=>$value)
 			{
-				$style .= $key.':'.$value.';';
+				$string .= $key.':'.$value.';';
 			}
 		}
 		
-		return $style;
+		return $string;
 	}
 	
 	private function processEventCode()

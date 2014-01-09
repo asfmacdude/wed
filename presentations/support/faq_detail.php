@@ -1,6 +1,6 @@
 <?php
 /*
- * @version		$Id: accordian_detail.php 1.0 2009-03-03 $
+ * @version		$Id: faq_detail.php 1.0 2009-03-03 $
  * @package		DreamWish
  * @subpackage	main
  * @copyright	Copyright (C) 2012 Medley Productions. All rights reserved.
@@ -14,35 +14,14 @@
  */
 defined( '_GOOFY' ) or die();
 /*
- * accordian_detail.php
+ * faq_detail.php
  * 
- * This is the detail object for presentations that displays accordian interfaces
+ * This is the detail object for presentations that displays faqs in an accordian interface
+ * using zozo_accordion
  *
- * All tabbed interfaces have two basic elements
- * - Tab Headings (labels on the tabs)
- * - Tab Content (content that is revealed when a tab is clicked)
- *
- * Content will mainly be extraced from the content_main table; however, in future
- * devs, there may be other ways of getting content
- * 
- * The TAB_STYLE file that will be included will contain an array of 'WRAPPERS' to be used
- * around the two elements of the tabbed interface. The following are required:
- * - MAIN_OUTER_WRAP some tabbed interfaces will have an outer wrap, leave blank if not the case
- * - TAB_WRAP this is the wrap that goes around both the tab headers and the content.
- * - TAB_HEADERS_WRAP this wraps the tab headers, most of the time it will be a <ul> with a class
- * - TAB_HEAD_WRAP this wraps each individual tab head, usually a <li> with class or classes
- * - TAB_HEAD_ICON optional if the style allows for icons as part of the head
- * - TAB_CONTENT_WRAP this is the main wrap around the entire content pane, usually a <div>
- * - TAB_CONTENT_PANE_WRAP this is the wrap around eac individual content pane
- *
- *
- * CONTENT
- * The content array will be similar across all presentation and look something like this:
- * - 'header'  => array( 'CONTENT_CODE'=>content_code,'ICON_CLASS'=> icon_code )
- * This will allow for as many options as you want for each section of the presentaion
  */
 
-class accordion_detail extends details
+class faq_detail extends details
 {
 	public $options  = array();
 	
@@ -55,14 +34,14 @@ class accordion_detail extends details
 	{
 		$this->options['CLASS_NAME']        = __CLASS__;
 		$this->options['LOCAL_PATH']        = dirname(__FILE__);
-		$this->options['COMPONENT']         = null;  // Components are system wide modules found in the components directory
+		$this->options['COMPONENT']         = 'zozo_accordion';  // Components are system wide modules found in the components directory
 		$this->options['ID']                = 'tab1'; // this is assigned by Presentations
-		$this->options['NAME']              = null;   // NOT SURE what name does??
+		$this->options['KEYWORDS']          = null;   // faqs are searched by keywords, this should be an array
 		$this->options['SETUP_DB']          = false; // presentation_setups db object
 		// $this->options['SCHEDULE_DB']       = false; // banner_schedule db object
 		$this->options['LIST_OBJECT']       = false; // list db object
 		$this->options['SETUP_ID']          = null;  // actual record id on the presentation_setups db
-		$this->options['SETUP_CODE']        = null;  // code of the presentation_setup (accordion_one)
+		$this->options['SETUP_CODE']        = 'zozo_accordion';  // code of the presentation_setup (zozo_accordion)
 		$this->options['SETUP_TAG']         = null;  // defaults to general
 		$this->options['TYPE_ID']           = null;  // type id of the content
 		$this->options['HEADING']           = 'General Heading'; 
@@ -85,7 +64,7 @@ class accordion_detail extends details
 	
 	private function buildPresentation()
 	{
-		if ((!$this->loadPresentationSetup()) || ($this->options['SETUP_ACTIVE']!='Y'))
+		if ((!$this->loadPresentationSetup()) || ($this->options['SETUP_ACTIVE']!='Y') || (!$this->loadFaqList()))
 		{
 			wed_changeSystemErrorCode($this->options['ERROR_CODE']);
 			return null;
@@ -94,41 +73,41 @@ class accordion_detail extends details
 		// This will load a component file if that is what we are using to create this presentation
 		$this->loadComponent();
 		
-		$connect_db   = $this->options['LIST_OBJECT'];
-		$header_html  = '';
-		$content_html = '';
-		$html         = '';
-		$acc_count    = 0;
+		$faq_db         = $this->options['LIST_OBJECT'];
+		$question_html  = '';
+		$answer_html    = '';
+		$html           = '';
 		
 		global $walt;
 		$shortcodes = $walt->getImagineer('shortcodes');
 		
 		$rec = 0;
 
-		while ($connect_db->moveRecordList($rec))
+		while ($faq_db->moveRecordList($rec))
 		{
-			// First get the article code and let shortcodes evaluate it
-			// If it evaluates to null then we don't run this tab. This
-			// way you can do timed schedules on certain content and instead
-			// of showing an empty tab, none shows at all and it is skipped.
-			$content = $connect_db->getFormattedValue('FULLARTICLE');
-			$content = $shortcodes->getHTML(array('HTML'=>$content));
+			/*
+			 * Load the QUESTION and the ANSWER form the faq table
+			 * Then run shortcodes on the answer to evaluate the content to make
+			 * sure it doesn't evaluate to null. If it is null, then we skip this one.
+			 *
+			 */
+			$question = $faq_db->getFormattedValue('QUESTION');
+			$answer   = $faq_db->getFormattedValue('ANSWER');
+			$answer   = $shortcodes->getHTML(array('HTML'=>$answer));
 			
-			if (!empty($content))
+			if (!empty($answer))
 			{
-				// Set the id for this acc
-				$acc_count++;
+				// Set the question
+				$question_html = str_replace(array('%CONTENT%'), array($question), $this->options['ACC_HEAD_WRAP']);
 				
-				// Set the heading
-				$header_html  = str_replace(array('%NUMBER%','%CONTENT%'), array($acc_count,$connect_db->getFormattedValue('TITLE')), $this->options['ACC_HEAD_WRAP']);
-				
-				// Set the content
-				$content_html = str_replace(array('%NUMBER%','%CONTENT%'), array($acc_count,$content), $this->options['ACC_CONTENT_WRAP']);
+				// Set the answer
+				$answer_html   = str_replace(array('%CONTENT%'), array($answer), $this->options['ACC_CONTENT_WRAP']);
 				
 				// Wrap it up
-				$html .= str_replace(array('%CONTENT%'), array($header_html.$content_html), $this->options['ACC_WRAP']);
+				$html .= str_replace(array('%CONTENT%'), array($question_html.$answer_html), $this->options['ACC_WRAP']);
 			}
 			
+			// Move to the next record
 			$rec++;
 		}
 		
@@ -169,7 +148,7 @@ class accordion_detail extends details
 		if ( ($setup_db->loadSetupCode($this->options['SETUP_CODE'])) || ($setup_db->loadSetupID($this->options['SETUP_ID'])) )
 		{	
 			$this->options['SETUP_DB']          = $setup_db;
-			$this->options['COMPONENT']         = $setup_db->getDetail('COMPONENT');
+			// $this->options['COMPONENT']         = $setup_db->getDetail('COMPONENT');
 			$this->options['SETUP_ID']          = $setup_db->getValue('id');
 			$this->options['SETUP_MAX']         = $setup_db->getValue('max');
 			$this->options['SETUP_ACTIVE']      = $setup_db->getValue('active');
@@ -180,6 +159,26 @@ class accordion_detail extends details
 			$this->options['ACC_HEAD_WRAP']     = $setup_db->getDetail('ACC_HEAD_WRAP',$this->options['ACC_HEAD_WRAP']);
 			$this->options['ACC_CONTENT_WRAP']  = $setup_db->getDetail('ACC_CONTENT_WRAP',$this->options['ACC_CONTENT_WRAP']);
 			$status = true;
+		}
+		
+		return $status;
+	}
+	
+	private function loadFaqList()
+	{	
+		$status = false;
+		$faq_db = wed_getDBObject('faq_sites_connect');
+		$keywords = $this->options['KEYWORDS'];
+		
+		if (!is_array($keywords))
+		{
+			$keywords = explode(',', $keywords);
+		}
+		
+		if ($faq_db->searchFaqKeywords($keywords))
+		{
+			$this->options['LIST_OBJECT'] = $faq_db;
+			$status = true;	
 		}
 		
 		return $status;
