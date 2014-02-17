@@ -68,6 +68,9 @@ class db_content_connect extends db_common
 		// ADD search by site_id
 		$this->where['BY_CURRENT_SITE'] = ' AND s.site_id = "'.wed_getSystemValue('SITE_ID').'"';
 		
+		// ADD search by active groups
+		$this->where['BY_ACTIVE_GROUP'] = ' AND d.cng_active = "Y"';
+		
 		// Search by content id or code
 		$this->where['CONTENT_ID']      = ' WHERE a.cnt_id = :id';
 		$this->where['CONTENT_CODE']    = ' WHERE a.cnt_code = :code';
@@ -339,6 +342,7 @@ class db_content_connect extends db_common
     {
 	    $options['QUERY'] = $this->sql['CONNECT_JOIN'] ;
 	    $options['WHERE'] = str_replace('%CONTROL_ID%', $control_id, $this->where['CNN_CONTROL_ID']);
+	    $options['WHERE'] = $options['WHERE'].$this->where['BY_ACTIVE_GROUP']; // Get only active groups
 	    // $options['WHERE'] = ($by_site) ? $options['WHERE'].$this->where['BY_CURRENT_SITE'] : $options['WHERE'];
 	    $options['ORDER'] = $this->order['TITLE'];
 	    

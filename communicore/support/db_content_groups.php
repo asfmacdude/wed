@@ -109,6 +109,12 @@ class db_content_groups extends db_common
 			'TITLE'    => 'Details',
 			'DB_FIELD' => 'cng_details'
 			);
+		
+		$fields['active'] = array(
+			'TITLE'    => 'Active Y/N?',
+			'DB_FIELD' => 'cng_active',
+			'DEFAULT'  => 'Y'
+			);
 			
 		return $fields;
 	}

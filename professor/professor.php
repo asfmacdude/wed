@@ -238,7 +238,7 @@ class professor extends imagineer
 			 $value   = (isset($this->options['SETTINGS'][$name])) ? $this->options['SETTINGS'][$name] : $value;
 		 }
 
-		 $this->logResponse($name,$value,$student);
+		 // $this->logResponse($name,$value,$student);
 		 
 		 return $value;
 	}
@@ -258,14 +258,23 @@ class professor extends imagineer
 			$site_id       = $sites->getValue('id');
 			$site_name     = $sites->getValue('name');
 			$site_theme_id = $sites->getValue('theme');
+			$site_security = $sites->getDetail('SECURITY_LEVEL',array());
+			
+			if (!is_array($site_security))
+			{
+				// SECURITY_LEVEL is a string, example: 1,2,3,4,5
+				$site_security = explode(',', $site_security);
+			}
 			
 			wed_addSystemValue($var_prefix.'SITE_ID',$site_id);
 			wed_addSystemValue($var_prefix.'SITE_NAME',$site_name);
 			wed_addSystemValue($var_prefix.'THEME_ID',$site_theme_id);
+			wed_addSystemValue($var_prefix.'SECURITY_LEVEL',$site_security);
 
-			$this->options[$var_prefix.'SITE_ID']   = $site_id;
-			$this->options[$var_prefix.'SITE_NAME'] = $site_name;
-			$this->options[$var_prefix.'THEME_ID']  = $site_theme_id;
+			$this->options[$var_prefix.'SITE_ID']         = $site_id;
+			$this->options[$var_prefix.'SITE_NAME']       = $site_name;
+			$this->options[$var_prefix.'THEME_ID']        = $site_theme_id;
+			$this->options[$var_prefix.'SECURITY_LEVEL']  = $site_security;
 		}
 		else
 		{

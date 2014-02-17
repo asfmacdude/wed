@@ -57,6 +57,7 @@ class animation_event extends details
 		$style        = (isset($this->options['STYLE'])) ? $this->options['STYLE'] : null ;
 		$settings     = (isset($this->options['SETTINGS'])) ? $this->options['SETTINGS'] : null ;
 		$text         = (isset($this->options['TEXT']))  ? $this->options['TEXT']  : null ;
+		$video        = (isset($this->options['VIDEO']))  ? $this->options['VIDEO']  : null ;
 		$style_str    = $this->dataToString($style);
 		$settings_str = $this->dataToString($settings);
 			
@@ -67,6 +68,10 @@ class animation_event extends details
 		{
 			// process image tag here
 			$html .= '<img src="'.$src.'" class="'.$class.'" style="'.$style_str.'">';
+		}
+		if ($type === 'video')
+		{
+			$html .= '<div class="'.$class.'" style="'.$style_str.'" data-ls="'.$settings_str.'" >'.$video.'</div>';
 		}
 		elseif ( ($type === 'h1') || ($type === 'h2') || ($type === 'h3') || ($type === 'h4') )
 		{

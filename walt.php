@@ -179,6 +179,25 @@ class walt extends imagineer
 	
 	public function showPagePresentation($call_page=null)
 	{
+		if (!wed_checkSiteLevels())
+		{
+			// header("Location: http://asffoundation.net/login.php");
+			// exit();
+			
+			include_once('classes/check.class.php');
+			$site_security = wed_getSystemValue('SECURITY_LEVEL');
+			
+			if (is_null($site_security))
+			{
+				protect('*');
+			}
+			else
+			{
+				$protect_str = implode(',', $site_security);
+				protect($protect_str);
+			}
+		}
+		
 		$this->loadImagineer('presentations');
 		$home_page  = wed_getSystemValue('HOME_PAGE');
 		$error_page = wed_getSystemValue('ERROR_404');

@@ -57,14 +57,16 @@ class communicore extends imagineer
 	
 	public function loadDBObject($name,$class='UNKNOWN')
 	{
+		$object = null;
+		
 		$object_name = 'db_'.$name;
 		
 		if (class_exists($object_name))
 		{
-			return new $object_name();
+			$object = new $object_name();
 		}
 		
-		return false;
+		return $object;
 	}
 }
 

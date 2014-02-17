@@ -48,18 +48,26 @@ class guestdirector extends imagineer
 	{
 		$this->setOptions();
 		$this->loadSupportFiles();
-		$this->options['USER_NAME']   = $this->getUserName();
-		$this->options['USER']        = $this->loadUserInformation();
-		$this->options['USER_ROLES']  = $this->getUserRoles();
-		$this->options['DEVELOPER']   = $this->setDeveloperMode();
-		$this->logUserOut();
 		$this->shareWithProfessor();
 	}
 	
 	protected function setOptions()
 	{
-		$this->options['CLASS_NAME']  = __CLASS__;
-		$this->options['LOCAL_PATH']  = dirname(__FILE__);
+		$this->options['CLASS_NAME']      = __CLASS__;
+		$this->options['LOCAL_PATH']      = dirname(__FILE__);
+		$this->options['DEVELOPER_LEVEL'] = 33;
+		
+		$this->options['USER_ID']       = (isset($_SESSION['jigowatt']['user_id'])) ? $_SESSION['jigowatt']['user_id'] : null;
+		$this->options['USER_NAME']     = (isset($_SESSION['jigowatt']['username'])) ? $_SESSION['jigowatt']['username'] : null;
+		$this->options['USER_LEVEL']    = (isset($_SESSION['jigowatt']['user_level'])) ? $_SESSION['jigowatt']['user_level'] : array();
+		$this->options['USER_EMAIL']    = (isset($_SESSION['jigowatt']['email'])) ? $_SESSION['jigowatt']['email'] : null;
+		$this->options['USER_GRAVATAR'] = (isset($_SESSION['jigowatt']['gravatar'])) ? $_SESSION['jigowatt']['gravatar'] : null;
+		
+		// var_dump($this->options['USER_LEVEL']);
+		
+		$this->compareCurrentData();
+		
+		$this->options['DEVELOPER']     = (in_array($this->options['DEVELOPER_LEVEL'], $this->options['USER_LEVEL'])) ? true : false;
 	}
 	
 	public function logUserOut()
@@ -67,6 +75,24 @@ class guestdirector extends imagineer
 		if ((isset($_GET['call'])) && ($_GET['call']=='logout'))
 		{
 			$this->options['USER']->logUserOut();
+		}
+	}
+	
+	private function compareCurrentData()
+	{
+		// This function compares the user data in the SESSION to what is actually
+		// in the login_users table and updates the SESSION accordingly
+		$user_db = wed_getDBObject('login_users');
+		
+		if ($user_db->loadUserID($this->options['USER_ID']))
+		{		
+			$this->options['USER_NAME']  = $user_db->getValue('username');
+			$this->options['USER_LEVEL'] = unserialize($user_db->getValue('level'));
+			$this->options['USER_EMAIL'] = $user_db->getValue('email');
+			
+			$_SESSION['jigowatt']['username']   = $this->options['USER_NAME'];
+			$_SESSION['jigowatt']['user_level'] = $this->options['USER_LEVEL'];
+			$_SESSION['jigowatt']['email']      = $this->options['USER_EMAIL'];
 		}
 	}
 	
@@ -93,54 +119,26 @@ class guestdirector extends imagineer
 	
 	private function shareWithProfessor()
 	{
-		$settings['GUEST_USER_NAME']     = $this->options['USER_NAME'];
-		$settings['GUEST_USER_ROLES']    = $this->options['USER_ROLES'];
-		$settings['GUEST_USER_GRAVATAR'] = $this->getGravatarImage(0);
-		$settings['DEVELOPER']           = $this->options['DEVELOPER'];
+		$settings['USER_ID']       = $this->options['USER_ID'];
+		$settings['USER_NAME']     = $this->options['USER_NAME'];
+		$settings['USER_LEVEL']    = $this->options['USER_LEVEL'];
+		$settings['USER_EMAIL']    = $this->options['USER_EMAIL'];
+		$settings['USER_GRAVATAR'] = $this->options['USER_GRAVATAR'];
+		$settings['DEVELOPER']     = $this->options['DEVELOPER'];
 		
 		wed_addSystemValueArray($settings);
 	}
 	
-	private function getUserName()
-	{
-		$name = null;
-		
-		if (isset($_COOKIE['user']))
-		{
-			$name = addslashes($_COOKIE['user']);
-		}
-		elseif (isset($_SESSION['UserName']))
-		{
-			$name = $_SESSION['UserName'];
-		}
-		
-		return $name;
-	}
-	
-	private function getUserRoles()
-	{
-		$roles = array();
-		$id    = $this->USER->getValue('id',null);
-		
-		if (!is_null($id))
-		{
-			$role_obj = new user_roles($id);
-			$roles    = $role_obj->getUserRoles();
-		}
-
-		return $roles;
-	}
-	
 	public function canUserSeeThis($list=array())
 	{
-		$result = false;
-		$roles  = $this->USER_ROLES;
+		$result  = false;
+		$levels  = $this->USER_LEVEL;
 		
 		if (is_array($list))
 		{
 			foreach ($list as $value)
 			{
-				$result = (in_array($value, $roles)) ? true : $result;
+				$result = (in_array($value, $levels)) ? true : $result;
 			}
 		}
 
@@ -149,32 +147,36 @@ class guestdirector extends imagineer
 	
 	public function getGravatarImage($size=200)
 	{
-		$email = $this->USER->getValue('email',null);
+		return $this->USER_GRAVATAR;
+		
+		/*
+$email = $this->USER->getValue('email',null);
 		$email = trim($email);
 		$email = strtolower($email);
 		$email_hash = md5($email);
 		$size  = ($size===0) ? '%s' : $size;
 		
 		return 'http://gravatar.com/avatar/'.$email_hash.'?s='.$size.'&d=mm';
+*/
 	}
 	
 	public function isLoggedIn()
 	{
-		return ($this->USER->getValue('loggedin')==1) ? true : false;
+		// return ($this->USER->getValue('loggedin')==1) ? true : false;
 	}
 	
 	public function isApproved()
 	{
-		return $this->USER->getValue('approved',false);
+		// return $this->USER->getValue('approved',false);
 	}
 	
 	public function isOwner()
 	{
-		return $this->USER->getValue('isowner',false);
+		// return $this->USER->getValue('isowner',false);
 	}
 	
 	public function isPremium()
 	{
-		return $this->USER->getValue('ispremium',false);
+		// return $this->USER->getValue('ispremium',false);
 	}
 }

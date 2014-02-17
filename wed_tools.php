@@ -673,11 +673,33 @@ function wed_number2Text($number=0)
 	return $numtext[$number];
 }
 
+// *******************************************************************
+// ********  Security ************************************************
+// *******************************************************************
 function wed_HashThis($hash_this)
 {
 	$salt = 'h@u!n#z$o%n^i!z*n';
 	$result = sha1(sha1($hash_this.$salt));
 	return $result;
+}
+
+function wed_checkSiteLevels()
+{
+	$status        = true;
+	$site_security = wed_getSystemValue('SECURITY_LEVEL',array());
+	
+	if (!empty($site_security))
+	{
+		$status        = false;
+		$user_level    = wed_getSystemValue('USER_LEVEL',array());
+	
+		foreach ($user_level as $key)
+		{
+			$status = (in_array($key, $site_security)) ? true : $status;
+		}
+	}
+	
+	return $status;
 }
 
 ?>

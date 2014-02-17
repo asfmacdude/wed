@@ -8,9 +8,9 @@
  */
 defined( '_GOOFY' ) or die();
 
-include_once('db_tools.php');
+include_once('db_xcrud.php');
 
-abstract class db_common extends db_tools
+abstract class db_common extends db_xcrud
 {	
 	public $record_list = null;
 	

@@ -146,5 +146,13 @@ class db_sites extends db_common
 		return $list;
 	}
 	
+	public function getDetail($detail,$default=null)
+    {
+	    $detail_field = $this->getValue('details');
+	    $detail_array = wed_getOptionsFromString($detail_field);
+	    
+	    return (isset($detail_array[$detail])) ? $detail_array[$detail] : $default;
+    }
+	
 }
 ?>
