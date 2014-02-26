@@ -50,7 +50,7 @@ class db_faq_sites_connect extends db_common
 		$this->order['QUESTION_ORDER']  = ' ORDER BY a.fqcn_question_order';
 	}
 	
-	private function setFields()
+	public function setFields($join=true)
 	{
 		/*
 		 * The 'FIELDS' array setup
@@ -82,34 +82,43 @@ class db_faq_sites_connect extends db_common
 		$fields = array();
 		
 		$fields['id'] = array(
-			'TITLE'     => 'ID',
+			'LABEL'     => 'ID',
 			'DB_FIELD'  => 'fqcn_id',
 			'NO_UPDATE' => 1
 			);
 		
 		$fields['modification'] = array(
-			'TITLE'     => 'Modification',
+			'LABEL'     => 'Modification',
 			'DB_FIELD'  => 'fqcn_modified',
 			'NO_UPDATE' => 1
 			);
 		
 		$fields['siteid'] = array(
-			'TITLE'    => 'Site ID',
-			'DB_FIELD' => 'fqcn_site_id'
+			'LABEL'    => 'Site ID',
+			'DB_FIELD' => 'fqcn_site_id',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 		
 		$fields['faqid'] = array(
-			'TITLE'    => 'FAQ ID',
-			'DB_FIELD' => 'fqcn_faq_id'
+			'LABEL'    => 'FAQ ID',
+			'DB_FIELD' => 'fqcn_faq_id',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['order'] = array(
-			'TITLE'    => 'FAQ Sort',
-			'DB_FIELD' => 'fqcn_question_order'
+			'LABEL'    => 'FAQ Sort',
+			'DB_FIELD' => 'fqcn_question_order',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
-		$fields = $this->joinFields($fields);
-			
+		if ($join)
+		{
+			$fields = $this->joinFields($fields);
+		}
+	
 		return $fields;
 	}
 	
@@ -220,6 +229,25 @@ class db_faq_sites_connect extends db_common
 	    }
 	    
 		return $image_path;
-    } 
+    }
+    
+    // *******************************************************************
+    // ********  XCRUD Section *******************************************
+    // *******************************************************************
+    
+    // *******************************************************************
+    // ********  setupXCrud initial setup of XCrud Object ****************
+    // *******************************************************************
+    public function setupXCrud($code=null)
+    {
+	    // Based on the code, we can present different views of the content_main
+	    // table with different settings.
+	    if ($code=='faq_100')
+	    {
+		    $this->initXCrud();
+		    $this->xcrud->relation('fqcn_site_id','sites','site_id','site_title');
+		    $this->xcrud->relation('fqcn_faq_id','faq_content','faq_id','faq_question');
+	    }
+    }
 }
 ?>

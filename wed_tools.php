@@ -4,6 +4,19 @@
 	in WED.
 	
 */
+
+function getImagineer($name=null)
+{
+	$imagineer = null;
+	
+	if (!is_null($name))
+	{
+		global $walt;
+		$imagineer = $walt->getImagineer($name);
+	}
+	
+	return $imagineer;	
+}
 // *******************************************************************
 // ********  PROFESSOR OPTIONS ***************************************
 // *******************************************************************
@@ -13,50 +26,43 @@ function wed_getSystemValue($name,$default=null)
     $options['NAME']    = $name;
     $options['DEFAULT'] = $default;
 
-    global $walt;
-	$prof = $walt->getImagineer('professor');
+	$prof = getImagineer('professor');
 	return  $prof->askProfessor($options);
 }
 
 function wed_addSystemValue($key,$value)
 {
-    global $walt;
-	$prof = $walt->getImagineer('professor');
+	$prof = getImagineer('professor');
 	$prof->addSetting($key,$value);
 }
 
 function wed_changeSystemErrorCode($value)
 {
-    global $walt;
-	$prof = $walt->getImagineer('professor');
+	$prof = getImagineer('professor');
 	$prof->changeErrorCode($value);
 }
 
 function wed_addSystemValueArray($array)
 {
-    global $walt;
-	$prof = $walt->getImagineer('professor');
+	$prof = getImagineer('professor');
 	$prof->addSettingArray($array);
 }
 
 function wed_setTheme($theme_id)
 {
-    global $walt;
-	$prof = $walt->getImagineer('professor');
+	$prof = getImagineer('professor');
 	$prof->setThemeSetup($theme_id);
 }
 
 function wed_getRecentHistory($max=10)
 {
-	global $walt;
-	$prof = $walt->getImagineer('professor');
+	$prof = getImagineer('professor');
 	return  $prof->getRecentHistory($max);
 }
 
 function wed_getRecentSearch($max=10)
 {
-	global $walt;
-	$prof = $walt->getImagineer('professor');
+	$prof = getImagineer('professor');
 	return  $prof->getRecentSearch($max);
 }
 
@@ -68,6 +74,13 @@ function wed_loggedIn()
 	global $walt;
 	$guest = $walt->getImagineer('guestdirector');
 	return $guest->isLoggedIn();
+}
+
+function wed_getGravatar($size=100)
+{
+	global $walt;
+	$guest = $walt->getImagineer('guestdirector');
+	return $guest->getGravatarImage($size);
 }
 // *******************************************************************
 // ********  PARSE URL FUNCTIONS *************************************
@@ -130,15 +143,13 @@ function wed_parseURLPath()
 // *******************************************************************
 function wed_getDBObject($db_name)
 {
-	global $walt;
-	$db    = $walt->getImagineer('communicore');
+	$db    = getImagineer('communicore');
 	return $db->loadDBObject($db_name,'WED_TOOLS');
 }
 
 function wed_verifyControlCode($code)
 {
-	global $walt;
-	$prof    = $walt->getImagineer('professor');
+	$prof    = getImagineer('professor');
 	return $prof->verifyControlCode($code);
 }
 
@@ -150,8 +161,7 @@ function wed_getPageInfo($code,$bysite=true)
 	//
 	// $bysite simply causes the search to be limited to the current site,
 	// in other words , only find page codes within the current site.
-	global $walt;
-	$db    = $walt->getImagineer('communicore');
+	$db    = getImagineer('communicore');
 	$pages = $db->loadDBObject('content_control','WED_TOOLS');
 	
 	if ($pages->loadPage($code,$bysite))
@@ -169,8 +179,7 @@ function wed_getContentInfo($code)
 	// This function returns an object from Communicore that the calling
 	// program can use to access information about the content_main
 	// article that was passed.
-	global $walt;
-	$db      = $walt->getImagineer('communicore');
+	$db      = getImagineer('communicore');
 	$content = $db->loadDBObject('content_main','WED_TOOLS');
 	
 	if ($content->loadArticle($code))
@@ -375,11 +384,27 @@ function wed_getPresentation($specs)
 	// These are the basic required items
 	$type  = (isset($specs['TYPE'])) ? $specs['TYPE'] : null;
 	$name  = (isset($specs['NAME'])) ? $specs['NAME'] : null;
-	
-	global $walt;
-	$pres = $walt->getImagineer('presentations');
+
+	$pres = getImagineer('presentations');
 	$id   = $pres->newPresentation($specs);
 	return $pres->getHTML(array('ID' => $id));
+}
+
+// *******************************************************************
+// ********  GET ASSETS OBJECT ***************************************
+// *******************************************************************
+function wed_getAssets()
+{
+	$theme    = wed_getSystemValue('THEME');
+	$dir_path = THEME_BASE . $theme . DS;
+	
+	$options['DIR_PATH']  = $dir_path;
+	$options['FILE_NAME'] = 'assets';
+	
+	$path = wed_getAlternatePath($options);
+	
+	$asset_class = strtolower($theme) . '_assets';	
+	return (wed_includeFile($path)) ? new $asset_class() : null;
 }
 
 // *******************************************************************
@@ -562,9 +587,7 @@ function wed_decodeJSON($string,$ret_array=true)
 // *******************************************************************
 function wed_cleanItUp($string=null,$soap=null)
 {
-    global $walt;
-    $clean = $walt->getImagineer('goofy_clean');
-    
+    $clean = getImagineer('goofy_clean');
     return (is_null($soap)) ? $clean->CleanItUp($string) : $clean->CleanItUp($string,$soap);
 }
 
@@ -697,6 +720,25 @@ function wed_checkSiteLevels()
 		{
 			$status = (in_array($key, $site_security)) ? true : $status;
 		}
+	}
+	
+	return $status;
+}
+
+function wed_checkSecurityLevel($security_string=null)
+{
+	$status = true;
+	
+	if ((!is_null($security_string)) && (strtoupper($security_string)!='ALL'))
+	{
+		$status     = false;
+		$user_level = wed_getSystemValue('USER_LEVEL',array());
+		$levels     = explode(',', $security_string);
+		
+		foreach ($levels as $value)
+		{
+			$status = (in_array($value, $user_level)) ? true : $status;
+		}	
 	}
 	
 	return $status;

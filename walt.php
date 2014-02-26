@@ -2,13 +2,14 @@
 
 
 /*
- * wed_tools.php
+ * wed_tools.php & wed_theme_tools.php
  *
  * This file is a collection of straight functions that can be called from
  * anywhere and provide an easy and clean way to access all of the Imagineers
  *
  */
 include_once('wed_tools.php') ;
+include_once('wed_theme_tools.php') ;
 /*
  * details.php
  *
@@ -182,7 +183,7 @@ class walt extends imagineer
 		if (!wed_checkSiteLevels())
 		{
 			// header("Location: http://asffoundation.net/login.php");
-			// exit();
+			// exit('Hello');
 			
 			include_once('classes/check.class.php');
 			$site_security = wed_getSystemValue('SECURITY_LEVEL');

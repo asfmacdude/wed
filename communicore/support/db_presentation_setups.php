@@ -33,7 +33,7 @@ class db_presentation_setups extends db_common
 		$this->addOptions($options);
 	}
 	
-	private function setFields()
+	public function setFields($join=true)
 	{
 		/*
 		 * The 'FIELDS' array setup
@@ -65,81 +65,104 @@ class db_presentation_setups extends db_common
 		$fields = array();
 		
 		$fields['id'] = array(
-			'TITLE'     => 'ID',
+			'LABEL'     => 'ID',
 			'DB_FIELD'  => 'pset_id',
 			'NO_UPDATE' => 1
 			);
 		
 		$fields['modified'] = array(
-			'TITLE'     => 'Creation',
+			'LABEL'     => 'Creation',
 			'DB_FIELD'  => 'pset_modified',
-			'NO_UPDATE' => 1
+			'NO_UPDATE' => 1,
+			'SHOW_FIELD' => 1
 			);
 			
 		$fields['code'] = array(
-			'TITLE'    => 'Setup Code',
+			'LABEL'    => 'Setup Code',
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The code is a required field',
-			'DB_FIELD' => 'pset_code'
+			'DB_FIELD' => 'pset_code',
+			'SHOW_COLUMN'   => 1,
+			'SHOW_FIELD'    => 1
 			);
 		
 		$fields['title'] = array(
-			'TITLE'    => 'Setup Title',
+			'LABEL'    => 'Setup Title',
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The title is a required field',
-			'DB_FIELD' => 'pset_title'
+			'DB_FIELD' => 'pset_title',
+			'SHOW_COLUMN'   => 1,
+			'SHOW_FIELD'    => 1
 			);
 			
 		$fields['description'] = array(
-			'TITLE'    => 'Description',
-			'DB_FIELD' => 'pset_description'
+			'LABEL'    => 'Description',
+			'DB_FIELD' => 'pset_description',
+			'SHOW_COLUMN'   => 1,
+			'SHOW_FIELD'    => 1
 			);
 			
 		$fields['max'] = array(
-			'TITLE'    => 'Max Items',
-			'DB_FIELD' => 'pset_max_items'
+			'LABEL'    => 'Max Items',
+			'DB_FIELD' => 'pset_max_items',
+			'SHOW_COLUMN'   => 1,
+			'SHOW_FIELD'    => 1
 			);
 			
 		$fields['active'] = array(
-			'TITLE'    => 'Active',
+			'LABEL'    => 'Active',
 			'DB_FIELD' => 'pset_active',
-			'DEFAULT'  => 'Y'
+			'DEFAULT'  => 'Y',
+			'LIST_SELECT'   => array('Y','N'),
+			'SHOW_COLUMN'   => 1,
+			'SHOW_FIELD'    => 1
 			);
 			
 		$fields['details'] = array(
 			'LABEL'    => 'Details',
 			'DB_FIELD' => 'pset_details',
-			'INSTRUCT' => 'Details are various options for this schedule. Example:  LINK| apple.com;'
+			'INSTRUCT' => 'Details are various options for this schedule. Example:  LINK| apple.com;',
+			'SHOW_FIELD'    => 1,
+			'NO_EDITOR'    => 1
 			);
 		
 		$fields['css'] = array(
 			'LABEL'    => 'CSS',
 			'DB_FIELD' => 'pset_css',
-			'INSTRUCT' => 'CSS for the styling this banner'
+			'INSTRUCT' => 'CSS for the styling this banner',
+			'SHOW_FIELD'    => 1,
+			'NO_EDITOR'    => 1
 			);
 			
 		$fields['js'] = array(
 			'LABEL'    => 'Javascript',
 			'DB_FIELD' => 'pset_js',
-			'INSTRUCT' => 'Javascript for this banner'
+			'INSTRUCT' => 'Javascript for this banner',
+			'SHOW_FIELD'    => 1,
+			'NO_EDITOR'    => 1
 			);
 			
 		$fields['formats'] = array(
 			'LABEL'    => 'Formats ',
 			'DB_FIELD' => 'pset_formats_json',
-			'INSTRUCT' => 'Formatting is JSON format.'
+			'INSTRUCT' => 'Formatting is JSON format.',
+			'SHOW_FIELD'    => 1,
+			'NO_EDITOR'    => 1
 			);
 			
 		$fields['data'] = array(
 			'LABEL'    => 'Formats ',
 			'DB_FIELD' => 'pset_data_json',
-			'INSTRUCT' => 'Data field for arrays in JSON format.'
+			'INSTRUCT' => 'Data field for arrays in JSON format.',
+			'SHOW_FIELD'    => 1,
+			'NO_EDITOR'    => 1
 			);
 			
 		$fields['file'] = array(
 			'LABEL'    => 'Include File ',
 			'DB_FIELD' => 'pset_include_file',
-			'INSTRUCT' => 'Name of include file if used.'
+			'INSTRUCT' => 'Name of include file if used.',
+			'SHOW_FIELD'    => 1
 			);
 					
 		return $fields;

@@ -31,7 +31,7 @@ class db_sites extends db_common
 		$this->addOptions($options);
 	}
 	
-	private function setFields()
+	public function setFields($join=true)
 	{
 		/*
 		 * The 'FIELDS' array setup
@@ -70,35 +70,47 @@ class db_sites extends db_common
 		
 		$fields['name'] = array(
 			'TITLE'    => 'Site Name',
-			'VALIDATE' => 'isRequired',
+			'VALIDATE' => 'Required',
 			'MESSAGE'  => 'The site name is a required field',
-			'DB_FIELD' => 'site_name'
+			'DB_FIELD' => 'site_name',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'   => 1
 			);
 			
 		$fields['title'] = array(
 			'TITLE'    => 'Site Title',
 			'DB_FIELD' => 'site_title',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'   => 1
 			);
 			
 		$fields['description'] = array(
 			'TITLE'    => 'Site Description',
 			'DB_FIELD' => 'site_description',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'   => 1
 			);
 			
 		$fields['url'] = array(
 			'TITLE'    => 'Site URL',
 			'DB_FIELD' => 'site_url',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'   => 1
 			);
 			
 		$fields['theme'] = array(
 			'TITLE'    => 'Site Theme',
 			'DB_FIELD' => 'site_theme',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'   => 1
 			);
 			
 		$fields['details'] = array(
 			'LABEL'    => 'Details',
 			'DB_FIELD' => 'site_details',
-			'INSTRUCT' => 'Details are various options for this site. Example:  SITE_TITLE| ASF Foundation;'
+			'INSTRUCT' => 'Details are various options for this site. Example:  SITE_TITLE| ASF Foundation;',
+			'SHOW_FIELD'   => 1,
+			'NO_EDITOR'  => 1
 			);	
 						
 		return $fields;

@@ -63,7 +63,8 @@ class guestdirector extends imagineer
 		$this->options['USER_EMAIL']    = (isset($_SESSION['jigowatt']['email'])) ? $_SESSION['jigowatt']['email'] : null;
 		$this->options['USER_GRAVATAR'] = (isset($_SESSION['jigowatt']['gravatar'])) ? $_SESSION['jigowatt']['gravatar'] : null;
 		
-		// var_dump($this->options['USER_LEVEL']);
+		// NOTE: The GRAVATAR variable that comes from jigowatt is a full html source complete with image tag which is not
+		// usually what you want. Use the getGravatarImage function to get just the source and the size that you want.
 		
 		$this->compareCurrentData();
 		
@@ -147,17 +148,13 @@ class guestdirector extends imagineer
 	
 	public function getGravatarImage($size=200)
 	{
-		return $this->USER_GRAVATAR;
-		
-		/*
-$email = $this->USER->getValue('email',null);
+		$email = $this->options['USER_EMAIL'];
 		$email = trim($email);
 		$email = strtolower($email);
 		$email_hash = md5($email);
 		$size  = ($size===0) ? '%s' : $size;
 		
 		return 'http://gravatar.com/avatar/'.$email_hash.'?s='.$size.'&d=mm';
-*/
 	}
 	
 	public function isLoggedIn()

@@ -29,7 +29,7 @@ class db_faq_content extends db_common
 		$this->addOptions($options);
 	}
 	
-	private function setFields()
+	public function setFields($join=true)
 	{
 		/*
 		 * The 'FIELDS' array setup
@@ -61,34 +61,40 @@ class db_faq_content extends db_common
 		$fields = array();
 		
 		$fields['id'] = array(
-			'TITLE'     => 'ID',
+			'LABEL'     => 'ID',
 			'DB_FIELD'  => 'faq_id',
 			'NO_UPDATE' => 1
 			);
 		
 		$fields['modification'] = array(
-			'TITLE'     => 'Modification',
+			'LABEL'     => 'Modification',
 			'DB_FIELD'  => 'faq_modified',
 			'NO_UPDATE' => 1
 			);
 		
 		$fields['question'] = array(
-			'TITLE'    => 'FAQ Question',
-			'VALIDATE' => 'isRequired',
+			'LABEL'    => 'FAQ Question',
+			'VALIDATE' => 'Required',
 			'MESSAGE'  => 'The faq question is a required field',
-			'DB_FIELD' => 'faq_question'
+			'DB_FIELD' => 'faq_question',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 		
 		$fields['answer'] = array(
-			'TITLE'    => 'FAQ Answer',
-			'VALIDATE' => 'isRequired',
+			'LABEL'    => 'FAQ Answer',
+			'VALIDATE' => 'Required',
 			'MESSAGE'  => 'The faq answer is a required field',
 			'DB_FIELD' => 'faq_answer',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['order'] = array(
-			'TITLE'    => 'FAQ Order',
+			'LABEL'    => 'FAQ Order',
 			'DB_FIELD' => 'faq_question_order',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 		
 		$fields['status'] = array(
@@ -96,24 +102,32 @@ class db_faq_content extends db_common
 			'DB_FIELD' => 'faq_status',
 			'INSTRUCT' => 'Publish means your faq can be viewed online. Hold or Draft will not be shown online.',
 			'DEFAULT'  => 'Publish',
-			'LIST-SELECT' => array('Publish'=>'Publish','Hold'=>'Hold','Draft'=>'Draft')
+			'LIST_SELECT' => array('Publish','Hold','Draft'),
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 		
 		$fields['details'] = array(
 			'LABEL'    => 'Details',
 			'DB_FIELD' => 'faq_details',
-			'INSTRUCT' => 'Details are various options for this faq. Example:  SITE_TITLE| ASF Foundation;'
+			'INSTRUCT' => 'Details are various options for this faq. Example:  SITE_TITLE| ASF Foundation;',
+			'SHOW_FIELD'  => 1,
+			'NO_EDITOR'   => 1
 			);
 			
 		$fields['searchtags'] = array(
-			'TITLE'    => 'FAQ Search Tags',
+			'LABEL'    => 'FAQ Search Tags',
 			'DB_FIELD' => 'faq_search_tags',
+			'SHOW_FIELD'  => 1,
+			'NO_EDITOR'   => 1
 			);
 			
 		$fields['keywords'] = array(
 			'LABEL'    => 'Keywords',
 			'DB_FIELD' => 'faq_keywords',
-			'INSTRUCT' => 'Use keywords separated with commas to be used in searches.'
+			'INSTRUCT' => 'Use keywords separated with commas to be used in searches.',
+			'SHOW_FIELD'  => 1,
+			'NO_EDITOR'   => 1
 			);
 			
 		return $fields;

@@ -1,16 +1,15 @@
 <?php
 /*
- * db_content_control
+ * db_wed_menus_base
  *
- * Database object for the online database content_control
- *
+ * Database object for the sites listing
  *
  */
 defined( '_GOOFY' ) or die();
 
 include_once('db_common.php');
 
-class db_content_control extends db_common
+class db_wed_menus_base extends db_common
 {
 	public $options;
 	public $db;
@@ -24,9 +23,10 @@ class db_content_control extends db_common
 	{
 		$this->options['CLASS_NAME']     = __CLASS__;
 		$this->options['LOCAL_PATH']     = dirname(__FILE__);
-		$this->options['TABLE_NAME']     = 'content_control';
-		$this->options['TABLE_ID_FIELD'] = 'cnc_id';
-			
+		$this->options['TABLE_NAME']     = 'wed_menus_base';
+		$this->options['DISPLAY_NAME']   = 'Menu Listing';
+		$this->options['TABLE_ID_FIELD'] = 'mnub_id';
+		
 		$this->options['FIELDS']         = $this->setFields();
 		$this->addOptions($options);
 	}
@@ -64,139 +64,91 @@ class db_content_control extends db_common
 		
 		$fields['id'] = array(
 			'LABEL'     => 'ID',
-			'DB_FIELD'  => 'cnc_id',
+			'DB_FIELD'  => 'mnub_id',
 			'NO_UPDATE' => 1
 			);
 		
 		$fields['modified'] = array(
 			'LABEL'     => 'Modified',
-			'DB_FIELD'  => 'cnc_modified',
+			'DB_FIELD'  => 'mnub_modified',
 			'NO_UPDATE' => 1,
-			'SHOW_FIELD' => 1
+			'SHOW_COLUMN'  => 1
 			);
 		
 		$fields['title'] = array(
-			'LABEL'    => 'Page Title',
-			'INSTRUCT' => 'Unique name or title for this page.',
+			'LABEL'    => 'Menu Title',
 			'VALIDATE' => 'isRequired',
-			'MESSAGE'  => 'The title is a required field',
-			'DB_FIELD' => 'cnc_title',
-			'DEFAULT'  => '',
+			'MESSAGE'  => 'The menu title is a required field',
+			'DB_FIELD' => 'mnub_title',
 			'SHOW_COLUMN'  => 1,
-			'SHOW_FIELD'   => 1
+			'SHOW_FIELD'  => 1
 			);
 			
-		$fields['code'] = array(
-			'LABEL'    => 'Page Code',
-			'INSTRUCT' => 'Unique code for calling this page. (Must be UNIQUE!)',
-			'VALIDATE' => 'isRequired',
-			'MESSAGE'  => 'The code is a required field',
-			'DB_FIELD' => 'cnc_code',
-			'DEFAULT'  => 'code_xxxx',
+		$fields['link'] = array(
+			'LABEL'    => 'Menu Link',
+			'DB_FIELD' => 'mnub_link',
 			'SHOW_COLUMN'  => 1,
-			'SHOW_FIELD'   => 1
-			);
-		
-		$fields['themeid'] = array(
-			'LABEL'     => 'Theme ID',
-			'DB_FIELD'  => 'cnc_theme_id',
-			'SHOW_COLUMN'  => 1,
-			'SHOW_FIELD'   => 1
+			'SHOW_FIELD'  => 1
 			);
 			
-		$fields['themepage'] = array(
-			'LABEL'    => 'Theme Page',
-			'VALIDATE' => 'isRequired',
-			'MESSAGE'  => 'The theme page is a required field',
-			'DB_FIELD' => 'cnc_theme_page',
-			'DEFAULT'  => 'index',
+		$fields['security'] = array(
+			'LABEL'    => 'Menu Security Levels',
+			'DB_FIELD' => 'mnub_security',
 			'SHOW_COLUMN'  => 1,
-			'SHOW_FIELD'   => 1
+			'SHOW_FIELD'  => 1
+			);
+			
+		$fields['description'] = array(
+			'LABEL'    => 'Menu Description',
+			'DB_FIELD' => 'mnub_description',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'  => 1
 			);
 		
 		$fields['details'] = array(
 			'LABEL'    => 'Details',
-			'DB_FIELD' => 'cnc_details',
-			'INSTRUCT' => 'Details are various options for this page. Example:  PAGE_TITLE| Official Web Site;',
-			'SHOW_FIELD'   => 1,
-			'NO_EDITOR'    => 1
+			'DB_FIELD' => 'mnub_details',
+			'INSTRUCT' => 'Details are various options for this article. Example:  AUTHOR| William Shakespeare;',
+			'SHOW_FIELD'  => 1,
+			'NO_EDITOR'   => 1
 			);
 			
-		$fields['structure'] = array(
-			'LABEL'    => 'Page Structure Code',
-			'DB_FIELD' => 'cnc_content',
-			'INSTRUCT' => 'Build the structure of your page using shortcodes.',
-			'SHOW_FIELD'   => 1,
-			'NO_EDITOR'    => 1
-			);
-			
-		$fields['status'] = array(
-			'LABEL'    => 'Status',
-			'DB_FIELD' => 'cnc_status',
-			'INSTRUCT' => 'Publish means your page can be viewed online. Hold or Draft will not be shown online.',
-			'DEFAULT'  => 'Publish',
-			'LIST_SELECT' => array('Publish','Hold','Draft'),
+		$fields['active'] = array(
+			'LABEL'    => 'Active Y/N?',
+			'DB_FIELD' => 'mnub_active',
+			'DEFAULT'  => 'Y',
+			'LIST_SELECT'  => array('Y','N'),
 			'SHOW_COLUMN'  => 1,
-			'SHOW_FIELD'   => 1
+			'SHOW_FIELD'  => 1
 			);
-			
-		
+					
 		return $fields;
 	}
 	
-	public function getControlID($name)
+	public function loadMenuID($id=null)
 	{
-		$data = $this->loadPage($name);
-		return (!$data) ? false : $this->getValue('id');
-	}
-	
-	public function loadPageID($id=null)
-	{
-		$data = $this->selectByID($id);
-			
-		if ($data)
-		{	
-			$this->addValues_Data($data);
-		}
+		$status = false;
 		
-		return (!$data) ? false : true ;
+		if (!is_null($id))
+        {
+            $table      = $this->options['TABLE_NAME'];        
+			$where_str  = ' WHERE ';
+			$where_str .= $this->options['FIELDS']['id']['DB_FIELD'].'="'.$id.'"';
+			$sql        = 'SELECT * FROM '.$table.$where_str;    
+			$data       = $this->dbRow($sql);
+			$this->addValues_Data($data);	
+			$status     = (!$data) ? false : true ;
+        }
+        
+        return $status;
 	}
 	
-	public function loadPage($code=null)
-	{
-		$data = $this->selectByCode($code);
-			
-		if ($data)
-		{	
-			$this->addValues_Data($data);
-		}
-		
-		return (!$data) ? false : true ;
-	}
-	
-	public function loadAllForTable($order=null)
-	{
-		$data = $this->selectAllTable($order);	
-		return (!$data) ? false : $data ;
-	}
-	
-	public function loadStructureID($id=null)
-	{
-		$data = $this->selectByID($id);
-		$this->addValues_Data($data);	
-		return (!$data) ? false : true ; // let showdirector know
-	}
-	
-	public function selectByCode($code=null)
+	public function getDetail($detail,$default=null)
     {
-		$site_id  = wed_getSystemValue('SITE_ID');
-		$pairs    = array('code' => $code);
-		return $this->selectByPairs($pairs,null,false);
-    }
-    
-    public function getDetails()
-    {
-	    return wed_getOptionsFromString($this->getValue('details'));
+	    $detail_field = $this->getValue('details');
+	    $detail_array = wed_getOptionsFromString($detail_field);
+	    
+	    return (isset($detail_array[$detail])) ? $detail_array[$detail] : $default;
     }
     
     // *******************************************************************
@@ -210,12 +162,13 @@ class db_content_control extends db_common
     {
 	    // Based on the code, we can present different views of the content_main
 	    // table with different settings.
-	    if ($code=='pages')
+	    if ($code=='menus_200')
 	    {
 		    $this->initXCrud();
-		    // $this->xcrud->relation('cnc_theme_id','wed_menus','mnu_id','mnu_title');
-		    // $this->xcrud->relation('mnuc_menu_base_id','wed_menus_base','mnub_id','mnub_title');
+		    // $this->xcrud->relation('fqcn_site_id','sites','site_id','site_title');
+		    // $this->xcrud->relation('fqcn_faq_id','faq_content','faq_id','faq_question');
 	    }
-    }	
+    }
+	
 }
 ?>

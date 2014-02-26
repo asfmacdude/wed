@@ -33,7 +33,7 @@ class db_content_groups extends db_common
 		$this->addOptions($options);
 	}
 	
-	private function setFields()
+	public function setFields($join=true)
 	{
 		/*
 		 * The 'FIELDS' array setup
@@ -73,7 +73,8 @@ class db_content_groups extends db_common
 		$fields['modification'] = array(
 			'TITLE'     => 'Modification',
 			'DB_FIELD'  => 'cng_modification',
-			'NO_UPDATE' => 1
+			'NO_UPDATE' => 1,
+			'SHOW_FIELD' => 1
 			);
 		
 		$fields['code'] = array(

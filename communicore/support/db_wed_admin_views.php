@@ -1,24 +1,21 @@
 <?php
 /*
- * db_banners
+ * db_wed_admin_views
  *
- * Database object for the online database banners
- *
+ * Database object for the sites listing
  *
  */
 defined( '_GOOFY' ) or die();
 
 include_once('db_common.php');
 
-class db_banners extends db_common
+class db_wed_admin_views extends db_common
 {
 	public $options;
 	public $db;
 	
 	public function __construct($options=array())
 	{
-		global $walt;
-		$this->db     = $walt->getImagineer('communicore');
 		$this->setOptions($options);
 	}
 	
@@ -26,8 +23,9 @@ class db_banners extends db_common
 	{
 		$this->options['CLASS_NAME']     = __CLASS__;
 		$this->options['LOCAL_PATH']     = dirname(__FILE__);
-		$this->options['TABLE_NAME']     = 'banners';
-		$this->options['TABLE_ID_FIELD'] = 'banr_id';
+		$this->options['TABLE_NAME']     = 'wed_admin_views';
+		$this->options['DISPLAY_NAME']   = 'Administration Views';
+		$this->options['TABLE_ID_FIELD'] = 'advw_id';
 		
 		$this->options['FIELDS']         = $this->setFields();
 		$this->addOptions($options);
@@ -62,80 +60,99 @@ class db_banners extends db_common
 		 *
 		 * NOTE: Other values can be added as needed.
 		 */
-		$fields     = array();
-		$today_date = wed_getDateToday();
+		$fields = array();
 		
 		$fields['id'] = array(
-			'TITLE'     => 'ID',
-			'DB_FIELD'  => 'banr_id',
+			'LABEL'     => 'ID',
+			'DB_FIELD'  => 'advw_id',
 			'NO_UPDATE' => 1
 			);
 		
 		$fields['modified'] = array(
-			'TITLE'     => 'Modified',
-			'DB_FIELD'  => 'banr_modified',
-			'NO_UPDATE' => 1
+			'LABEL'     => 'Modified',
+			'DB_FIELD'  => 'advw_modified',
+			'NO_UPDATE' => 1,
+			'SHOW_FIELD' => 1
+			);
+		
+		$fields['code'] = array(
+			'LABEL'    => 'View Code',
+			'VALIDATE' => 'isRequired',
+			'MESSAGE'  => 'The view code is a required field',
+			'DB_FIELD' => 'advw_code',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['title'] = array(
-			'TITLE'     => 'Banner Title',
-			'DB_FIELD'  => 'banr_title'
+			'LABEL'    => 'View Title',
+			'DB_FIELD' => 'advw_title',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['description'] = array(
-			'TITLE'     => 'Description',
-			'DB_FIELD'  => 'banr_description'
+			'LABEL'    => 'View Description',
+			'DB_FIELD' => 'advw_description',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
-		$fields['width'] = array(
-			'TITLE'    => 'Width',
-			'DB_FIELD' => 'banr_width'
+		$fields['instructions'] = array(
+			'LABEL'    => 'View Instructions',
+			'DB_FIELD' => 'advw_instructions',
+			'SHOW_FIELD'  => 1
+			);
+			
+		$fields['security'] = array(
+			'LABEL'    => 'View Security',
+			'DB_FIELD' => 'advw_security',
+			'DEFAULT'  => 'all',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'  => 1
+			);
+			
+		$fields['db'] = array(
+			'LABEL'    => 'View Database',
+			'DB_FIELD' => 'advw_db_object',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'  => 1
 			);
 		
-		$fields['type'] = array(
-			'TITLE'    => 'Type',
-			'DB_FIELD' => 'banr_type',
-			'INSTRUCT' => 'Banners can either be Image or HTML',
-			'DEFAULT'  => 'Image'
-			);
-			
-		$fields['height'] = array(
-			'TITLE'    => 'Height',
-			'DB_FIELD' => 'banr_height'
-			);
-			
 		$fields['details'] = array(
 			'LABEL'    => 'Details',
-			'DB_FIELD' => 'banr_details',
-			'INSTRUCT' => 'Details are various options for this schedule. Example:  LINK| apple.com;'
+			'DB_FIELD' => 'advw_details',
+			'INSTRUCT' => 'Details are various options for this view.',
+			'SHOW_FIELD'  => 1,
+			'NO_EDITOR'   => 1
 			);
-			
-		$fields['html'] = array(
-			'LABEL'    => 'HTML',
-			'DB_FIELD' => 'banr_html',
-			'INSTRUCT' => 'Use this to store HTML for HTML banners'
-			);
-			
-		$fields['active'] = array(
-			'TITLE'    => 'Active',
-			'DB_FIELD' => 'banr_active',
-			'DEFAULT'  => 'Y'
-			);
-			
+					
 		return $fields;
 	}
 	
-	public function loadImageID($id=null)
+	public function loadView($code=null)
 	{
-		if (is_null($id))
+		$data = $this->selectByCode($code);
+		$this->addValues_Data($data);	
+		return (!$data) ? false : true ;
+	}
+	
+	public function selectByCode($code=null)
+    {
+        if (is_null($code))
         {
             return false;
         }
         
-		$data = $this->selectByID($id);
-		$this->addValues_Data($data);	
-		return (!$data) ? false : true ;
-	}
+        $table     = $this->options['TABLE_NAME'];
+        
+        $where_str  = ' WHERE ';
+        $where_str .= $this->options['FIELDS']['code']['DB_FIELD'].'="'.$code.'"';
+
+        $sql = 'SELECT * FROM '.$table.$where_str;
+        
+        return $this->dbRow($sql);
+    }
 	
 	public function getDetail($detail,$default=null)
     {
@@ -144,7 +161,6 @@ class db_banners extends db_common
 	    
 	    return (isset($detail_array[$detail])) ? $detail_array[$detail] : $default;
     }
-	
 	
 }
 ?>

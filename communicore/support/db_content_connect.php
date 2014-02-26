@@ -80,7 +80,7 @@ class db_content_connect extends db_common
 		$this->order['CNN_SORT']   = ' ORDER BY a.cnn_sort ASC';
 	}
 	
-	private function setFields()
+	public function setFields($join=true)
 	{
 		/*
 		 * The 'FIELDS' array setup
@@ -182,7 +182,10 @@ class db_content_connect extends db_common
 			'DEFAULT'  => null
 			);
 			
-		$fields = $this->joinFields($fields);
+		if ($join)
+		{
+			$fields = $this->joinFields($fields);
+		}
 			
 		return $fields;
 	}
@@ -681,8 +684,9 @@ class db_content_connect extends db_common
 	    $current_site_id = wed_getSystemValue('SITE_ID');
 	    $record_site_id  = $this->getValue('cnn_siteid');
 	    $type            = $this->getTYPE();
+	    $http_prefix     = 'http://';
 	    
-	    $link = ($record_site_id===$current_site_id) ? null : $this->getValue('site_url');
+	    $link = ($record_site_id===$current_site_id) ? null : $http_prefix . $this->getValue('site_url');
 	    
 	    if ($this->getValue('linktype')=='Article')
 	    {

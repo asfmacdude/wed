@@ -45,6 +45,7 @@ class content_detail extends details
 		$this->options['EXPT_LENGTH']     = 150;
 		$this->options['HTML_FORMATS']    = array(
 			'TITLE'    => wed_getSystemValue('THEME_TITLE','<h1>%TITLE%</h1>'),
+			'TITLE2'   => wed_getSystemValue('THEME_TITLE','<h2>%TITLE%</h2>'),
 			'SUBTITLE' => wed_getSystemValue('THEME_SUBTITLE','<h3>%SUBTITLE%</h3>'),
 			'VIDEO'    => wed_getSystemValue('THEME_VIDEO','<iframe width="%WIDTH%" height="%HEIGHT%" src="//www.youtube.com/embed/%CODE%" frameborder="0" allowfullscreen></iframe>'),
 			'IMAGE'    => wed_getSystemValue('THEME_IMAGE','<img src="%IMAGE_PATH%" style="padding-bottom:20px;" />'),
@@ -154,12 +155,25 @@ class content_detail extends details
 		$html  = str_replace('%TITLE%', $this->getTitle(), $this->options['HTML_FORMATS']['TITLE']);
 		$html .= $this->getMedia('LARGE');
 		$html .= str_replace('%ARTICLE%', $this->getFullArticle(), $this->options['HTML_FORMATS']['ARTICLE']);
+		$html  = wed_cleanItUp($html,'SC_BRACKETS');
+		return $html;
+	}
+	
+	private function getFormatTAB()
+	{
+		$this->updateHeader();
+		// $html  = str_replace('%TITLE%', $this->getTitle(), $this->options['HTML_FORMATS']['TITLE2']);
+		$html = $this->getMedia('SMALL');
+		$html .= str_replace('%ARTICLE%', $this->getFullArticle(), $this->options['HTML_FORMATS']['ARTICLE']);
+		$html  = wed_cleanItUp($html,'SC_BRACKETS');
 		return $html;
 	}
 	
 	private function getFormatEXCERPT()
 	{
-		return str_replace('%EXCERPT%', $this->getExcerpt(), $this->options['HTML_FORMATS']['EXCERPT']);
+		$html = str_replace('%EXCERPT%', $this->getExcerpt(), $this->options['HTML_FORMATS']['EXCERPT']);
+		$html = wed_cleanItUp($html,'SC_BRACKETS');
+		return $html;
 	}
 	
 	private function getFormatSECTION()

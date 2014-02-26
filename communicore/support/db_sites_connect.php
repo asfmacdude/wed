@@ -50,7 +50,7 @@ class db_sites_connect extends db_common
 		$this->order['CONTROL_NAME']      = ' ORDER BY c.cnc_code';
 	}
 	
-	private function setFields()
+	public function setFields($join=true)
 	{
 		/*
 		 * The 'FIELDS' array setup
@@ -82,29 +82,36 @@ class db_sites_connect extends db_common
 		$fields = array();
 		
 		$fields['id'] = array(
-			'TITLE'     => 'ID',
+			'LABEL'     => 'ID',
 			'DB_FIELD'  => 'stcn_id',
 			'NO_UPDATE' => 1
 			);
 		
 		$fields['modification'] = array(
-			'TITLE'     => 'Modification',
+			'LABEL'     => 'Modification',
 			'DB_FIELD'  => 'stcn_modification',
 			'NO_UPDATE' => 1
 			);
 		
 		$fields['siteid'] = array(
-			'TITLE'    => 'Site ID',
-			'DB_FIELD' => 'stcn_site_id'
+			'LABEL'    => 'Site ID',
+			'DB_FIELD' => 'stcn_site_id',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'   => 1
 			);
 		
 		$fields['controlid'] = array(
-			'TITLE'    => 'Control ID',
-			'DB_FIELD' => 'stcn_control_id'
+			'LABEL'    => 'Control ID',
+			'DB_FIELD' => 'stcn_control_id',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'   => 1
 			);
 
 			
-		$fields = $this->joinFields($fields);
+		if ($join)
+		{
+			$fields = $this->joinFields($fields);
+		}
 			
 		return $fields;
 	}

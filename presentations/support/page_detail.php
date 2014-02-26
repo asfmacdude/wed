@@ -59,7 +59,7 @@ class page_detail extends details
 			/*
 			 * Theme Update
 			 *
-			 * Here we check to see if the Control Code has a theme. The golbal theme
+			 * Here we check to see if the Control Code has a theme. The global theme
 			 * has already been set, but the control code is allowed to override the theme
 			 * here if desired.
 			 */
@@ -100,24 +100,11 @@ class page_detail extends details
 		return true;
 	}
 	
-	public function loadAssets()
-	{
-		$theme    = wed_getSystemValue('THEME');
-		$dir_path = THEME_BASE . $theme . DS;
-		
-		$options['DIR_PATH']  = $dir_path;
-		$options['FILE_NAME'] = 'assets';
-		
-		$path = wed_getAlternatePath($options);
-		
-		$asset_class = strtolower($theme) . '_assets';	
-		return (wed_includeFile($path)) ? new $asset_class() : null;
-	}
-	
 	private function loadTemplates($html)
 	{
-		global $walt;
-		$shortcodes = $walt->getImagineer('shortcodes');
+		$shortcodes = getImagineer('shortcodes');
+		// Convert all HTML entities to their applicable characters
+		$html       = html_entity_decode($html);
 		return $shortcodes->getHTML(array('HTML'=>$html,'PRE'=>true));
 	}
 	
@@ -150,11 +137,12 @@ class page_detail extends details
 	
 	private function finalizeHTML($html)
 	{
-		global $walt;
-		$keys       = $walt->getImagineer('keys');
-		$shortcodes = $walt->getImagineer('shortcodes');
-		$css        = $walt->getImagineer('cssdirector');
-		$javascript = $walt->getImagineer('jsdirector');
+		// Convert all HTML entities to their applicable characters
+		$html       = html_entity_decode($html);
+		$keys       = getImagineer('keys');
+		$shortcodes = getImagineer('shortcodes');
+		$css        = getImagineer('cssdirector');
+		$javascript = getImagineer('jsdirector');
 
 		// Order below is very important because keys and shortcodes
 		// can add css and javascript along the way so those must be
@@ -175,12 +163,11 @@ class page_detail extends details
 		
 		// We run Keys again to do the merge keys
 		$html = $keys->getHTML(array('HTML'=>$html,'MERGE'=>true));
-		
+		$html = wed_cleanItUp($html,'FINAL_HTML');
 		$this->getDebugMessages();
-
 		$html = $this->devShowErrorDiv($html);
 		$html = $this->devShowMessageDiv($html);
-		
+
 		return $html;
 	}
 	
@@ -191,9 +178,9 @@ class page_detail extends details
 		
 		if ($mode)
 		{
-			dbug($_SESSION);
-			dbug($_SERVER);
-			dbug($_REQUEST);
+			//dbug($_SESSION);
+			//dbug($_SERVER);
+			//dbug($_REQUEST);
 			
 			if (function_exists('dbug'))
 			{
@@ -215,10 +202,18 @@ class page_detail extends details
 		if (($this->checkURLGroup()) && ($this->loadControl()))
 		{	
 			// Load assets.php
-			$this->options['ASSETS'] = $this->loadAssets();
+			$this->options['ASSETS'] = wed_getAssets(); // $this->loadAssets();
+			
+			if (!is_null($this->options['ASSETS']))
+			{
+				// Call pushOptions method to push important settings out
+				// to other directors.
+				$this->options['ASSETS']->pushOptions();
+			}
 			
 			// Load & Work Control Content
 			$html = wed_getSystemValue('STRUCTURE');
+			// Run Shortcodes on structure html
 			$html = $this->loadTemplates($html);
 			
 			// Load theme page

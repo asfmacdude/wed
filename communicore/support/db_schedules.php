@@ -33,7 +33,7 @@ class db_schedules extends db_common
 		$this->addOptions($options);
 	}
 	
-	private function setFields()
+	public function setFields($join=true)
 	{
 		/*
 		 * The 'FIELDS' array setup
@@ -66,46 +66,58 @@ class db_schedules extends db_common
 		$today_date = wed_getDateToday();
 		
 		$fields['id'] = array(
-			'TITLE'     => 'ID',
+			'LABEL'     => 'ID',
 			'DB_FIELD'  => 'schd_id',
 			'NO_UPDATE' => 1
 			);
 		
 		$fields['modified'] = array(
-			'TITLE'     => 'Modified',
+			'LABEL'     => 'Modified',
 			'DB_FIELD'  => 'schd_modified',
-			'NO_UPDATE' => 1
+			'NO_UPDATE' => 1,
+			'SHOW_FIELD' => 1
 			);
 			
 		$fields['name'] = array(
-			'TITLE'     => 'Schedule Name',
-			'DB_FIELD'  => 'schd_name'
+			'LABEL'     => 'Schedule Name',
+			'DB_FIELD'  => 'schd_name',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'    => 1
 			);
 			
 		$fields['active'] = array(
-			'TITLE'    => 'Active',
+			'LABEL'    => 'Active',
 			'DB_FIELD' => 'schd_active',
-			'DEFAULT'  => 'Y'
+			'DEFAULT'  => 'Y',
+			'LIST_SELECT' => array('Y','N'),
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'    => 1
 			);
 		
 		$fields['start'] = array(
-			'TITLE'    => 'Start Date',
+			'LABEL'    => 'Start Date',
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The start date is a required field',
 			'DB_FIELD' => 'schd_start_date',
-			'DEFAULT'  => $today_date
+			'DEFAULT'  => $today_date,
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'    => 1
 			);
 			
 		$fields['end'] = array(
-			'TITLE'    => 'End Date',
+			'LABEL'    => 'End Date',
 			'DB_FIELD' => 'schd_end_date',
-			'DEFAULT'  => null
+			'DEFAULT'  => null,
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'    => 1
 			);
 			
 		$fields['details'] = array(
 			'LABEL'    => 'Details',
 			'DB_FIELD' => 'schd_details',
-			'INSTRUCT' => 'Details are various options for this schedule. Example:  LINK| apple.com;'
+			'INSTRUCT' => 'Details are various options for this schedule. Example:  LINK| apple.com;',
+			'SHOW_FIELD'    => 1,
+			'NO_EDITOR'    => 1
 			);
 			
 		return $fields;

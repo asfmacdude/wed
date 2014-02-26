@@ -38,7 +38,7 @@ class db_events_connect extends db_common
 		$this->sql['RESULTS_JOIN'] = 'SELECT * FROM events_connect a JOIN events b ON a.evct_event_id = b.evnt_id JOIN events_activity c ON a.evct_event_activity_id = c.actv_id JOIN content_groups d ON a.evct_group_id = d.cng_id JOIN events_results e ON a.evct_event_activity_id=e.rslt_event_activity_id';
 	}
 	
-	private function setFields()
+	public function setFields($join=true)
 	{
 		/*
 		 * The 'FIELDS' array setup
@@ -96,7 +96,10 @@ class db_events_connect extends db_common
 			'DB_FIELD' => 'evct_group_id'
 			);
 			
-		$fields = $this->joinFields($fields);
+		if ($join)
+		{
+			$fields = $this->joinFields($fields);
+		}
 			
 		return $fields;
 	}

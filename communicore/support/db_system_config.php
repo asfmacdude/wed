@@ -31,7 +31,7 @@ class db_system_config extends db_common
 		$this->addOptions($options);
 	}
 	
-	private function setFields()
+	public function setFields($join=true)
 	{
 		/*
 		 * The 'FIELDS' array setup
@@ -71,7 +71,8 @@ class db_system_config extends db_common
 		$fields['modified'] = array(
 			'LABEL'     => 'Modified',
 			'DB_FIELD'  => 'sys_cfg_modify',
-			'NO_UPDATE' => 1
+			'NO_UPDATE' => 1,
+			'SHOW_FIELD' => 1
 			);
 		
 		$fields['siteid'] = array(
@@ -80,7 +81,9 @@ class db_system_config extends db_common
 			'MESSAGE'  => 'The site is a required field',
 			'INSTRUCT' => 'Each setting is site specific so choose which site this will affect.',
 			'DB_FIELD' => 'sys_cfg_site_id',
-			'DEFAULT'  => 4
+			'DEFAULT'  => 4,
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['name'] = array(
@@ -89,7 +92,9 @@ class db_system_config extends db_common
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The setting name is a required field',
 			'DB_FIELD' => 'sys_cfg_name',
-			'DEFAULT'  => 'ENTER_NAME'
+			'DEFAULT'  => 'ENTER_NAME',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['value'] = array(
@@ -98,7 +103,10 @@ class db_system_config extends db_common
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The setting value is a required field',
 			'DB_FIELD' => 'sys_cfg_value',
-			'DEFAULT'  => 'none'
+			'DEFAULT'  => 'none',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1,
+			'NO_EDITOR'   => 1
 			);
 			
 		$fields['convert'] = array(
@@ -107,23 +115,31 @@ class db_system_config extends db_common
 			'MESSAGE'  => 'The value type is a required field',
 			'DB_FIELD' => 'sys_cfg_convert',
 			'DEFAULT'  => 'string',
-			'LIST-SELECT' => array('string'=>'string','bool'=>'bool','array'=>'array','encrypt'=>'encrypt')
+			'LIST_SELECT' => array('string','bool','array','encrypt'),
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['description'] = array(
 			'LABEL'    => 'Description',
 			'INSTRUCT' => 'Insert a description of this setting for others to understand.',
-			'DB_FIELD' => 'sys_cfg_description'
+			'DB_FIELD' => 'sys_cfg_description',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['message'] = array(
 			'LABEL'    => 'Error Message',
-			'DB_FIELD' => 'sys_cfg_message'
+			'DB_FIELD' => 'sys_cfg_message',
+			'SHOW_FIELD'  => 1,
+			'NO_EDITOR'   => 1
 			);
 			
 		$fields['validate'] = array(
 			'LABEL'    => 'Setting Validation',
-			'DB_FIELD' => 'sys_cfg_validate'
+			'DB_FIELD' => 'sys_cfg_validate',
+			'SHOW_FIELD'  => 1,
+			'NO_EDITOR'   => 1
 			);
 			
 		$fields['access'] = array(
@@ -131,18 +147,23 @@ class db_system_config extends db_common
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The setting access is a required field',
 			'DB_FIELD' => 'sys_cfg_access',
-			'DEFAULT'  => '50:50'
+			'DEFAULT'  => '50:50',
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['edit'] = array(
 			'LABEL'    => 'Edit Options',
-			'DB_FIELD' => 'sys_cfg_edit'
+			'DB_FIELD' => 'sys_cfg_edit',
+			'SHOW_FIELD'  => 1,
+			'NO_EDITOR'   => 1
 			);
 			
 		$fields['replace'] = array(
 			'LABEL'    => 'Setting Replace',
 			'DB_FIELD' => 'sys_cfg_replaceable',
-			'DEFAULT'  => 'Y'
+			'DEFAULT'  => 'Y',
+			'LIST_SELECT' => array('Y','N'),
+			'SHOW_FIELD'  => 1
 			);
 		
 		return $fields;
@@ -197,6 +218,24 @@ class db_system_config extends db_common
 		}
 		
 		return $settings;
+    }
+    
+    // *******************************************************************
+    // ********  XCRUD Section *******************************************
+    // *******************************************************************
+    
+    // *******************************************************************
+    // ********  setupXCrud initial setup of XCrud Object ****************
+    // *******************************************************************
+    public function setupXCrud($code=null)
+    {
+	    // Based on the code, we can present different views of the content_main
+	    // table with different settings.
+	    if ($code=='system_config')
+	    {
+		    $this->initXCrud();
+		    $this->xcrud->relation('sys_cfg_site_id','sites','site_id','site_title');
+	    }
     }
 }
 ?>

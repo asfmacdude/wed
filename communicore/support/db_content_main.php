@@ -38,7 +38,7 @@ class db_content_main extends db_common
 		return $list_db->options['TYPE_LIST'];
 	}
 	
-	private function setFields()
+	public function setFields($join=true)
 	{
 		/*
 		 * The 'FIELDS' array setup
@@ -78,39 +78,47 @@ class db_content_main extends db_common
 		$fields['modified'] = array(
 			'LABEL'     => 'Modified',
 			'DB_FIELD'  => 'cnt_modified',
-			'NO_UPDATE' => 1
+			'NO_UPDATE' => 1,
+			'SHOW_FIELD' => 1
 			);
 		
 		$fields['title'] = array(
 			'LABEL'    => 'Title',
-			'VALIDATE' => 'isRequired',
+			'VALIDATE' => 'Required',
 			'MESSAGE'  => 'The title is a required field',
 			'DB_FIELD' => 'cnt_title',
 			'INSTRUCT' => 'This is the unique name to identify this article.',
-			'DEFAULT'  => 'Enter a title'
+			'DEFAULT'  => 'Enter a title',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['typeid'] = array(
 			'LABEL'    => 'Type',
 			'DB_FIELD' => 'cnt_type_id',
 			'INSTRUCT' => 'Select the type of content.',
-			'DEFAULT'  => 1
+			'DEFAULT'  => 1,
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 		
 		$fields['code'] = array(
 			'LABEL'    => 'Content Code',
-			'VALIDATE' => 'isRequired',
+			'VALIDATE' => 'Required',
 			'MESSAGE'  => 'The code is a required field',
 			'DB_FIELD' => 'cnt_code',
 			'INSTRUCT' => 'This is the unique code that the system uses to index this article.',
-			'DEFAULT'  => 'Enter a code'
+			'DEFAULT'  => 'Enter a code',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 		
 		$fields['order'] = array(
 			'LABEL'    => 'Content Order',
 			'DB_FIELD' => 'cnt_content_order',
 			'INSTRUCT' => 'This is used to sort certain grouped content records.',
-			'DEFAULT'  => 'zzzz'
+			'DEFAULT'  => 'zzzz',
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['status'] = array(
@@ -118,58 +126,73 @@ class db_content_main extends db_common
 			'DB_FIELD' => 'cnt_status',
 			'INSTRUCT' => 'Publish means your content can be viewed online. Hold or Draft will not be shown online.',
 			'DEFAULT'  => 'Publish',
-			'LIST-SELECT' => array('Publish'=>'Publish','Hold'=>'Hold','Draft'=>'Draft')
+			'LIST_SELECT' => array('Publish','Hold','Draft'),
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['details'] = array(
 			'LABEL'    => 'Details',
 			'DB_FIELD' => 'cnt_details',
-			'INSTRUCT' => 'Details are various options for this article. Example:  AUTHOR| William Shakespeare;'
+			'INSTRUCT' => 'Details are various options for this article. Example:  AUTHOR| William Shakespeare;',
+			'SHOW_FIELD'  => 1,
+			'NO_EDITOR'   => 1
 			);
 			
 		$fields['excerpt'] = array(
 			'LABEL'    => 'Excerpt',
 			'DB_FIELD' => 'cnt_excerpt',
-			'INSTRUCT' => 'The excerpt should only be about 150 characters of less and should give a clear introduction of the actual content.'
+			'INSTRUCT' => 'The excerpt should only be about 150 characters of less and should give a clear introduction of the actual content.',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['fullarticle'] = array(
 			'LABEL'    => 'Full Article',
 			'DB_FIELD' => 'cnt_content',
 			'NO_TABLE' => true,
-			'INSTRUCT' => 'Use the WYSIWYG Editor to format and style the article to your taste.'
+			'INSTRUCT' => 'Use the WYSIWYG Editor to format and style the article to your taste.',
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['published'] = array(
 			'LABEL'    => 'Publish Date',
 			'DB_FIELD' => 'cnt_published_timestamp',
 			'INSTRUCT' => 'The timestamp when the article was published.',
-			'DEFAULT'  => $this->getDateToday()
+			'DEFAULT'  => $this->getDateToday(),
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['author'] = array(
 			'LABEL'    => 'Author',
 			'DB_FIELD' => 'cnt_author',
 			'INSTRUCT' => 'The author of the article.',
-			'DEFAULT'  => $this->getDateToday()
+			'DEFAULT'  => $this->getDateToday(),
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['tag'] = array(
 			'LABEL'    => 'Related Tags',
-			'DB_FIELD' => 'cnt_related_tag',
-			'INSTRUCT' => 'Select one or more related tags for this article.(optional)'
+			'DB_FIELD' => 'cnt_related_tags',
+			'INSTRUCT' => 'Select one or more related tags for this article.(optional)',
+			'SHOW_FIELD'  => 1,
+			'NO_EDITOR'   => 1
 			);
 			
 		$fields['keywords'] = array(
 			'LABEL'    => 'Keywords',
 			'DB_FIELD' => 'cnt_search_keywords',
-			'INSTRUCT' => 'Use keywords separated with commas to be used in searches.'
+			'INSTRUCT' => 'Use keywords separated with commas to be used in searches.',
+			'SHOW_FIELD'  => 1,
+			'NO_EDITOR'   => 1
 			);
 			
 		$fields['syskeywords'] = array(
 			'LABEL'    => 'System Keywords',
 			'DB_FIELD' => 'cnt_system_keywords',
-			'INSTRUCT' => 'Use keywords separated with commas to be used by the system.'
+			'INSTRUCT' => 'Use keywords separated with commas to be used by the system.',
+			'SHOW_FIELD'  => 1,
+			'NO_EDITOR'   => 1
 			);
 		
 		return $fields;
@@ -414,9 +437,16 @@ class db_content_main extends db_common
     // *******************************************************************
     // ********  setupXCrud initial setup of XCrud Object ****************
     // *******************************************************************
-    public function setupXCrud()
+    public function setupXCrud($code=null)
     {
-	    $this->initXCrud();
+	    // Based on the code, we can present different views of the content_main
+	    // table with different settings.
+	    if ($code=='content')
+	    {
+		    $this->initXCrud();
+		    $this->xcrud->relation('cnt_type_id','content_types','ctp_id','ctp_title');
+		    // $this->connections = $this->xcrud->nested_table('connections','cnt_id','content_connect','cnn_content_id');
+	    }
     }
 }
 ?>

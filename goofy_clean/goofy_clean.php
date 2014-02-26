@@ -56,7 +56,9 @@ class goofy_clean extends imagineer
             'SYS_ACT'      => 'cleanSysAct',
             'NUMBER'       => 'cleanAlpha',
             'ALPHA'        => 'cleanNumbers',
-            'URL'          => 'cleanURL'
+            'URL'          => 'cleanURL',
+            'FINAL_HTML'   => 'cleanHTML',
+            'SC_BRACKETS'  => 'cleanPreShortcodes'
         );
 
         $this->soap_regex = array(
@@ -330,6 +332,34 @@ class goofy_clean extends imagineer
         $this->cleaningLog($transform);
 
         return $string;
+    }
+    
+    private function cleanPreShortcodes($string)
+    {
+	    /*
+	     * The WYSIWYG Editors all put paragraph tags around everything including
+	     * your shortcodes so it ends up looking like <p>[shortcode /]</p>. This
+	     * function will attempt to clean that up.
+	     *
+	     */
+	     $string = str_replace('<p>[', '[', $string);
+	     $string = str_replace(']</p>', ']', $string);
+	     
+	     return $string;
+    }
+    
+    private function cleanHTML($string)
+    {
+	    /*
+	     * This cleans up after all the other imagineers, shortcodes are
+	     * going to leave '<p></p>' all over the place and there will be
+	     * others that do similar.
+	     *
+	     */
+	     $dirt = array('<p></p>');
+	     $string = str_replace($dirt, '', $string);
+	     
+	     return $string;
     }
 
     private function smartProper($string)

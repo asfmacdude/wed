@@ -63,6 +63,7 @@ class tab_detail extends details
 		// $this->options['SCHEDULE_DB']       = false; // banner_schedule db object
 		$this->options['LIST_OBJECT']       = false; // list db object
 		$this->options['CONTENT_OBJ']       = null; // connect db object
+		$this->options['CODE_LIST']         = null;
 		
 		// $this->options['SETUP_MAX']         = 0;     // Max number of items in rotating banner
 		$this->options['SETUP_ACTIVE']      = 'N';   // Is the presentation object active?
@@ -88,7 +89,13 @@ class tab_detail extends details
 		
 		// This allows for the user to put a string of codes in the content area between the opening and closing
 		// tags. It would need to be comma delimited. Example: code1,code2,code3
-		$this->options['CODE_LIST'] = (!is_null($this->options['ACTUAL_CONTENT'])) ? explode(',', $this->options['ACTUAL_CONTENT']) : null;
+		if (!is_null($this->options['ACTUAL_CONTENT']))
+		{
+			$this->options['ACTUAL_CONTENT'] = str_replace('<p>', '', $this->options['ACTUAL_CONTENT']);
+			$this->options['ACTUAL_CONTENT'] = str_replace('</p>', '', $this->options['ACTUAL_CONTENT']);
+			$this->options['CODE_LIST']      = explode(',', $this->options['ACTUAL_CONTENT']);
+		}
+		
 	}
 	
 	private function buildPresentation()
@@ -128,7 +135,8 @@ class tab_detail extends details
 			// If it evaluates to null then we don't run this tab. This
 			// way you can do timed schedules on certain content and instead
 			// of showing an empty tab, none shows at all and it is skipped.
-			$content = $connect_db->getFormattedValue('FULLARTICLE');
+			$code    = $connect_db->getValue('cnt_code');
+			$content = '[presentation type="content" code="'.$code.'" format="TAB" /]'; // $connect_db->getFormattedValue('FULLARTICLE');
 			
 			$content = $shortcodes->getHTML(array('HTML'=>$content));
 			
@@ -162,7 +170,7 @@ class tab_detail extends details
 				$content_html = str_replace('%TAB_ID%', $tab_id, $this->options['TAB_CONTENT_PANE_WRAP']);
 				
 				// add the TITLE to the article
-				$content  = '<h2>'.$connect_db->getFormattedValue('TITLE').'</h2>' . $content;
+				// $content  = '<h2>'.$connect_db->getFormattedValue('TITLE').'</h2>' . $content;
 			
 				$content_html = str_replace('%CONTENT%', $content, $content_html);
 				$content_html = str_replace('%ACTIVE%', $active_class, $content_html);

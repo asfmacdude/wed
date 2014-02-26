@@ -1,16 +1,15 @@
 <?php
 /*
- * db_system_redirect
+ * db_wed_menus
  *
- * Database object for the online database system_redirect
- *
+ * Database object for the sites listing
  *
  */
 defined( '_GOOFY' ) or die();
 
 include_once('db_common.php');
 
-class db_system_redirect extends db_common
+class db_wed_menus extends db_common
 {
 	public $options;
 	public $db;
@@ -24,14 +23,15 @@ class db_system_redirect extends db_common
 	{
 		$this->options['CLASS_NAME']     = __CLASS__;
 		$this->options['LOCAL_PATH']     = dirname(__FILE__);
-		$this->options['TABLE_NAME']     = 'system_redirect';
-		$this->options['TABLE_ID_FIELD'] = 'rdr_id';
+		$this->options['TABLE_NAME']     = 'wed_menus';
+		$this->options['DISPLAY_NAME']   = 'Menus';
+		$this->options['TABLE_ID_FIELD'] = 'mnu_id';
 		
 		$this->options['FIELDS']         = $this->setFields();
 		$this->addOptions($options);
 	}
 	
-	private function setFields()
+	public function setFields($join=true)
 	{
 		/*
 		 * The 'FIELDS' array setup
@@ -64,87 +64,91 @@ class db_system_redirect extends db_common
 		
 		$fields['id'] = array(
 			'LABEL'     => 'ID',
-			'DB_FIELD'  => 'rdr_id',
+			'DB_FIELD'  => 'mnu_id',
 			'NO_UPDATE' => 1
 			);
 		
 		$fields['modified'] = array(
 			'LABEL'     => 'Modified',
-			'DB_FIELD'  => 'rdr_modified',
-			'NO_UPDATE' => 1
+			'DB_FIELD'  => 'mnu_modified',
+			'NO_UPDATE' => 1,
+			'SHOW_COLUMN'  => 1
 			);
 		
-		$fields['site'] = array(
-			'LABEL'    => 'Site',
-			'VALIDATE' => 'isRequired',
-			'MESSAGE'  => 'The site is a required field',
-			'DB_FIELD' => 'rdr_site',
-			'DEFAULT'  => 'com_alagames',
-			'LIST-SELECT' => array('admin'=>'admin','system'=>'system','com_alagames'=>'com_alagames')
-			);
-			
-		$fields['subject'] = array(
-			'LABEL'    => 'Subject',
-			'INSTRUCT' => 'The subject will appear immediately after the domain name. Example: /subject',
-			'VALIDATE' => 'isRequired',
-			'MESSAGE'  => 'The subject is a required field',
-			'DB_FIELD' => 'rdr_subject'
-			);
-			
-		$fields['action'] = array(
-			'LABEL'    => 'Action',
-			'INSTRUCT' => 'The action is optional and adds an extra category to the redirect. Example: /subject/action',
-			'DB_FIELD' => 'rdr_action'
-			);
-			
 		$fields['code'] = array(
-			'LABEL'    => 'Page Code',
-			'INSTRUCT' => 'The code is the page code for the page that you are redirecting to',
+			'LABEL'    => 'Menu Code',
 			'VALIDATE' => 'isRequired',
-			'MESSAGE'  => 'The page code is a required field',
-			'DB_FIELD' => 'rdr_code',
-			'DEFAULT'  => 'home_page'
+			'MESSAGE'  => 'The menu code is a required field',
+			'DB_FIELD' => 'mnu_code',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
-		$fields['keywords'] = array(
-			'LABEL'    => 'Keywords',
-			'INSTRUCT' => 'Keywords will be used in search functions to allow the CMS to redirect by interests.',
-			'DB_FIELD' => 'rdr_keywords'
+		$fields['title'] = array(
+			'LABEL'    => 'Menu Title',
+			'DB_FIELD' => 'mnu_title',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'  => 1
 			);
-		
+			
+		$fields['description'] = array(
+			'LABEL'    => 'Menu Description',
+			'DB_FIELD' => 'mnu_description',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'  => 1
+			);
+					
 		return $fields;
 	}
 	
-	public function loadAllForTable($order=null)
+	public function loadMenu($code=null)
 	{
-		$data = $this->selectAllTable($order);	
-		return (!$data) ? false : $data ;
+		$data = $this->selectByCode($code);
+		$this->addValues_Data($data);	
+		return (!$data) ? false : true ;
 	}
 	
-	public function loadRedirectID($id=null)
-	{
-		$data = $this->selectByID($id);
-		$this->addValues_Data($data);	
-		return (!$data) ? false : true ; // let showdirector know
-	}
-		
-	public function selectBySubject($subject=null)
+	public function selectByCode($code=null)
     {
-        if (is_null($subject))
+        if (is_null($code))
         {
-            return null;
+            return false;
         }
         
-        $table = $this->options['TABLE_NAME'];
+        $table     = $this->options['TABLE_NAME'];
+        
+        $where_str  = ' WHERE ';
+        $where_str .= $this->options['FIELDS']['code']['DB_FIELD'].'="'.$code.'"';
+
+        $sql = 'SELECT * FROM '.$table.$where_str;
+        
+        return $this->dbRow($sql);
+    }
+	
+	public function getSiteList()
+	{
+		$list   = array();
+		$fields = 'mnu_id,mnu_name';
+		$order  = 'mnu_name';
+		$data   = $this->selectAllForList($fields,$order);
 		
-		$pairs = array(
-			'site'    => SITE_DOMAIN, 
-			'subject' => $subject
-		);
-		
-		$order_str = $this->options['FIELDS']['subject']['DB_FIELD'].','.$this->options['FIELDS']['action']['DB_FIELD'];
-		
-		return $this->selectByPairs($pairs, $order_str); 
+		if ($data)
+		{
+			foreach ($data as $row=>$fields)
+			{
+				$list[$fields['mnu_id']] = $fields['mnu_name'];
+			}
+		}
+			
+		return $list;
+	}
+	
+	public function getDetail($detail,$default=null)
+    {
+	    $detail_field = $this->getValue('details');
+	    $detail_array = wed_getOptionsFromString($detail_field);
+	    
+	    return (isset($detail_array[$detail])) ? $detail_array[$detail] : $default;
     }
 	
 }
