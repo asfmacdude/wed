@@ -181,6 +181,7 @@ class content_detail extends details
 		$html  = str_replace('%SUBTITLE%', $this->getTitle(), $this->options['HTML_FORMATS']['SUBTITLE']);
 		$html .= $this->getMedia('SMALL');
 		$html .= str_replace('%ARTICLE%', $this->getFullArticle(), $this->options['HTML_FORMATS']['ARTICLE']);
+		$html  = wed_cleanItUp($html,'SC_BRACKETS');
 		return $html;
 	}
 	

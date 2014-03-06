@@ -212,9 +212,38 @@ class db_content_control extends db_common
 	    // table with different settings.
 	    if ($code=='pages')
 	    {
-		    $this->initXCrud();
-		    // $this->xcrud->relation('cnc_theme_id','wed_menus','mnu_id','mnu_title');
-		    // $this->xcrud->relation('mnuc_menu_base_id','wed_menus_base','mnub_id','mnub_title');
+		    $xcrud = new db_xcrud_tools();
+		    $xcrud->initXCrud();
+		    $xcrud->setTable($this->options['TABLE_NAME']);
+		    $xcrud->configFields($this->setFields(false));
+		    
+		   
+		    
+		    // Try Nested Table
+		    $nest_name1 = 'sites_connect';
+		    $db_object  = wed_getDBObject($nest_name1);
+		    
+		    $nest1_options = array(
+		    	'OBJECT_NAME'     => $nest_name1,
+		    	'CONNECTION_NAME' => 'Site Connections',
+		    	'RELATE_FROM'     => 'cnc_id',
+		    	'RELATE_TABLE'    => $nest_name1,
+		    	'RELATE_TO'       => 'stcn_control_id'
+		    );
+			
+			$xcrud->createNestedTable($nest1_options);
+			$xcrud->configFields($db_object->setFields(false),$nest_name1);
+			
+			$nest1_relations = $db_object->getXCrudRelations();
+			
+			foreach ($nest1_relations as $key=>$data)
+			{
+				$data['OBJECT_NAME'] = $nest_name1;
+				$xcrud->setRelation($data);
+			}
+		    
+		    return $xcrud->renderXCrud();
+
 	    }
     }	
 }

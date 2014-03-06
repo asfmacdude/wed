@@ -443,10 +443,54 @@ class db_content_main extends db_common
 	    // table with different settings.
 	    if ($code=='content')
 	    {
-		    $this->initXCrud();
-		    $this->xcrud->relation('cnt_type_id','content_types','ctp_id','ctp_title');
-		    // $this->connections = $this->xcrud->nested_table('connections','cnt_id','content_connect','cnn_content_id');
+		    $xcrud = new db_xcrud_tools();
+		    $xcrud->initXCrud();
+		    $xcrud->setTable($this->options['TABLE_NAME']);
+		    $xcrud->configFields($this->setFields(false));
+		    
+		    $local_relations = $this->getXCrudRelations();
+		    
+		    foreach ($local_relations as $key=>$data)
+		    {
+			    $xcrud->setRelation($data);
+		    }
+		    
+		    // Try Nested Table
+		    $nest_name1 = 'content_connect';
+		    $db_object  = wed_getDBObject($nest_name1);
+		    
+		    $nest1_options = array(
+		    	'OBJECT_NAME'     => $nest_name1,
+		    	'CONNECTION_NAME' => 'Content Group Connections',
+		    	'RELATE_FROM'     => 'cnt_id',
+		    	'RELATE_TABLE'    => $nest_name1,
+		    	'RELATE_TO'       => 'cnn_content_id'
+		    );
+			
+			$xcrud->createNestedTable($nest1_options);
+			$xcrud->configFields($db_object->setFields(false),$nest_name1);
+			
+			$nest1_relations = $db_object->getXCrudRelations();
+			
+			foreach ($nest1_relations as $key=>$data)
+			{
+				$data['OBJECT_NAME'] = $nest_name1;
+				$xcrud->setRelation($data);
+			}
+		    
+		    return $xcrud->renderXCrud();
+
 	    }
+    }
+    
+    public function getXCrudRelations()
+    {
+	    $relations[] = array(
+	    	'RELATE_FROM'   => 'cnt_type_id', 
+	    	'RELATE_TABLE'  => 'content_types', 
+	    	'RELATE_TO'     => 'ctp_id', 
+	    	'DISPLAY_FIELD' => 'ctp_title');
+	    return $relations;
     }
 }
 ?>

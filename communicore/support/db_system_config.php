@@ -233,9 +233,31 @@ class db_system_config extends db_common
 	    // table with different settings.
 	    if ($code=='system_config')
 	    {
-		    $this->initXCrud();
-		    $this->xcrud->relation('sys_cfg_site_id','sites','site_id','site_title');
+		    $xcrud = new db_xcrud_tools();
+		    $xcrud->initXCrud();
+		    $xcrud->setTable($this->options['TABLE_NAME']);
+		    $xcrud->configFields($this->setFields(false));
+		    
+		    $local_relations = $this->getXCrudRelations();
+		    
+		    foreach ($local_relations as $key=>$data)
+		    {
+			    $xcrud->setRelation($data);
+		    }
+		    
+		    return $xcrud->renderXCrud();
+
 	    }
+    }
+    
+    public function getXCrudRelations()
+    {
+	    $relations[] = array(
+	    	'RELATE_FROM'   => 'sys_cfg_site_id', 
+	    	'RELATE_TABLE'  => 'sites', 
+	    	'RELATE_TO'     => 'site_id', 
+	    	'DISPLAY_FIELD' => 'site_title');
+	    return $relations;
     }
 }
 ?>

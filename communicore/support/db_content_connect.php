@@ -113,73 +113,94 @@ class db_content_connect extends db_common
 		$today_date = wed_getDateToday();
 		
 		$fields['id'] = array(
-			'TITLE'     => 'ID',
+			'LABEL'     => 'ID',
 			'DB_FIELD'  => 'cnn_id',
-			'NO_UPDATE' => 1
+			'NO_UPDATE' => 1	
 			);
 		
 		$fields['modification'] = array(
-			'TITLE'     => 'Modification',
+			'LABEL'     => 'Modification',
 			'DB_FIELD'  => 'cnn_modification',
-			'NO_UPDATE' => 1
+			'NO_UPDATE' => 1,
+			'SHOW_FIELD' => 1
 			);
 		
 		$fields['siteid'] = array(
-			'TITLE'    => 'Site ID',
-			'DB_FIELD' => 'cnn_site_id'
+			'LABEL'    => 'Site ID',
+			'DB_FIELD' => 'cnn_site_id',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 		
 		$fields['controlid'] = array(
-			'TITLE'    => 'Control ID',
-			'DB_FIELD' => 'cnn_control_id'
+			'LABEL'    => 'Control ID',
+			'DB_FIELD' => 'cnn_control_id',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['contentid'] = array(
-			'TITLE'    => 'Content ID',
-			'DB_FIELD' => 'cnn_content_id'
+			'LABEL'    => 'Content ID',
+			'DB_FIELD' => 'cnn_content_id',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 		
 		$fields['groupid'] = array(
-			'TITLE'    => 'Group ID',
-			'DB_FIELD' => 'cnn_group_id'
+			'LABEL'    => 'Group ID',
+			'DB_FIELD' => 'cnn_group_id',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['sort'] = array(
-			'TITLE'    => 'Sort by',
+			'LABEL'    => 'Sort by',
 			'DB_FIELD' => 'cnn_sort',
-			'DEFAULT'  => 1
+			'DEFAULT'  => 1,
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['primary'] = array(
-			'TITLE'    => 'Primary Group?',
+			'LABEL'    => 'Primary Group?',
 			'DB_FIELD' => 'cnn_primary_group',
-			'DEFAULT'  => 'N'
+			'DEFAULT'  => 'N',
+			'LIST_SELECT' => array('Y','N'),
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['linktype'] = array(
-			'TITLE'    => 'Primary Group?',
+			'LABEL'    => 'Type',
 			'DB_FIELD' => 'cnn_link_type',
-			'DEFAULT'  => 'Group'
+			'DEFAULT'  => 'Group',
+			'LIST_SELECT' => array('Article','Group'),
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['feature'] = array(
-			'TITLE'    => 'Feature Type',
+			'LABEL'    => 'Feature Type',
 			'DB_FIELD' => 'cnn_feature_type',
-			'DEFAULT'  => 'none'
+			'DEFAULT'  => 'none',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['start'] = array(
-			'TITLE'    => 'Start Date',
+			'LABEL'    => 'Start Date',
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The start date is a required field',
 			'DB_FIELD' => 'cnn_feature_start_date',
-			'DEFAULT'  => $today_date
+			'DEFAULT'  => $today_date,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['end'] = array(
-			'TITLE'    => 'End Date',
+			'LABEL'    => 'End Date',
 			'DB_FIELD' => 'cnn_feature_end_date',
-			'DEFAULT'  => null
+			'DEFAULT'  => null,
+			'SHOW_FIELD'  => 1
 			);
 			
 		if ($join)
@@ -654,7 +675,7 @@ class db_content_connect extends db_common
 			$thumb_specs['ZOOM_CROP'] = 1;
 			$thumb_specs['WIDTH']     = ( (isset($sizes['WIDTH'])) && (!is_null($sizes['WIDTH'])) ) ? $sizes['WIDTH'] : null;
 			$thumb_specs['HEIGHT']    = ( (isset($sizes['HEIGHT'])) && (!is_null($sizes['HEIGHT'])) ) ? $sizes['HEIGHT'] : null;
-		
+			
 			$image_path = $img_obj->getFileThumbPath($thumb_specs);
 	    }
 	    else
@@ -784,6 +805,33 @@ class db_content_connect extends db_common
     {
 	    $keywords = $this->getValue('cnt_keywords');
 	    return explode(',', $keywords); // return an array
+    }
+    
+    
+    
+    public function getXCrudRelations()
+    {
+	    $relations[] = array(
+	    	'RELATE_FROM'   => 'cnn_site_id', 
+	    	'RELATE_TABLE'  => 'sites', 
+	    	'RELATE_TO'     => 'site_id', 
+	    	'DISPLAY_FIELD' => 'site_title');
+	    $relations[] = array(
+	    	'RELATE_FROM'   => 'cnn_control_id', 
+	    	'RELATE_TABLE'  => 'content_control', 
+	    	'RELATE_TO'     => 'cnc_id', 
+	    	'DISPLAY_FIELD' => 'cnc_title');
+	    $relations[] = array(
+	    	'RELATE_FROM'   => 'cnn_content_id', 
+	    	'RELATE_TABLE'  => 'content_main', 
+	    	'RELATE_TO'     => 'cnt_id', 
+	    	'DISPLAY_FIELD' => 'cnt_title');
+	    $relations[] = array(
+	    	'RELATE_FROM'   => 'cnn_group_id', 
+	    	'RELATE_TABLE'  => 'content_groups', 
+	    	'RELATE_TO'     => 'cng_id', 
+	    	'DISPLAY_FIELD' => 'cng_group_title');
+	    return $relations;
     }
 }
 ?>

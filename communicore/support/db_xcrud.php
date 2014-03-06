@@ -20,8 +20,9 @@ abstract class db_xcrud extends db_tools
 	{	
 		global $db_settings;
 		$this->xcrud = Xcrud::get_instance();
-		Xcrud_config::$editor_url = 'http://admin.asffoundation.net/components/editors/ckeditor/ckeditor.js';
-		$this->xcrud->connection($db_settings['USERNAME'],$db_settings['PASSWORD'],$db_settings['DB_NAME'],'localhost');		
+		// Xcrud_config::$editor_url = 'http://asffoundation.net/components/editors/tinymce/tinymce.min.js';
+		// Xcrud_config::$editor_url = 'http://admin.asffoundation.net/components/editors/ckeditor/ckeditor.js';
+		// $this->xcrud->connection($db_settings['USERNAME'],$db_settings['PASSWORD'],$db_settings['DB_NAME'],'localhost');		
 		$this->xcrud->table($this->options['TABLE_NAME']);
 		$this->configFields();
 	}
@@ -40,7 +41,8 @@ abstract class db_xcrud extends db_tools
 	
 	public function setupXCrud($code=null)
     {
-	 	$this->initXCrud();  
+	 	$this->initXCrud();
+	 	return $this->renderXCrud(); 
     }
     
     public function configFields()

@@ -356,16 +356,66 @@ class db_wed_menus_connect extends db_common
     // *******************************************************************
     // ********  setupXCrud initial setup of XCrud Object ****************
     // *******************************************************************
+    
     public function setupXCrud($code=null)
     {
 	    // Based on the code, we can present different views of the content_main
 	    // table with different settings.
 	    if ($code=='menus_100')
 	    {
-		    $this->initXCrud();
-		    $this->xcrud->relation('mnuc_menu_id','wed_menus','mnu_id','mnu_title');
-		    $this->xcrud->relation('mnuc_menu_base_id','wed_menus_base','mnub_id','mnub_title');
+		    $xcrud = new db_xcrud_tools();
+		    $xcrud->initXCrud();
+		    $xcrud->setTable($this->options['TABLE_NAME']);
+		    $xcrud->configFields($this->setFields(false));
+		    
+		    $local_relations = $this->getXCrudRelations();
+		    
+		    foreach ($local_relations as $key=>$data)
+		    {
+			    $xcrud->setRelation($data);
+		    }
+		    
+		    // Try Nested Table
+		    $nest_name1 = 'wed_menus_base';
+		    $db_object  = wed_getDBObject($nest_name1);
+		    
+		    $nest1_options = array(
+		    	'OBJECT_NAME'     => $nest_name1,
+		    	'CONNECTION_NAME' => 'Base Menu Connections',
+		    	'RELATE_FROM'     => 'mnuc_menu_base_id',
+		    	'RELATE_TABLE'    => $nest_name1,
+		    	'RELATE_TO'       => 'mnub_id'
+		    );
+			
+			$xcrud->createNestedTable($nest1_options);
+			$xcrud->configFields($db_object->setFields(false),$nest_name1);
+			
+			$nest1_relations = $db_object->getXCrudRelations();
+			
+			foreach ($nest1_relations as $key=>$data)
+			{
+				$data['OBJECT_NAME'] = $nest_name1;
+				$xcrud->setRelation($data);
+			}
+		    
+		    return $xcrud->renderXCrud();
+
 	    }
+    }
+    
+    public function getXCrudRelations()
+    {
+	    $relations[] = array(
+	    	'RELATE_FROM'   => 'mnuc_menu_id', 
+	    	'RELATE_TABLE'  => 'wed_menus', 
+	    	'RELATE_TO'     => 'mnu_id', 
+	    	'DISPLAY_FIELD' => 'mnu_title');
+	    $relations[] = array(
+	    	'RELATE_FROM'   => 'mnuc_menu_base_id', 
+	    	'RELATE_TABLE'  => 'wed_menus_base', 
+	    	'RELATE_TO'     => 'mnub_id', 
+	    	'DISPLAY_FIELD' => 'mnub_title');
+	    return $relations;
     }
 }
 ?>

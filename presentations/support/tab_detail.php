@@ -135,13 +135,16 @@ class tab_detail extends details
 			// If it evaluates to null then we don't run this tab. This
 			// way you can do timed schedules on certain content and instead
 			// of showing an empty tab, none shows at all and it is skipped.
-			$code    = $connect_db->getValue('cnt_code');
-			$content = '[presentation type="content" code="'.$code.'" format="TAB" /]'; // $connect_db->getFormattedValue('FULLARTICLE');
-			
-			$content = $shortcodes->getHTML(array('HTML'=>$content));
+			// $code    = $connect_db->getValue('cnt_code');
+			$content = $connect_db->getFormattedValue('FULLARTICLE');		
+			$content = wed_renderContent($content); // $shortcodes->getHTML(array('HTML'=>$content));
 			
 			if (!empty($content))
 			{
+				$present = getImagineer('presentations');
+				$id      = $present->newPresentation(array('type' => 'content', 'code' => $connect_db->getValue('cnt_code'), 'format' => 'TAB'));
+				$content = (!$id) ? null : $present->getHTML(array('ID'=>$id));
+				
 				// Set the id for this tab
 				$tab_count++;
 				$tab_id       = $base_id . $tab_count;

@@ -197,24 +197,21 @@ function wed_getContentInfo($code)
 // *******************************************************************
 function wed_getImageObject($options=array())
 {
-	global $walt;
-	$file   = $walt->getImagineer('file_sorcerer');
+	$file   = getImagineer('file_sorcerer');
 	$options['FILE_TYPE'] = 'image';
 	return $file->newFileMagic($options);
 }
 
 function wed_getDocumentObject($options=array())
 {
-	global $walt;
-	$file   = $walt->getImagineer('file_sorcerer');
+	$file   = getImagineer('file_sorcerer');
 	$options['FILE_TYPE'] = 'document';
 	return $file->newFileMagic($options);
 }
 
 function wed_getCurlObject($options=array())
 {
-	global $walt;
-	$file   = $walt->getImagineer('file_sorcerer');
+	$file   = getImagineer('file_sorcerer');
 	$options['FILE_TYPE'] = 'curl';
 	return $file->newFileMagic($options);
 }
@@ -422,12 +419,13 @@ function wed_getKeysMerge($html)
 // *******************************************************************
 function wed_renderContent($content=null,$pre=false)
 {
-	global $walt;
-	$sc              = $walt->getImagineer('shortcodes');	
+	$sc              = getImagineer('shortcodes');	
 	$content         = trim($content);
 	$options['HTML'] = $content;
 	$options['PRE']  = $pre;
-	return $sc->getHTML($options);
+	
+	// FINAL_HTML cleans out all the <p></p> leftover from shortcodes
+	return wed_cleanItUp($sc->getHTML($options),'FINAL_HTML');
 }
 
 // *******************************************************************
@@ -596,8 +594,20 @@ function wed_cleanItUp($string=null,$soap=null)
 // *******************************************************************
 function wed_getMomentInTime($options=array())
 {
-	$start = (isset($options['start_date'])) ? $options['start_date'] : false ;
-	$end   = (isset($options['end_date'])) ? $options['end_date'] : false ;
+	$start    = (isset($options['start_date'])) ? $options['start_date'] : false ;
+	$end      = (isset($options['end_date'])) ? $options['end_date'] : false ;
+	$schedule = (isset($options['schedule'])) ? $options['schedule'] : null ;
+	
+	if (!is_null($schedule))
+	{
+		$db_schedule = wed_getDBObject('schedules');
+		
+		if ($db_schedule->selectByName($schedule))
+		{
+			$start = $db_schedule->getValue('start');
+			$end   = $db_schedule->getValue('end');
+		}
+	}
 	
 	if (!$start && !$end)
 	{

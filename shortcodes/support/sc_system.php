@@ -161,10 +161,7 @@ function sc_showElementsContent($options=array(), $content='')
 
 function sc_runTime($options=array(), $content='')
 {
-	$startDate = (isset($options['start_date'])) ? $options['start_date'] : false ;
-	$endDate   = (isset($options['end_date'])) ? $options['end_date'] : false ;
-	
-	if (!calulateRunDate($startDate, $endDate))
+	if (!wed_getMomentInTime($options))
 	{
 		return null;
 	}
@@ -261,9 +258,8 @@ function sc_Presentations($options=array(), $content='')
 	
 	// wed_renderContent runs the shortcodes found in the $content
 	$options['ACTUAL_CONTENT'] = wed_renderContent($content);
-	
-	global $walt;
-	$present = $walt->getImagineer('presentations');
+
+	$present = getImagineer('presentations');
 	$id      = $present->newPresentation($options);
 	return (!$id) ? null : $present->getHTML(array('ID'=>$id));
 }
@@ -377,33 +373,32 @@ function sc_galleryPresentation($options=array(), $content='')
 
 function sc_fileDownload($options=array(), $content='')
 {
-	$html     = '';
-	$title    = (isset($options['title'])) ? $options['title'] : null ;
-	$file     = (isset($options['file'])) ? $options['file'] : null ;
-	$category = (isset($options['category'])) ? $options['category'] : null ;
+	$html                = '';
+	$options['TITLE']    = (isset($options['title'])) ? $options['title'] : 'Download' ;
+	$options['FILE']     = (isset($options['file'])) ? $options['file'] : null ;
+	$options['CATEGORY'] = (isset($options['category'])) ? $options['category'] : null ;
 	
-	if (is_null($file))
+	if (is_null($options['FILE']))
 	{
 		return null;
 	}
 	
-	if (is_null($category))
+	if (is_null($options['CATEGORY']))
 	{
 		$call_parts = wed_getSystemValue('CALL_PARTS');
-		$category   = (isset($call_parts[1])) ? $call_parts[1] : null;
+		$options['CATEGORY']   = (isset($call_parts[1])) ? $call_parts[1] : null;
 	}
 	
-	$doc_options['NAME']     = $file;
-	$doc_options['CATEGORY'] = $category;
+	$options['NAME'] = $options['FILE'];
 	
-	$doc_obj = wed_getDocumentObject($options=array());
+	$doc_obj = wed_getDocumentObject($options);
 	
 	$file_path = $doc_obj->getDocumentFilePath();
 	
 	// the styling class here is specific to the Kallyas theme. You will need
 	// to create a way to add different classes based on the theme or standardize
 	// the class names across themes
-	return '<p class="register" ><a href="'.$file_path.'"><button class="btn btn-success" type="button">Download</button></a> '.$title.'</p>'.LINE1;
+	return '<p class="register" ><a href="'.$file_path.'"><button class="btn btn-success" type="button">Download</button></a> '.$options['TITLE'].'</p>'.LINE1;
 }
 
 // **********************************************************************

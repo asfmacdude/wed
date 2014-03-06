@@ -295,6 +295,21 @@ class db_sites_connect extends db_common
 	    }
 	    
 		return $image_path;
-    } 
+    }
+    
+    public function getXCrudRelations()
+    {
+	    $relations[] = array(
+	    	'RELATE_FROM'   => 'stcn_site_id', 
+	    	'RELATE_TABLE'  => 'sites', 
+	    	'RELATE_TO'     => 'site_id', 
+	    	'DISPLAY_FIELD' => 'site_title');
+	    $relations[] = array(
+	    	'RELATE_FROM'   => 'stcn_control_id', 
+	    	'RELATE_TABLE'  => 'content_control', 
+	    	'RELATE_TO'     => 'cnc_id', 
+	    	'DISPLAY_FIELD' => 'cnc_title');
+	    return $relations;
+    }
 }
 ?>

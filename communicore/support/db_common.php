@@ -580,5 +580,13 @@ abstract class db_common extends db_xcrud
 			return $value;
 		}
 	}
+	
+	// *******************************************************************
+    // ********  XCrud Function Stubs ************************************
+    // *******************************************************************
+	public function getXCrudRelations()
+	{
+		return array();
+	}
 }
 ?>

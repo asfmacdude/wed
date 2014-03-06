@@ -63,29 +63,35 @@ class db_content_types extends db_common
 		$fields = array();
 		
 		$fields['id'] = array(
-			'TITLE'     => 'ID',
+			'LABEL'     => 'ID',
 			'DB_FIELD'  => 'ctp_id',
 			'NO_UPDATE' => 1
 			);
 		
 		$fields['title'] = array(
-			'TITLE'    => 'Type Name',
+			'LABEL'    => 'Type Name',
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The Type name is a required field',
-			'DB_FIELD' => 'ctp_title'
+			'DB_FIELD' => 'ctp_title',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'   => 1
 			);
 			
 		$fields['sysname'] = array(
-			'TITLE'    => 'System Name',
+			'LABEL'    => 'System Name',
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The system name is a required field',
-			'DB_FIELD' => 'ctp_sysname'
+			'DB_FIELD' => 'ctp_sysname',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'   => 1
 			);
 			
 		$fields['details'] = array(
 			'LABEL'    => 'Details',
 			'DB_FIELD' => 'ctp_details',
-			'INSTRUCT' => 'Details are various options for this site. Example:  SITE_TITLE| ASF Foundation;'
+			'INSTRUCT' => 'Details are various options for this site. Example:  SITE_TITLE| ASF Foundation;',
+			'SHOW_FIELD'   => 1,
+			'NO_EDITOR'    => 1
 			);	
 						
 		return $fields;

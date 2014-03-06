@@ -86,7 +86,7 @@ class thumb_magic extends details
 		
 		if (method_exists($this, $method))
 		{
-			call_user_func_array(array($this,$method), array('URL_KEY' => $url_key));
+			call_user_func(array($this,$method), array('URL_KEY' => $url_key));
 		}
 		else
 		{
@@ -104,15 +104,15 @@ class thumb_magic extends details
 	
 	private function getWIDTH($options)
 	{
-		if ( (!is_null($this->options['WIDTH'])) && (isset($options['URL_KEY'])) && ($this->options['WIDTH']>0))
-		{		
+		if ( (!is_null($this->options['WIDTH'])) && ($this->options['WIDTH']>0))
+		{
 			$this->options['QUERY'][$options['URL_KEY']] = $this->options['WIDTH'];
 		}
 	}
 	
 	private function getHEIGHT($options)
 	{
-		if ( (!is_null($this->options['HEIGHT'])) && (isset($options['URL_KEY'])) && ($this->options['HEIGHT']>0))
+		if ( (!is_null($this->options['HEIGHT'])) && ($this->options['HEIGHT']>0))
 		{		
 			$this->options['QUERY'][$options['URL_KEY']] = $this->options['HEIGHT'];
 		}
@@ -120,7 +120,7 @@ class thumb_magic extends details
 	
 	private function getQUALITY($options)
 	{
-		if ( (!is_null($this->options['QUALITY'])) && (isset($options['URL_KEY'])) && ($this->options['QUALITY']>0))
+		if ( (!is_null($this->options['QUALITY'])) && ($this->options['QUALITY']>0))
 		{		
 			$this->options['QUERY'][$options['URL_KEY']] = $this->options['QUALITY'];
 		}
@@ -130,7 +130,7 @@ class thumb_magic extends details
 	{
 		$pos_values = array('c', 't', 'l', 'r', 'b', 'tl', 'tr', 'bl', 'br');
 		
-		if ( (!is_null($this->options['ALIGNMENT'])) && (isset($options['URL_KEY'])) && (in_array($this->options['ALIGNMENT'], $pos_values)) )
+		if ( (!is_null($this->options['ALIGNMENT']))  && (in_array($this->options['ALIGNMENT'], $pos_values)) )
 		{		
 			$this->options['QUERY'][$options['URL_KEY']] = $this->options['ALIGNMENT'];
 		}
@@ -140,7 +140,7 @@ class thumb_magic extends details
 	{
 		$pos_values = array(0, 1, 2, 3);
 		
-		if ( (!is_null($this->options['ZOOM_CROP'])) && (isset($options['URL_KEY'])) && (in_array($this->options['ZOOM_CROP'], $pos_values)) )
+		if ( (!is_null($this->options['ZOOM_CROP'])) && (in_array($this->options['ZOOM_CROP'], $pos_values)) )
 		{		
 			$this->options['QUERY'][$options['URL_KEY']] = $this->options['ZOOM_CROP'];
 		}
@@ -148,7 +148,7 @@ class thumb_magic extends details
 	
 	private function getSHARPEN($options)
 	{
-		if ( (!is_null($this->options['SHARPEN'])) && (isset($options['URL_KEY'])) && ($this->options['SHARPEN']==1))
+		if ( (!is_null($this->options['SHARPEN']))  && ($this->options['SHARPEN']==1))
 		{		
 			$this->options['QUERY'][$options['URL_KEY']] = $this->options['SHARPEN'];
 		}
@@ -156,7 +156,7 @@ class thumb_magic extends details
 	
 	private function getCANVAS_TRANS($options)
 	{
-		if ( (!is_null($this->options['CANVAS_TRANS'])) && (isset($options['URL_KEY'])) && ($this->options['CANVAS_TRANS']==1))
+		if ( (!is_null($this->options['CANVAS_TRANS'])) && ($this->options['CANVAS_TRANS']==1))
 		{		
 			$this->options['QUERY'][$options['URL_KEY']] = $this->options['CANVAS_TRANS'];
 		}

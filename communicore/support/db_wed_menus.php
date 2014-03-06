@@ -150,6 +150,77 @@ class db_wed_menus extends db_common
 	    
 	    return (isset($detail_array[$detail])) ? $detail_array[$detail] : $default;
     }
-	
+    
+    // *******************************************************************
+    // ********  XCRUD Section *******************************************
+    // *******************************************************************
+    
+    // *******************************************************************
+    // ********  setupXCrud initial setup of XCrud Object ****************
+    // *******************************************************************
+    
+    public function setupXCrud($code=null)
+    {
+	    // Based on the code, we can present different views of the content_main
+	    // table with different settings.
+	    if ($code=='menus')
+	    {
+		    $xcrud = new db_xcrud_tools();
+		    $xcrud->initXCrud();
+		    $xcrud->setTable($this->options['TABLE_NAME']);
+		    $xcrud->configFields($this->setFields(false));
+		    
+		    
+		    // Try Nested Table
+		    $nest_name1 = 'wed_menus_connect';
+		    $db_object  = wed_getDBObject($nest_name1);
+		    
+		    $nest1_options = array(
+		    	'OBJECT_NAME'     => $nest_name1,
+		    	'CONNECTION_NAME' => 'Menu Connections',
+		    	'RELATE_FROM'     => 'mnu_id',
+		    	'RELATE_TABLE'    => $nest_name1,
+		    	'RELATE_TO'       => 'mnuc_menu_id'
+		    );
+			
+			$xcrud->createNestedTable($nest1_options);
+			$xcrud->configFields($db_object->setFields(false),$nest_name1);
+			
+			$nest1_relations = $db_object->getXCrudRelations();
+			
+			foreach ($nest1_relations as $key=>$data)
+			{
+				$data['OBJECT_NAME'] = $nest_name1;
+				$xcrud->setRelation($data);
+			}
+			
+			// Try Nested Table 2
+		    $nest_name2 = 'wed_menus_base';
+		    $db_object2  = wed_getDBObject($nest_name2);
+		    
+		    $nest2_options = array(
+		    	'OBJECT_NAME'     => $nest_name2,
+		    	'PARENT_NAME'   => $nest_name1,
+		    	'CONNECTION_NAME' => 'Base Menu Connections',
+		    	'RELATE_FROM'     => 'mnuc_menu_base_id',
+		    	'RELATE_TABLE'    => $nest_name2,
+		    	'RELATE_TO'       => 'mnub_id'
+		    );
+			
+			$xcrud->createNestedTable($nest2_options);
+			$xcrud->configFields($db_object2->setFields(false),$nest_name2);
+			
+			$nest2_relations = $db_object2->getXCrudRelations();
+			
+			foreach ($nest2_relations as $key=>$data)
+			{
+				$data['OBJECT_NAME'] = $nest_name2;
+				$xcrud->setRelation($data);
+			}
+		    
+		    return $xcrud->renderXCrud();
+
+	    }
+    }
 }
 ?>

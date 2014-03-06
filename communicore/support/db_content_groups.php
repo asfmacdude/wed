@@ -65,56 +65,69 @@ class db_content_groups extends db_common
 		$fields = array();
 		
 		$fields['id'] = array(
-			'TITLE'     => 'ID',
+			'LABEL'     => 'ID',
 			'DB_FIELD'  => 'cng_id',
 			'NO_UPDATE' => 1
 			);
 		
 		$fields['modification'] = array(
-			'TITLE'     => 'Modification',
+			'LABEL'     => 'Modification',
 			'DB_FIELD'  => 'cng_modification',
 			'NO_UPDATE' => 1,
 			'SHOW_FIELD' => 1
 			);
 		
 		$fields['code'] = array(
-			'TITLE'    => 'Code',
+			'LABEL'    => 'Code',
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The 4 character code is a required field',
 			'DB_FIELD' => 'cng_code',
-			'DEFAULT'  => 'xxxx'
+			'DEFAULT'  => 'xxxx',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'   => 1
 			);
 			
 		$fields['sysname'] = array(
-			'TITLE'    => 'System Name',
+			'LABEL'    => 'System Name',
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The system name is a required field',
-			'DB_FIELD' => 'cng_sys_name'
+			'DB_FIELD' => 'cng_sys_name',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'   => 1
 			);
 			
 		$fields['title'] = array(
-			'TITLE'    => 'Title',
+			'LABEL'    => 'Title',
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The title is a required field',
-			'DB_FIELD' => 'cng_group_title'
+			'DB_FIELD' => 'cng_group_title',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'   => 1
 			);
 			
 		$fields['pagetitle'] = array(
-			'TITLE'    => 'Page Title',
+			'LABEL'    => 'Page Title',
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The title is a required field',
-			'DB_FIELD' => 'cng_page_title'
+			'DB_FIELD' => 'cng_page_title',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'   => 1
 			);
 			
 		$fields['details'] = array(
-			'TITLE'    => 'Details',
-			'DB_FIELD' => 'cng_details'
+			'LABEL'    => 'Details',
+			'DB_FIELD' => 'cng_details',
+			'SHOW_FIELD'   => 1,
+			'NO_EDITOR'    => 1
 			);
 		
 		$fields['active'] = array(
-			'TITLE'    => 'Active Y/N?',
+			'LABEL'    => 'Active Y/N?',
 			'DB_FIELD' => 'cng_active',
-			'DEFAULT'  => 'Y'
+			'DEFAULT'  => 'Y',
+			'LIST_SELECT'  => array('Y','N'),
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'   => 1
 			);
 			
 		return $fields;
@@ -215,6 +228,76 @@ class db_content_groups extends db_common
 	    $detail_array = wed_getOptionsFromString($detail_field);
 	    
 	    return (isset($detail_array[$detail])) ? $detail_array[$detail] : $default;
+    }
+    
+    // *******************************************************************
+    // ********  XCRUD Section *******************************************
+    // *******************************************************************
+    
+    // *******************************************************************
+    // ********  setupXCrud initial setup of XCrud Object ****************
+    // *******************************************************************
+    public function setupXCrud($code=null)
+    {
+	    // Based on the code, we can present different views of the content_main
+	    // table with different settings.
+	    if ($code=='content_200')
+	    {
+		    $xcrud = new db_xcrud_tools();
+		    $xcrud->initXCrud();
+		    $xcrud->setTable($this->options['TABLE_NAME']);
+		    $xcrud->configFields($this->setFields(false));
+		    
+		    // Try Nested Table
+		    $nest_name1 = 'content_connect';
+		    $db_object  = wed_getDBObject($nest_name1);
+		    
+		    $nest1_options = array(
+		    	'OBJECT_NAME'     => $nest_name1,
+		    	'CONNECTION_NAME' => 'Content Group Connections',
+		    	'RELATE_FROM'     => 'cng_id',
+		    	'RELATE_TABLE'    => $nest_name1,
+		    	'RELATE_TO'       => 'cnn_group_id'
+		    );
+			
+			$xcrud->createNestedTable($nest1_options);
+			$xcrud->configFields($db_object->setFields(false),$nest_name1);
+			
+			$nest1_relations = $db_object->getXCrudRelations();
+			
+			foreach ($nest1_relations as $key=>$data)
+			{
+				$data['OBJECT_NAME'] = $nest_name1;
+				$xcrud->setRelation($data);
+			}
+			
+			// Try Nested Table 2
+		    $nest_name2 = 'content_main';
+		    $db_object2  = wed_getDBObject($nest_name2);
+		    
+		    $nest2_options = array(
+		    	'OBJECT_NAME'     => $nest_name2,
+		    	'PARENT_NAME'     => $nest_name1,
+		    	'CONNECTION_NAME' => 'Selected Content',
+		    	'RELATE_FROM'     => 'cnn_content_id',
+		    	'RELATE_TABLE'    => $nest_name2,
+		    	'RELATE_TO'       => 'cnt_id'
+		    );
+			
+			$xcrud->createNestedTable($nest2_options);
+			$xcrud->configFields($db_object2->setFields(false),$nest_name2);
+			
+			$nest2_relations = $db_object2->getXCrudRelations();
+			
+			foreach ($nest2_relations as $key=>$data)
+			{
+				$data['OBJECT_NAME'] = $nest_name2;
+				$xcrud->setRelation($data);
+			}
+		    
+		    return $xcrud->renderXCrud();
+
+	    }
     }
 }
 ?>
