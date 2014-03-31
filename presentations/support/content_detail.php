@@ -36,6 +36,8 @@ class content_detail extends details
 		$this->options['CLASS_NAME']      = __CLASS__;
 		$this->options['LOCAL_PATH']      = dirname(__FILE__);
 		$this->options['ERROR_CODE']      = 10;
+		$this->options['SHOW_ERROR']      = false;
+		$this->options['ERROR_MSG']       = wed_getSystemValue('CONTENT_UNAVAILABLE');
 		$this->options['CONTENT_OBJ']     = null;
 		$this->options['CODE']            = null;
 		$this->options['ID']              = null;
@@ -70,15 +72,21 @@ class content_detail extends details
 		$this->options['CODE_LIST'] = (!is_null($this->options['ACTUAL_CONTENT'])) ? explode(',', $this->options['ACTUAL_CONTENT']) : null;
 		
 		// This will capture the content code in the URL if  so desired.
-		if ( ($this->options['CODE']==='URL') || ($this->options['CODE']==='URL-ID') || ($this->options['CODE']==='URL_overview') )
+		if ( ($this->options['CODE']==='URL') || ($this->options['CODE']==='URL-ID') || (substr($this->options['CODE'], 0, 4)==='URL_') )
 		{
-			$call_parts = wed_getSystemValue('CALL_PARTS');
+			$call_parts                  = wed_getSystemValue('CALL_PARTS');
+			$this->options['SHOW_ERROR'] = true;
 			
 			if ((isset($call_parts[1])) && (!empty($call_parts[1])))
 			{
 				$this->options['CODE'] = ($this->options['CODE']==='URL') ? $call_parts[1] : $this->options['CODE'];
-				$this->options['CODE'] = ($this->options['CODE']==='URL_overview') ? $call_parts[1] . '_overview' : $this->options['CODE'];
 				$this->options['ID']   = ($this->options['CODE']==='URL-ID') ? $call_parts[1] : $this->options['ID'];
+				
+				if (substr($this->options['CODE'], 0, 4)==='URL_')
+				{
+					$code_replace = $call_parts[1].'_';
+					$this->options['CODE'] = str_replace('URL_', $code_replace, $this->options['CODE']);
+				}
 			}
 			else
 			{
@@ -290,6 +298,13 @@ class content_detail extends details
 		
 	public function setHTML($options=null)
 	{
-		return $this->buildPresentation();
+		$html  = $this->buildPresentation();
+		
+		if ((is_null($html)) && ($this->options['SHOW_ERROR']))
+		{
+			$html = $this->options['ERROR_MSG'];
+		}
+		
+		return $html;
 	}
 }

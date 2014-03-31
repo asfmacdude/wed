@@ -66,51 +66,65 @@ class db_banner_schedule extends db_common
 		$today_date = wed_getDateToday();
 		
 		$fields['id'] = array(
-			'TITLE'     => 'ID',
+			'LABEL'     => 'ID',
 			'DB_FIELD'  => 'bsch_id',
 			'NO_UPDATE' => 1
 			);
 		
 		$fields['modified'] = array(
-			'TITLE'     => 'Modified',
+			'LABEL'     => 'Modified',
 			'DB_FIELD'  => 'bsch_modified',
-			'NO_UPDATE' => 1
+			'NO_UPDATE' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['bannerid'] = array(
-			'TITLE'     => 'Banner ID',
-			'DB_FIELD'  => 'bsch_banner_id'
+			'LABEL'     => 'Banner ID',
+			'DB_FIELD'  => 'bsch_banner_id',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['categoryid'] = array(
-			'TITLE'     => 'Category ID',
-			'DB_FIELD'  => 'bsch_category_id'
+			'LABEL'     => 'Category ID',
+			'DB_FIELD'  => 'bsch_category_id',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['active'] = array(
-			'TITLE'    => 'Active',
+			'LABEL'    => 'Active',
 			'DB_FIELD' => 'bsch_active',
-			'DEFAULT'  => 'Y'
+			'DEFAULT'  => 'Y',
+			'LIST_SELECT' => array('Y','N'),
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 		
 		$fields['start'] = array(
-			'TITLE'    => 'Start Date',
+			'LABEL'    => 'Start Date',
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The start date is a required field',
 			'DB_FIELD' => 'bsch_start_date',
-			'DEFAULT'  => $today_date
+			'DEFAULT'  => $today_date,
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['end'] = array(
-			'TITLE'    => 'End Date',
+			'LABEL'    => 'End Date',
 			'DB_FIELD' => 'bsch_end_date',
-			'DEFAULT'  => null
+			'DEFAULT'  => null,
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['details'] = array(
 			'LABEL'    => 'Details',
 			'DB_FIELD' => 'bsch_details',
-			'INSTRUCT' => 'Details are various options for this schedule. Example:  LINK| apple.com;'
+			'INSTRUCT' => 'Details are various options for this schedule. Example:  LINK| apple.com;',
+			'SHOW_FIELD'  => 1,
+			'NO_EDITOR'   => 1
 			);
 			
 		return $fields;
@@ -154,6 +168,45 @@ class db_banner_schedule extends db_common
 		$order_str = $this->options['FIELDS']['gallery']['DB_FIELD'].','.$this->options['FIELDS']['title']['DB_FIELD'];
 		
 		return $this->selectByPairs($pairs, $order_str); 
+    }
+    
+    // *******************************************************************
+    // ********  XCRUD Section *******************************************
+    // *******************************************************************
+    
+    // *******************************************************************
+    // ********  setupXCrud initial setup of XCrud Object ****************
+    // *******************************************************************
+    public function setupXCrud($code=null)
+    {
+	    // Based on the code, we can present different views of the content_main
+	    // table with different settings.
+	    if ($code=='banner_schedules')
+	    {
+		    $xcrud = new db_xcrud_tools();
+		    $xcrud->initXCrud();
+		    $xcrud->setTable($this->options['TABLE_NAME'],$this->options['TABLE_DISPLAY']);
+		    $xcrud->configFields($this->setFields(false));
+ 
+		    $local_relations = $this->getXCrudRelations();
+		    
+		    foreach ($local_relations as $key=>$data)
+		    {
+			    $xcrud->setRelation($data);
+		    }
+		    
+		    return $xcrud->renderXCrud();
+	    }
+    }
+    
+    public function getXCrudRelations()
+    {
+	    $relations[] = array(
+	    	'RELATE_FROM'   => 'bsch_category_id', 
+	    	'RELATE_TABLE'  => 'presentation_setups', 
+	    	'RELATE_TO'     => 'pset_id', 
+	    	'DISPLAY_FIELD' => 'pset_title');
+	    return $relations;
     }
 	
 }

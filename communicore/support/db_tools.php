@@ -24,7 +24,7 @@ abstract class db_tools
 		}
 		catch (PDOException $e)
 		{
-			$err_message = SYS_ERR_NO_DB . ' ' . $e->getMessage();	
+			$err_message = 'System Error: Database connection failed. ' . $e->getMessage();	
 			trigger_error($err_message, E_USER_ERROR);
 		}
 		
@@ -44,7 +44,7 @@ abstract class db_tools
 		}
 		catch (PDOException $e)
 		{
-			$err_message = SYS_ERR_QUERY . ' ' . $e->getMessage();	
+			$err_message = 'System Error: Database query failed. ' . $e->getMessage();	
 			trigger_error($err_message, E_USER_ERROR);
 		}
 		

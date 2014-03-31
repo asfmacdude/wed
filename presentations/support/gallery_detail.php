@@ -90,6 +90,8 @@ class gallery_detail extends details
 	
 	private function buildPresentation()
 	{
+		$html = null;
+		
 		if ((!$this->loadPresentationSetup()) || ($this->options['SETUP_ACTIVE']!='Y'))
 		{
 			wed_changeSystemErrorCode($this->options['ERROR_CODE']);

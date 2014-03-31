@@ -47,7 +47,6 @@ $postcodes = array(
 	'gallery'      => 'sc_galleryPresentation',
 	'download'     => 'sc_fileDownload',
 	'search'       => 'sc_searchManager',
-	'template'     => 'sc_getTemplate',
 	'system_error' => 'sc_systemError',
 	'event_results' => 'sc_eventResults',
 	'schedule'      => 'sc_scheduleEvent'
@@ -467,9 +466,8 @@ function sc_scheduleEvent($options=array(), $content='')
 	$options['PREFIX'] = (isset($options['PREFIX'])) ? $options['PREFIX'] : null ;
 	$options['SUFFIX'] = (isset($options['SUFFIX'])) ? $options['SUFFIX'] : null ;
 	$options['PRINT']  = (isset($options['PRINT'])) ? $options['PRINT'] : null ;
-	
-	global $walt;
-	$time   = $walt->getImagineer('timemachine');	
+
+	$time   = getImagineer('timemachine');	
 	$id     = $time->newSchedule($options);
 	$detail = $time->getDetailObject($id);
 	

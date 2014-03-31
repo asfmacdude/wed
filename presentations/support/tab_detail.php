@@ -136,7 +136,7 @@ class tab_detail extends details
 			// way you can do timed schedules on certain content and instead
 			// of showing an empty tab, none shows at all and it is skipped.
 			// $code    = $connect_db->getValue('cnt_code');
-			$content = $connect_db->getFormattedValue('FULLARTICLE');		
+			$content = $connect_db->getFormattedValue('FULLARTICLE');	
 			$content = wed_renderContent($content); // $shortcodes->getHTML(array('HTML'=>$content));
 			
 			if (!empty($content))

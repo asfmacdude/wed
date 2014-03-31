@@ -181,21 +181,6 @@ class db_system_config extends db_common
 		$this->addValues_Data($data);	
 		return (!$data) ? false : true ; // let showdirector know
 	}
-	
-	public function selectByName($name=null)
-    {
-        if (is_null($name))
-        {
-            return null;
-        }
-        
-        $table      = $this->options['TABLE_NAME'];
-        $where_str  = ' WHERE ';
-        $where_str .= $this->options['FIELDS']['name']['DB_FIELD'].'="'.$name.'"';
-        $sql        = 'SELECT * FROM '.$table.$where_str;
-        
-        return $this->dbRow($sql);
-    }
     
     public function getSettings($id=4)
     {

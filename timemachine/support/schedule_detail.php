@@ -34,6 +34,7 @@ class schedule_detail extends time_tools
 		$this->options['CLASS_NAME']        = __CLASS__;
 		$this->options['LOCAL_PATH']        = dirname(__FILE__);
 		$this->options['NAME']              = null; // name of the event
+		$this->options['CODE']              = null; // code of the event
 		$this->options['SCHEDULE_DB']       = null; // holds the actual db object
 		$this->options['SCHEDULE_ID']       = null; // holds the ID of the db record
 		$this->options['SCHEDULE_ACTIVE']   = null; // Y or N for whether the schedule is active
@@ -67,16 +68,24 @@ class schedule_detail extends time_tools
 	private function loadSchedule()
 	{
 		$status   = (!is_null($this->options['SCHEDULE_DB']));
-		$setup_db = wed_getDBObject('schedules');
+		$setup_db = wed_getDBObject('wed_schedules');
 		
-		if ( (is_null($this->options['SCHEDULE_DB'])) && ($setup_db->selectByName($this->options['NAME'])) )
+		if ( (is_null($this->options['SCHEDULE_DB'])) && ($setup_db->getRecordByName($this->options['NAME'])) )
+		{		
+			$status = true;
+		}
+		elseif ( (is_null($this->options['SCHEDULE_DB'])) && ($setup_db->getRecordByCode($this->options['CODE'])) )
+		{
+			$status = true;
+		}
+		
+		if ($status)
 		{
 			$this->options['SCHEDULE_DB']         = $setup_db;
 			$this->options['SCHEDULE_ID']         = $setup_db->getValue('id');
 			$this->options['SCHEDULE_ACTIVE']     = $setup_db->getValue('active');
 			$this->options['SCHEDULE_START']      = $setup_db->getValue('start');
 			$this->options['SCHEDULE_END']        = $setup_db->getValue('end');
-			$status = true;
 		}
 		
 		return $status;

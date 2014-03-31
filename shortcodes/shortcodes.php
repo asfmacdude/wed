@@ -230,6 +230,13 @@ class shortcodes extends imagineer
 	 */
 	public function do_shortcode_tag( $m )
 	{	
+		$clean_entity = function($value)
+		{
+			return html_entity_decode($value);
+		};
+		
+		$m = array_map($clean_entity, $m);
+		
 		// allow [[foo]] syntax for escaping a tag
 		// strips the extra [ ] off the ends
 		if ( $m[1] == '[' && $m[6] == ']' )

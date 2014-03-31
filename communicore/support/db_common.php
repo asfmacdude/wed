@@ -198,6 +198,82 @@ abstract class db_common extends db_xcrud
     }
     
     // *******************************************************************
+    // * getRecordByField allows easy selecting by a field and value pair
+    // *******************************************************************
+    /*
+     * This function allows quick and easy searches by a $field/$value pair
+     * for one record such as id, code, name, etc. I have included several
+     * helper functions to make the function name easier to remember.
+     *
+     */
+    public function getRecordByField($field=null,$value=null)
+    {
+	    $status = false;
+	    
+	    if ( (is_null($field)) && (is_null($value)) )
+	    {
+		    return $status;
+	    }
+	    
+	    $fields = $this->setFields(false); // Do not get join fields
+	    
+	    if (isset($fields[$field]))
+	    {
+		    $table  = $this->options['TABLE_NAME'];	
+			$pairs  = array( $field => $value );	
+			$data   = $this->selectByPairs($pairs,null,false);
+			
+			if ($data)
+			{
+				$this->addValues_Data($data);
+				$status = true;
+			}
+	    }
+		
+		return $status;
+    }
+    
+    public function getRecordByID($id)
+    {
+	    return $this->getRecordByField('id',$id);
+    }
+    
+    public function getRecordByName($name)
+    {
+	    return $this->getRecordByField('name',$name);
+    }
+    
+    public function getRecordByCode($code)
+    {
+	    return $this->getRecordByField('code',$code);
+    }
+    
+    // *******************************************************************
+    // * getDetail allows easy access to detail field values *************
+    // *******************************************************************
+    /*
+     * This function allows quick and easy access to detail fields where
+     * additional values can be setup without having to define fields for
+     * everything. The values should be setup as follows:
+     * NAME_OF_VALUE| value;
+     * ANOTHER_NAME| another value;
+     */
+    public function getDetail($detail,$default=null)
+    {
+	    $value  = $default;	    
+	    $fields = $this->setFields(false); // Do not get join fields
+	    
+	    if (isset($fields['details']))
+	    {
+		    $detail_field = $this->getValue('details');
+			$detail_array = wed_getOptionsFromString($detail_field);
+			$value        = (isset($detail_array[$detail])) ? $detail_array[$detail] : $default;
+	    }
+	    
+	    return $value;
+    }
+    
+    // *******************************************************************
     // ** joinFields merges other fields listing into one  ***************
     // *******************************************************************
     /*

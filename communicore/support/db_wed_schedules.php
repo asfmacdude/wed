@@ -1,6 +1,6 @@
 <?php
 /*
- * db_schedules
+ * db_wed_schedules
  *
  * Database object for the online database schedules
  *
@@ -10,7 +10,7 @@ defined( '_GOOFY' ) or die();
 
 include_once('db_common.php');
 
-class db_schedules extends db_common
+class db_wed_schedules extends db_common
 {
 	public $options;
 	public $db;
@@ -26,7 +26,8 @@ class db_schedules extends db_common
 	{
 		$this->options['CLASS_NAME']     = __CLASS__;
 		$this->options['LOCAL_PATH']     = dirname(__FILE__);
-		$this->options['TABLE_NAME']     = 'schedules';
+		$this->options['TABLE_NAME']     = 'wed_schedules';
+		$this->options['TABLE_DISPLAY']  = 'Schedule Management';
 		$this->options['TABLE_ID_FIELD'] = 'schd_id';
 		
 		$this->options['FIELDS']         = $this->setFields();
@@ -84,6 +85,24 @@ class db_schedules extends db_common
 			'SHOW_COLUMN'  => 1,
 			'SHOW_FIELD'    => 1
 			);
+		
+		$fields['code'] = array(
+			'LABEL'    => 'Schedule Code',
+			'VALIDATE' => 'Required',
+			'MESSAGE'  => 'The code is a required field',
+			'DB_FIELD' => 'schd_code',
+			'INSTRUCT' => 'This is the unique code that the system uses to index this article.',
+			'DEFAULT'  => 'Enter a code',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
+			);
+		
+		$fields['description'] = array(
+			'LABEL'    => 'Schedule Description',
+			'DB_FIELD' => 'schd_description',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'  => 1
+			);
 			
 		$fields['active'] = array(
 			'LABEL'    => 'Active',
@@ -121,29 +140,6 @@ class db_schedules extends db_common
 			);
 			
 		return $fields;
-	}
-	
-	public function selectByName($name=null)
-    {
-        if (is_null($name))
-        {
-            return false;
-        }
-        
-        $table  = $this->options['TABLE_NAME'];	
-		$pairs  = array( 'name'=> $name );	
-		$data   = $this->selectByPairs($pairs,null,false);
-		$this->addValues_Data($data);	
-		return (!$data) ? false : true ;
-    }
-    
-    public function getDetail($detail,$default=null)
-    {
-	    $detail_field = $this->getValue('details');
-	    $detail_array = wed_getOptionsFromString($detail_field);
-	    
-	    return (isset($detail_array[$detail])) ? $detail_array[$detail] : $default;
-    }
-	
+	}	
 }
 ?>

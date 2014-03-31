@@ -24,6 +24,7 @@ class db_content_types extends db_common
 		$this->options['CLASS_NAME']     = __CLASS__;
 		$this->options['LOCAL_PATH']     = dirname(__FILE__);
 		$this->options['TABLE_NAME']     = 'content_types';
+		$this->options['TABLE_DISPLAY']  = 'Content Management Types';
 		$this->options['TABLE_ID_FIELD'] = 'ctp_id';
 		
 		$this->options['FIELDS']         = $this->setFields();
@@ -148,5 +149,53 @@ class db_content_types extends db_common
 			
 		return $list;
 	}
+	
+	// *******************************************************************
+    // ********  XCRUD Section *******************************************
+    // *******************************************************************
+    
+    // *******************************************************************
+    // ********  setupXCrud initial setup of XCrud Object ****************
+    // *******************************************************************
+    public function setupXCrud($code=null)
+    {
+	    // Based on the code, we can present different views of the content_main
+	    // table with different settings.
+	    if ($code=='content_100')
+	    {
+		    $xcrud = new db_xcrud_tools();
+		    $xcrud->initXCrud();
+		    $xcrud->setTable($this->options['TABLE_NAME'],$this->options['TABLE_DISPLAY']);
+		    $xcrud->configFields($this->setFields(false));
+		    
+		    // Try Nested Table
+		    $nest_name1 = 'content_main';
+		    $db_object  = wed_getDBObject($nest_name1);
+		    
+		    $nest1_options = array(
+		    	'OBJECT_NAME'     => $nest_name1,
+		    	'CONNECTION_NAME' => 'Content Connections',
+		    	'RELATE_FROM'     => 'ctp_id',
+		    	'RELATE_TABLE'    => $nest_name1,
+		    	'RELATE_TO'       => 'cnt_type_id'
+		    );
+			
+			$xcrud->createNestedTable($nest1_options);
+			$xcrud->configFields($db_object->setFields(false),$nest_name1);
+			
+			$nest1_relations = $db_object->getXCrudRelations();
+			
+			foreach ($nest1_relations as $key=>$data)
+			{
+				$data['OBJECT_NAME'] = $nest_name1;
+				$xcrud->setRelation($data);
+			}
+		    
+		    return $xcrud->renderXCrud();
+
+	    }
+    }
+	
+	
 }
 ?>

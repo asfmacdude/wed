@@ -48,6 +48,12 @@ class time_tools extends details
 		return $dtime_obj->format("F j, Y");
 	}
 	
+	public function getShortDate($dtime_obj)
+	{
+		// returns 1/15/2014
+		return $dtime_obj->format("m/d/Y");
+	}
+	
 	public function getMonth($dtime_obj)
 	{
 		// returns January

@@ -24,6 +24,7 @@ abstract class db_xcrud extends db_tools
 		// Xcrud_config::$editor_url = 'http://admin.asffoundation.net/components/editors/ckeditor/ckeditor.js';
 		// $this->xcrud->connection($db_settings['USERNAME'],$db_settings['PASSWORD'],$db_settings['DB_NAME'],'localhost');		
 		$this->xcrud->table($this->options['TABLE_NAME']);
+		$this->xcrud->buttons_position('left');
 		$this->configFields();
 	}
 	

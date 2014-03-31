@@ -27,6 +27,7 @@ class db_banners extends db_common
 		$this->options['CLASS_NAME']     = __CLASS__;
 		$this->options['LOCAL_PATH']     = dirname(__FILE__);
 		$this->options['TABLE_NAME']     = 'banners';
+		$this->options['TABLE_DISPLAY']  = 'Banner Management';
 		$this->options['TABLE_ID_FIELD'] = 'banr_id';
 		
 		$this->options['FIELDS']         = $this->setFields();
@@ -66,60 +67,77 @@ class db_banners extends db_common
 		$today_date = wed_getDateToday();
 		
 		$fields['id'] = array(
-			'TITLE'     => 'ID',
+			'LABEL'     => 'ID',
 			'DB_FIELD'  => 'banr_id',
 			'NO_UPDATE' => 1
 			);
 		
 		$fields['modified'] = array(
-			'TITLE'     => 'Modified',
+			'LABEL'     => 'Modified',
 			'DB_FIELD'  => 'banr_modified',
-			'NO_UPDATE' => 1
+			'NO_UPDATE' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['title'] = array(
-			'TITLE'     => 'Banner Title',
-			'DB_FIELD'  => 'banr_title'
+			'LABEL'     => 'Banner Title',
+			'DB_FIELD'  => 'banr_title',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['description'] = array(
-			'TITLE'     => 'Description',
-			'DB_FIELD'  => 'banr_description'
+			'LABEL'     => 'Description',
+			'DB_FIELD'  => 'banr_description',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['width'] = array(
-			'TITLE'    => 'Width',
-			'DB_FIELD' => 'banr_width'
+			'LABEL'    => 'Width',
+			'DB_FIELD' => 'banr_width',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 		
 		$fields['type'] = array(
-			'TITLE'    => 'Type',
+			'LABEL'    => 'Type',
 			'DB_FIELD' => 'banr_type',
 			'INSTRUCT' => 'Banners can either be Image or HTML',
-			'DEFAULT'  => 'Image'
+			'DEFAULT'  => 'Image',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['height'] = array(
-			'TITLE'    => 'Height',
-			'DB_FIELD' => 'banr_height'
+			'LABEL'    => 'Height',
+			'DB_FIELD' => 'banr_height',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['details'] = array(
 			'LABEL'    => 'Details',
 			'DB_FIELD' => 'banr_details',
-			'INSTRUCT' => 'Details are various options for this schedule. Example:  LINK| apple.com;'
+			'INSTRUCT' => 'Details are various options for this schedule. Example:  LINK| apple.com;',
+			'SHOW_FIELD'  => 1,
+			'NO_EDITOR'   => 1
 			);
 			
 		$fields['html'] = array(
 			'LABEL'    => 'HTML',
 			'DB_FIELD' => 'banr_html',
-			'INSTRUCT' => 'Use this to store HTML for HTML banners'
+			'INSTRUCT' => 'Use this to store HTML for HTML banners',
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['active'] = array(
-			'TITLE'    => 'Active',
+			'LABEL'    => 'Active',
 			'DB_FIELD' => 'banr_active',
-			'DEFAULT'  => 'Y'
+			'DEFAULT'  => 'Y',
+			'LIST_SELECT' => array('Y','N'),
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		return $fields;
@@ -144,7 +162,50 @@ class db_banners extends db_common
 	    
 	    return (isset($detail_array[$detail])) ? $detail_array[$detail] : $default;
     }
-	
-	
+    
+    // *******************************************************************
+    // ********  XCRUD Section *******************************************
+    // *******************************************************************
+    
+    // *******************************************************************
+    // ********  setupXCrud initial setup of XCrud Object ****************
+    // *******************************************************************
+    public function setupXCrud($code=null)
+    {
+	    // Based on the code, we can present different views of the content_main
+	    // table with different settings.
+	    if ($code=='banners_100')
+	    {
+		    $xcrud = new db_xcrud_tools();
+		    $xcrud->initXCrud();
+		    $xcrud->setTable($this->options['TABLE_NAME'],$this->options['TABLE_DISPLAY']);
+		    $xcrud->configFields($this->setFields(false));
+		    
+		    // Try Nested Table
+		    $nest_name1 = 'banner_schedule';
+		    $db_object  = wed_getDBObject($nest_name1);
+		    
+		    $nest1_options = array(
+		    	'OBJECT_NAME'     => $nest_name1,
+		    	'CONNECTION_NAME' => 'Schedules for this Banner',
+		    	'RELATE_FROM'     => 'banr_id',
+		    	'RELATE_TABLE'    => $nest_name1,
+		    	'RELATE_TO'       => 'bsch_banner_id'
+		    );
+			
+			$xcrud->createNestedTable($nest1_options);
+			$xcrud->configFields($db_object->setFields(false),$nest_name1);
+			
+			$nest1_relations = $db_object->getXCrudRelations();
+			
+			foreach ($nest1_relations as $key=>$data)
+			{
+				$data['OBJECT_NAME'] = $nest_name1;
+				$xcrud->setRelation($data);
+			}
+		    
+		    return $xcrud->renderXCrud();
+	    }
+    }	
 }
 ?>

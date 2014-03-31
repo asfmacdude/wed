@@ -19,12 +19,18 @@ class db_xcrud_tools
 	public function initXCrud()
 	{	
 		$this->xcrud = Xcrud::get_instance();
+		$this->xcrud->buttons_position('left');
 		// Xcrud_config::$editor_url = 'http://admin.asffoundation.net/components/editors/ckeditor/ckeditor.js';
 	}
 	
-	public function setTable($table)
+	public function setTable($table,$table_name=null)
 	{
 		$this->xcrud->table($table);
+		
+		if (!is_null($table_name))
+		{
+			$this->xcrud->table_name($table_name);
+		}
 	}
 	
 	public function createNestedTable($options=array())

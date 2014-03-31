@@ -25,6 +25,7 @@ class db_content_control extends db_common
 		$this->options['CLASS_NAME']     = __CLASS__;
 		$this->options['LOCAL_PATH']     = dirname(__FILE__);
 		$this->options['TABLE_NAME']     = 'content_control';
+		$this->options['TABLE_DISPLAY']  = 'Page Control';
 		$this->options['TABLE_ID_FIELD'] = 'cnc_id';
 			
 		$this->options['FIELDS']         = $this->setFields();
@@ -214,10 +215,8 @@ class db_content_control extends db_common
 	    {
 		    $xcrud = new db_xcrud_tools();
 		    $xcrud->initXCrud();
-		    $xcrud->setTable($this->options['TABLE_NAME']);
-		    $xcrud->configFields($this->setFields(false));
-		    
-		   
+		    $xcrud->setTable($this->options['TABLE_NAME'],$this->options['TABLE_DISPLAY']);
+		    $xcrud->configFields($this->setFields(false));  
 		    
 		    // Try Nested Table
 		    $nest_name1 = 'sites_connect';

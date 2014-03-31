@@ -600,9 +600,9 @@ function wed_getMomentInTime($options=array())
 	
 	if (!is_null($schedule))
 	{
-		$db_schedule = wed_getDBObject('schedules');
+		$db_schedule = wed_getDBObject('wed_schedules');
 		
-		if ($db_schedule->selectByName($schedule))
+		if ( ($db_schedule->getRecordByName($schedule)) || ($db_schedule->getRecordByCode($schedule)) )
 		{
 			$start = $db_schedule->getValue('start');
 			$end   = $db_schedule->getValue('end');

@@ -25,6 +25,7 @@ class db_content_main extends db_common
 		$this->options['CLASS_NAME']     = __CLASS__;
 		$this->options['LOCAL_PATH']     = dirname(__FILE__);
 		$this->options['TABLE_NAME']     = 'content_main';
+		$this->options['TABLE_DISPLAY']  = 'Content Management';
 		$this->options['TABLE_ID_FIELD'] = 'cnt_id';
 		
 		$this->options['FIELDS']         = $this->setFields();
@@ -445,9 +446,9 @@ class db_content_main extends db_common
 	    {
 		    $xcrud = new db_xcrud_tools();
 		    $xcrud->initXCrud();
-		    $xcrud->setTable($this->options['TABLE_NAME']);
+		    $xcrud->setTable($this->options['TABLE_NAME'],$this->options['TABLE_DISPLAY']);
 		    $xcrud->configFields($this->setFields(false));
-		    
+ 
 		    $local_relations = $this->getXCrudRelations();
 		    
 		    foreach ($local_relations as $key=>$data)
