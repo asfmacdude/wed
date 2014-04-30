@@ -58,7 +58,9 @@ class goofy_clean extends imagineer
             'ALPHA'        => 'cleanNumbers',
             'URL'          => 'cleanURL',
             'FINAL_HTML'   => 'cleanHTML',
-            'SC_BRACKETS'  => 'cleanPreShortcodes'
+            'SC_BRACKETS'  => 'cleanPreShortcodes',
+            'NO_P_TAGS'    => 'cleanParagraphTags',
+            'NO_DOUBLE_P'  => 'cleanDoubleParagraphTags'
         );
 
         $this->soap_regex = array(
@@ -344,6 +346,33 @@ class goofy_clean extends imagineer
 	     */
 	     $string = str_replace('<p>[', '[', $string);
 	     $string = str_replace(']</p>', ']', $string);
+	     $string = str_replace('<p></p>', '', $string);
+	     
+	     return $string;
+    }
+    
+    private function cleanParagraphTags($string)
+    {
+	    /*
+	     * This takes  out all paragraph tags <p> and </p>
+	     *
+	     */
+	     $string = str_replace('<p>', '', $string);
+	     $string = str_replace('</p>', '', $string);
+	     
+	     return $string;
+    }
+    
+    private function cleanDoubleParagraphTags($string)
+    {
+	    /*
+	     * This takes  out all double paragraph tags <p><p> and </p></p>
+	     * Occassionally these are left behind by shortcodes that combine content
+	     * from excerpts and snippets.
+	     *
+	     */
+	     $string = str_replace('<p><p>', '<p>', $string);
+	     $string = str_replace('</p></p>', '</p>', $string);
 	     
 	     return $string;
     }
@@ -356,8 +385,9 @@ class goofy_clean extends imagineer
 	     * others that do similar.
 	     *
 	     */
-	     $dirt = array('<p></p>');
+	     $dirt   = array('<p></p>');
 	     $string = str_replace($dirt, '', $string);
+	     $string = $this->cleanDoubleParagraphTags($string);
 	     
 	     return $string;
     }

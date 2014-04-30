@@ -88,7 +88,7 @@ class db_content_groups extends db_common
 			'SHOW_FIELD'   => 1
 			);
 			
-		$fields['sysname'] = array(
+		$fields['name'] = array(
 			'LABEL'    => 'System Name',
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The system name is a required field',
@@ -218,7 +218,7 @@ class db_content_groups extends db_common
         }
         
         $table     = $this->options['TABLE_NAME'];	
-		$pairs     = array( 'sysname'=> $name );
+		$pairs     = array( 'name'=> $name );
 		
 		return $this->selectByPairs($pairs, null, false); 
     }

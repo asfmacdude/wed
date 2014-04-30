@@ -63,13 +63,13 @@ class db_sites extends db_common
 		$fields = array();
 		
 		$fields['id'] = array(
-			'TITLE'     => 'ID',
+			'LABEL'     => 'ID',
 			'DB_FIELD'  => 'site_id',
 			'NO_UPDATE' => 1
 			);
 		
 		$fields['name'] = array(
-			'TITLE'    => 'Site Name',
+			'LABEL'    => 'Site Name',
 			'VALIDATE' => 'Required',
 			'MESSAGE'  => 'The site name is a required field',
 			'DB_FIELD' => 'site_name',
@@ -78,29 +78,29 @@ class db_sites extends db_common
 			);
 			
 		$fields['title'] = array(
-			'TITLE'    => 'Site Title',
+			'LABEL'    => 'Site Title',
 			'DB_FIELD' => 'site_title',
 			'SHOW_COLUMN'  => 1,
 			'SHOW_FIELD'   => 1
 			);
 			
 		$fields['description'] = array(
-			'TITLE'    => 'Site Description',
+			'LABEL'    => 'Site Description',
 			'DB_FIELD' => 'site_description',
 			'SHOW_COLUMN'  => 1,
 			'SHOW_FIELD'   => 1
 			);
 			
 		$fields['url'] = array(
-			'TITLE'    => 'Site URL',
+			'LABEL'    => 'Site URL',
 			'DB_FIELD' => 'site_url',
 			'SHOW_COLUMN'  => 1,
 			'SHOW_FIELD'   => 1
 			);
 			
-		$fields['theme'] = array(
-			'TITLE'    => 'Site Theme',
-			'DB_FIELD' => 'site_theme',
+		$fields['themeid'] = array(
+			'LABEL'    => 'Site Theme',
+			'DB_FIELD' => 'site_theme_id',
 			'SHOW_COLUMN'  => 1,
 			'SHOW_FIELD'   => 1
 			);
@@ -184,6 +184,13 @@ class db_sites extends db_common
 		    $xcrud->setTable($this->options['TABLE_NAME']);
 		    $xcrud->configFields($this->setFields(false));
 		    
+		    $local_relations = $this->getXCrudRelations();
+		    
+		    foreach ($local_relations as $key=>$data)
+		    {
+			    $xcrud->setRelation($data);
+		    }
+		    
 		    // Try Nested Table
 		    $nest_name1 = 'sites_connect';
 		    $db_object  = wed_getDBObject($nest_name1);
@@ -242,6 +249,13 @@ class db_sites extends db_common
 		    $xcrud->setTable($this->options['TABLE_NAME']);
 		    $xcrud->configFields($this->setFields(false));
 		    
+		    $local_relations = $this->getXCrudRelations();
+		    
+		    foreach ($local_relations as $key=>$data)
+		    {
+			    $xcrud->setRelation($data);
+		    }
+		    
 		    // Try Nested Table
 		    $nest_name1 = 'system_config';
 		    $db_object  = wed_getDBObject($nest_name1);
@@ -268,6 +282,16 @@ class db_sites extends db_common
 		    return $xcrud->renderXCrud();
 
 	    }
+    }
+    
+    public function getXCrudRelations()
+    {
+	    $relations[] = array(
+	    	'RELATE_FROM'   => 'site_theme_id', 
+	    	'RELATE_TABLE'  => 'wed_themes', 
+	    	'RELATE_TO'     => 'theme_id', 
+	    	'DISPLAY_FIELD' => 'theme_name');
+	    return $relations;
     }
 	
 }

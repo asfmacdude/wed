@@ -151,7 +151,7 @@ class db_presentation_setups extends db_common
 			);
 			
 		$fields['data'] = array(
-			'LABEL'    => 'Formats ',
+			'LABEL'    => 'Data ',
 			'DB_FIELD' => 'pset_data_json',
 			'INSTRUCT' => 'Data field for arrays in JSON format.',
 			'SHOW_FIELD'    => 1,

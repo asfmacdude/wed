@@ -85,7 +85,7 @@ class guestdirector extends imagineer
 		// in the login_users table and updates the SESSION accordingly
 		$user_db = wed_getDBObject('login_users');
 		
-		if ($user_db->loadUserID($this->options['USER_ID']))
+		if ($user_db->getRecordByID($this->options['USER_ID']))
 		{		
 			$this->options['USER_NAME']  = $user_db->getValue('username');
 			$this->options['USER_LEVEL'] = unserialize($user_db->getValue('level'));

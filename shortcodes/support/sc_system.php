@@ -4,7 +4,9 @@
  * sc_system.php
  *
  * These are shortcode functions designed for the entire system no matter
- * what theme you are using.
+ * what theme you are using. All functions have the prefix sys_ to cut down of conflicts
+ * between themes. Themes could possibly have the same shortcode and since the theme
+ * loads after the system, the them shortcode will 'override' the system shortcode.
  *
  * Precodes
  * Precodes only fire on the content extracted from the control code table. That
@@ -18,45 +20,86 @@
  */
 
 $precodes = array(
-	'body'         => 'sc_showBodyParts',
-	'template'     => 'sc_getTemplate',
-	'hide'         => 'sc_hideContent',
-	'runtime'      => 'sc_runTime',
-	'url_path'     => 'sc_urlPath',
-	'system_error' => 'sc_systemError'
+	'body'         => 'sys_showBodyParts',
+	'template'     => 'sys_getTemplate',
+	'hide'         => 'sys_hideContent',
+	'runtime'      => 'sys_runTime',
+	'url_path'     => 'sys_urlPath',
+	'system_error' => 'sys_systemError'
 );
 
-global $walt;
-$short = $walt->getImagineer('shortcodes');
-$short->add_shortcodes_array($precodes,true);
+wed_registerShortcodes($precodes,true);
 
 // *******************************************************************
 // *****  Post Code List - Shortcodes that are run last **************
 // *******************************************************************
 $postcodes = array(
-	'template'     => 'sc_getTemplate',
-	'presentation' => 'sc_Presentations',
-	'article'      => 'sc_getArticle',
-	'hide'         => 'sc_hideContent',
-	'clear'        => 'sc_divClear',
-	'data_table'   => 'sc_getData_Table',
-	'runtime'      => 'sc_runTime',
-	'tabs_group'   => 'sc_tabGroupPresentation',
-	'accordion'    => 'sc_accordionPresentation',
-	'accordion_faq' => 'sc_accordionFaqPresentation',
-	'gallery'      => 'sc_galleryPresentation',
-	'download'     => 'sc_fileDownload',
-	'search'       => 'sc_searchManager',
-	'system_error' => 'sc_systemError',
-	'event_results' => 'sc_eventResults',
-	'schedule'      => 'sc_scheduleEvent'
+	'template'     => 'sys_getTemplate',
+	'presentation' => 'sys_Presentations',
+	'article'      => 'sys_getArticle',
+	'hide'         => 'sys_hideContent',
+	'clear'        => 'sys_divClear',
+	'data_table'   => 'sys_getData_Table',
+	'runtime'      => 'sys_runTime',
+	'tabs_group'   => 'sys_tabGroupPresentation',
+	'accordion'    => 'sys_accordionPresentation',
+	'accordion_faq' => 'sys_accordionFaqPresentation',
+	'gallery'      => 'sys_galleryPresentation',
+	'download'     => 'sys_fileDownload',
+	'search'       => 'sys_searchManager',
+	'system_error' => 'sys_systemError',
+	'event_results' => 'sys_eventResults',
+	'schedule'      => 'sys_scheduleEvent'
 );
 
-global $walt;
-$short = $walt->getImagineer('shortcodes');
-$short->add_shortcodes_array($postcodes);
+$postcodes['banner']  = 'sys_BannerPresentation';
+$postcodes['content'] = 'sys_ContentPresentation';
+$postcodes['image']   = 'sys_ImagePresentation';
 
-function sc_showBodyParts($options=array(), $content='')
+
+wed_registerShortcodes($postcodes);
+
+
+// *******************************************************************
+// *****  Presentation Shortcodes ************************************
+// *******************************************************************
+function sys_Presentations($options=array(), $content='')
+{
+	if (!wed_getMomentInTime($options))
+	{
+		return null;
+	}
+	
+	// wed_renderContent runs the shortcodes found in the $content
+	$options['ACTUAL_CONTENT'] = wed_renderContent($content);
+
+	$present = getImagineer('presentations');
+	$id      = $present->newPresentation($options);
+	return (!$id) ? null : $present->getHTML(array('ID'=>$id));
+}
+
+function sys_BannerPresentation($options=array(), $content='')
+{
+	$options['type'] = 'banner';
+	return sys_Presentations($options, $content);
+
+}
+
+function sys_ContentPresentation($options=array(), $content='')
+{
+	$options['type'] = 'content';
+	return sys_Presentations($options, $content);
+
+}
+
+function sys_ImagePresentation($options=array(), $content='')
+{
+	$options['type'] = 'image';
+	return sys_Presentations($options, $content);
+
+}
+
+function sys_showBodyParts($options=array(), $content='')
 {
 	global $walt;
 	$prof = $walt->getImagineer('professor');
@@ -69,7 +112,7 @@ function sc_showBodyParts($options=array(), $content='')
 	$prof->addSetting('BODY_HTML',$actual_content);
 }
 
-function sc_urlPath($options=array(), $content='')
+function sys_urlPath($options=array(), $content='')
 {
 	$part = (isset($options['part'])) ? $options['part'] : 'LIST' ;
 	
@@ -83,7 +126,7 @@ function sc_urlPath($options=array(), $content='')
 	}
 }
 
-function sc_getTemplate($options=array(), $content='')
+function sys_getTemplate($options=array(), $content='')
 {
 	$name      = (isset($options['name'])) ? $options['name'] : null ;
 	$mobile    = (isset($options['mobile'])) ? $options['mobile'] : false ;
@@ -94,7 +137,7 @@ function sc_getTemplate($options=array(), $content='')
 	$endDate   = (isset($options['end_date'])) ? $options['end_date'] : false ;
 	$page_type = wed_getSystemValue('PAGE_TYPE');
 	
-	if ( (!$name) || (!calulateRunDate($startDate, $endDate)) )
+	if (!wed_getMomentInTime($options))
 	{
 		return null;
 	}
@@ -143,7 +186,7 @@ function sc_getTemplate($options=array(), $content='')
 	return $html;
 }
 
-function sc_showElementsContent($options=array(), $content='')
+function sys_showElementsContent($options=array(), $content='')
 {
 	global $walt;
 	$prof = $walt->getImagineer('professor');
@@ -158,7 +201,7 @@ function sc_showElementsContent($options=array(), $content='')
 	$prof->addSetting('CONTENT_HTML',$actual_content);
 }
 
-function sc_runTime($options=array(), $content='')
+function sys_runTime($options=array(), $content='')
 {
 	if (!wed_getMomentInTime($options))
 	{
@@ -171,47 +214,15 @@ function sc_runTime($options=array(), $content='')
 }
 
 	
-function sc_getArticle($options=array(), $content='')
+function sys_getArticle($options=array(), $content='')
 {
-	if (!wed_getMomentInTime($options))
-	{
-		return null;
-	}
+	$options['type'] = 'content';
+	return sys_Presentations($options, $content);
 	
-	$specs['ARTICLE_CODE'] = (isset($options['code'])) ? $options['code'] : null ;
-	$specs['ARTICLE_ID']   = (isset($options['id'])) ? $options['id'] : null ;
-	$specs['FORMAT']       = (isset($options['format'])) ? $options['format'] : null ;
-	$specs['DETAIL']       = (isset($options['detail'])) ? $options['detail'] : null ;
-	$specs['TYPE']         = 'article';
-	
-	if ((is_null($specs['ARTICLE_CODE'])) && (is_null($specs['ARTICLE_ID'])))
-	{
-		return null;
-	}
-	
-	if ( ($specs['ARTICLE_CODE']==='URL') || ($specs['ARTICLE_CODE']==='URL-ID') )
-	{
-		$call_parts = wed_getSystemValue('CALL_PARTS');
-		
-		if ((isset($call_parts[1])) && (!empty($call_parts[1])))
-		{
-			$specs['ARTICLE_CODE'] = ($specs['ARTICLE_CODE']==='URL') ? $call_parts[1] : null;
-			$specs['ARTICLE_ID']   = ($specs['ARTICLE_CODE']==='URL-ID') ? $call_parts[1] : null;
-			$update_header = true;
-		}
-		else
-		{
-			wed_changeSystemErrorCode('NO ARTICLE CODE');
-		}
-	}
-	
-	global $walt;
-	$article  = $walt->getImagineer('presentations');
-	$id       = $article->newPresentation($specs);
-	return $article->getHTML(array('ID'=>$id));
+	// Deprecate this function soon!
 }
 		
-function sc_getData_Table($options=array(), $content='')
+function sys_getData_Table($options=array(), $content='')
 {
 	global $walt;
 	$js = $walt->getImagineer('jsdirector');
@@ -235,39 +246,21 @@ function sc_getData_Table($options=array(), $content='')
 	return $acct->getHTML($options);
 }
 
-function sc_hideContent($options=array(), $content='')
+function sys_hideContent($options=array(), $content='')
 {
 	return '';
 }
 
-function sc_divClear($options=array(), $content='')
+function sys_divClear($options=array(), $content='')
 {
 	return '<div style="clear:both;"></div>';
 }
 
-// *******************************************************************
-// *****  sc_Presentations *******************************************
-// *******************************************************************
-function sc_Presentations($options=array(), $content='')
-{
-	if (!wed_getMomentInTime($options))
-	{
-		return null;
-	}
-	
-	// wed_renderContent runs the shortcodes found in the $content
-	$options['ACTUAL_CONTENT'] = wed_renderContent($content);
-
-	$present = getImagineer('presentations');
-	$id      = $present->newPresentation($options);
-	return (!$id) ? null : $present->getHTML(array('ID'=>$id));
-}
-
 
 // *******************************************************************
-// *****  sc_tabGroupPresentation *************************************
+// *****  sys_tabGroupPresentation *************************************
 // *******************************************************************
-function sc_tabGroupPresentation($options=array(), $content='')
+function sys_tabGroupPresentation($options=array(), $content='')
 {
 	// Common Shortcode: [tabs_group setup="tabs_vertical" group="archery_" /]
 	$html      = '';
@@ -304,9 +297,9 @@ function sc_tabGroupPresentation($options=array(), $content='')
 }
 
 // *******************************************************************
-// *****  sc_accordionPresentation ***********************************
+// *****  sys_accordionPresentation ***********************************
 // *******************************************************************
-function sc_accordionPresentation($options=array(), $content='')
+function sys_accordionPresentation($options=array(), $content='')
 {
 	$html      = '';
 	$type      = (isset($options['type'])) ? $options['type'] : 'accordion' ;
@@ -337,7 +330,7 @@ function sc_accordionPresentation($options=array(), $content='')
 }
 
 
-function sc_galleryPresentation($options=array(), $content='')
+function sys_galleryPresentation($options=array(), $content='')
 {
 	$html      = '';
 	$type      = (isset($options['type'])) ? $options['type'] : 'gallery' ;
@@ -370,7 +363,7 @@ function sc_galleryPresentation($options=array(), $content='')
 	return $html;
 }
 
-function sc_fileDownload($options=array(), $content='')
+function sys_fileDownload($options=array(), $content='')
 {
 	$html                = '';
 	$options['TITLE']    = (isset($options['title'])) ? $options['title'] : 'Download' ;
@@ -403,7 +396,7 @@ function sc_fileDownload($options=array(), $content='')
 // **********************************************************************
 // ************** SEARCH FUNCTIONS **************************************
 // **********************************************************************
-function sc_searchResults($options=array(), $content='')
+function sys_searchResults($options=array(), $content='')
 {
 	$html      = '';
 	$type      = (isset($options['type'])) ? $options['type'] : 'content' ;
@@ -432,7 +425,7 @@ function sc_searchResults($options=array(), $content='')
 	return $html;
 }
 
-function sc_searchManager($options=array(), $content='')
+function sys_searchManager($options=array(), $content='')
 {
 	$theme                   = wed_getSystemValue('THEME','System');
 	$specs['THEME']          = (isset($options['theme'])) ? $options['theme'] : $theme ;
@@ -443,20 +436,19 @@ function sc_searchManager($options=array(), $content='')
 	$specs['SEARCH_OPTIONS'] = (isset($options['options'])) ? $options['options'] : array() ;
 	$specs['HEADING']        = (isset($options['heading'])) ? $options['heading'] : 'Search Results' ;
 	
-	global $walt;
-	$search  = $walt->getImagineer('search');	
+	$search  = getImagineer('search');	
 	$id      = $search->newSearch($specs);
 		
 	return $search->getHTML(array('ID'=>$id));
 }
 
-function sc_systemError($options=array(), $content='')
+function sys_systemError($options=array(), $content='')
 {
 	$code = (isset($options['code'])) ? $options['code'] : 'GENERAL ERROR' ;
 	wed_changeSystemErrorCode($code);
 }
 
-function sc_scheduleEvent($options=array(), $content='')
+function sys_scheduleEvent($options=array(), $content='')
 {
 	$options = wed_standardKeys($options);
 	
@@ -501,7 +493,7 @@ function sc_scheduleEvent($options=array(), $content='')
 // **********************************************************************
 // ************** EVENT MANAGER FUNCTIONS *******************************
 // **********************************************************************
-function sc_eventResults($options=array(), $content='')
+function sys_eventResults($options=array(), $content='')
 {
 	$options = wed_standardKeys($options);
 	
@@ -522,26 +514,4 @@ function sc_eventResults($options=array(), $content='')
 	return $html;
 }
 
-// **********************************************************************
-// ************** COMMON FUNCTIONS **************************************
-// **********************************************************************
-function calulateRunDate($start=false,$end=false)
-{
-	date_default_timezone_set('America/Chicago');
-	
-	// this function will return true is today's date either falls
-	// between the start and end date or before the end date
-	if (!$start && !$end)
-	{
-		return true;
-	}
-	else
-	{
-		$start_date = (!$start) ? new DateTime('now') : new DateTime($start);
-		$end_date   = new DateTime($end);
-		$moment     = new DateTime('now');
-		
-		return ( ( ($moment>$start_date) || ($moment==$start_date) ) && (($moment==$end_date) || ($moment<$end_date)) );
-	}
-}
 ?>

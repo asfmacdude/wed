@@ -158,4 +158,57 @@ abstract class details
 	}
 }
 
+/*
+ * class detail_object
+ *
+ * I want to use this class to have a standard object for passing varibles
+ * around from function to function.
+ *
+ * 
+ */
+class detail_object
+{
+	public $options;
+	
+	public function __construct($options=array(),$source=null)
+	{	
+		$this->setOptions($options,$source);
+	}
+	
+	public function setOptions($options,$source)
+	{
+		$this->options['CLASS_NAME'] = __CLASS__;
+		$this->addOptions($options);
+		$this->registerObject($source);
+	}
+	
+	public function addOptions($options)
+	{
+		if (is_array($options))
+		{
+			$this->options = array_merge( $this->options, $options);
+		}
+		else
+		{
+			dbug($options);
+		}		
+	}
+	
+	public function __get($name)
+	{
+		$name = strtoupper($name);
+		return  (isset($this->options[$name])) ? $this->options[$name] : null;
+	}
+	
+	public function __set($name,$value)
+	{
+		$this->options[strtoupper($name)] = $value;
+	}
+	
+	public function registerObject($source=null)
+	{
+		wed_registerObject($this,$source);
+	}
+}
+
 ?>

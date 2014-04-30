@@ -76,10 +76,19 @@ class db_wed_menus_base extends db_common
 			);
 		
 		$fields['title'] = array(
-			'LABEL'    => 'Menu Title',
+			'LABEL'    => 'Menu Display Title',
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The menu title is a required field',
 			'DB_FIELD' => 'mnub_title',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'  => 1
+			);
+			
+		$fields['list'] = array(
+			'LABEL'    => 'Menu List Title',
+			'VALIDATE' => 'isRequired',
+			'MESSAGE'  => 'The menu title is a required field',
+			'DB_FIELD' => 'mnub_list_title',
 			'SHOW_COLUMN'  => 1,
 			'SHOW_FIELD'  => 1
 			);
@@ -94,7 +103,6 @@ class db_wed_menus_base extends db_common
 		$fields['security'] = array(
 			'LABEL'    => 'Menu Security Levels',
 			'DB_FIELD' => 'mnub_security',
-			'SHOW_COLUMN'  => 1,
 			'SHOW_FIELD'  => 1
 			);
 			

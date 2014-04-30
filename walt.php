@@ -8,8 +8,8 @@
  * anywhere and provide an easy and clean way to access all of the Imagineers
  *
  */
-include_once('wed_tools.php') ;
-include_once('wed_theme_tools.php') ;
+include_once('support/wed_tools.php') ;
+include_once('support/wed_theme_tools.php') ;
 /*
  * details.php
  *
@@ -17,7 +17,7 @@ include_once('wed_theme_tools.php') ;
  * and provides a singel source of several repeatable methods that are used in all
  * detail classes.
  */
-include_once('details.php') ;
+include_once('support/details.php') ;
 /*
  * imagineer.php
  *
@@ -25,7 +25,7 @@ include_once('details.php') ;
  * this one and gain sharable methods.
  *
  */
-include_once('imagineer.php') ;
+include_once('support/imagineer.php') ;
 
 
 
@@ -150,6 +150,7 @@ class walt extends imagineer
 		// Checks for user cookies and/or sessions and loads user information
 		$this->greetUser();
 		
+		// Deprecate this part when switch is made
 		$call_parts = wed_getSystemValue('CALL_PARTS');
 		$call_page  = (!empty($call_parts[0])) ? $call_parts[0] : null ;
 		
@@ -180,45 +181,55 @@ class walt extends imagineer
 	
 	public function showPagePresentation($call_page=null)
 	{
-		if (!wed_checkSiteLevels())
+		// Check Site security levels
+		$this->checkSiteSecurity();
+		
+		$this->loadImagineer('presentations');
+		
+		// Deprecate these lines when switch is made.
+		$home_page  = wed_getSystemValue('HOME_PAGE');
+		$error_page = wed_getSystemValue('ERROR_404');
+		
+		$call_page  = (!is_null($call_page)) ? $call_page : $home_page ;
+	
+		$pages =  $this->getPageCodes();
+			
+		$html = null;
+		
+		if ( (SITE_DOMAIN === 'seniorstategames.asffoundation') || (SITE_DOMAIN === 'alagames') )
 		{
-			// header("Location: http://asffoundation.net/login.php");
-			// exit('Hello');
-			
-			include_once('classes/check.class.php');
-			$site_security = wed_getSystemValue('SECURITY_LEVEL');
-			
-			if (is_null($site_security))
+			foreach ($pages as $key)
 			{
-				protect('*');
+				$page_id  = $this->wed_imagineers['presentations']->newPresentation(array('TYPE' => 'mainpage', 'PAGE_TEMPLATE_CODE' => $key));
+				$html     = $this->wed_imagineers['presentations']->getHTML(array('ID' => $page_id));
+				
+				if ($html)
+				{
+					break;
+				}
+			}
+		}
+		else
+		{
+			$call_page_id  = $this->wed_imagineers['presentations']->newPresentation(array('TYPE' => 'page', 'PAGE' => $call_page));
+			$html = $this->wed_imagineers['presentations']->getHTML(array('ID' => $call_page_id));
+		}
+		
+				
+		if ( (!$html) || (is_null($html)) )
+		{
+			$donald = (isset($_GET['donald'])) ? $_GET['donald'] : 'Great';
+			
+			if ($donald!='quacked')
+			{
+				$err_message = wed_getSystemValue('SYSTEM_ERROR_CODE','No HTML');	
+				trigger_error($err_message, E_USER_ERROR);
+				exit();
 			}
 			else
 			{
-				$protect_str = implode(',', $site_security);
-				protect($protect_str);
-			}
-		}
-		
-		$this->loadImagineer('presentations');
-		$home_page  = wed_getSystemValue('HOME_PAGE');
-		$error_page = wed_getSystemValue('ERROR_404');
-		$call_page  = (!is_null($call_page)) ? $call_page : $home_page ;
-		
-		$html = null;
-		
-		$call_page_id  = $this->wed_imagineers['presentations']->newPresentation(array('TYPE' => 'page', 'PAGE' => $call_page));
-		$html = $this->wed_imagineers['presentations']->getHTML(array('ID' => $call_page_id));
-				
-		if ((is_null($html)) || (!is_null(wed_getSystemValue('SYSTEM_ERROR_CODE'))))
-		{
-			header('Location: /'.$error_page);
-			exit();
-		}
-		
-		if ( (!$html) || (is_null($html)) )
-		{
-			$err_message = wed_getSystemValue('SYS_ERR_NO_HTML','No HTML');	
-			trigger_error($err_message, E_USER_ERROR);
+				var_dump($this);
+			}	
 		}
 		
 		echo $html;
@@ -251,6 +262,51 @@ class walt extends imagineer
 	public function greetUser()
 	{
 		$this->loadImagineer('guestdirector');
+	}
+	
+	public function checkSiteSecurity()
+	{
+		if (!wed_checkSiteLevels())
+		{
+			include_once('classes/check.class.php');
+			$site_security = wed_getSystemValue('SECURITY_LEVEL');
+			
+			if (is_null($site_security))
+			{
+				protect('*');
+			}
+			else
+			{
+				$protect_str = implode(',', $site_security);
+				protect($protect_str);
+			}
+		}
+	}
+	
+	public function getPageCodes()
+	{
+		$pages = array();
+		$call_parts = wed_getSystemValue('CALL_PARTS');
+		
+		foreach ($call_parts as $key)
+		{
+			$pages[] = $key;
+		}
+		
+		/*
+		 * The first member of $pages will be empty if it is the
+		 * home page so it must be reset to the system value of HOME_PAGE
+		 *
+		 */
+		if (empty($pages[0]))
+		{
+			$pages[0] = wed_getSystemValue('HOME_PAGE');
+		}
+		
+		$pages[] = wed_getSystemValue('ERROR_404');
+		$pages[] = 'index';
+
+		return $pages;	
 	}
 	
 	public function trackUser()

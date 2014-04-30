@@ -49,7 +49,6 @@ class professor extends imagineer
 	{
 		$this->setOptions();
 		$this->loadSupportFiles();
-		$this->loadThemeObject();
 		$this->setToken();
 	}
 	
@@ -64,19 +63,6 @@ class professor extends imagineer
 		$this->options['ASSETS']                = null; // Becomes the assets object of the theme
 		$this->options['SHOW_CODE']             = null;
 		$this->options['RESTRICTED']            = array();
-	}
-	
-	protected function loadThemeObject()
-	{
-		$theme_obj = null;
-		$setup     = THEME_BASE . 'theme_setup.php';
-		
-		if (file_exists($setup))
-		{
-			include_once($setup);
-			$this->theme_obj = new theme_setup();
-		}
-		
 	}
 	
 	public function loadAllSettings()
@@ -101,8 +87,8 @@ class professor extends imagineer
 		$this->checkSiteDomain('system');
 		/*
 		 * Set the Global Theme for this site
-		 *
-		 * This can be overridden in the control codes
+		 * If theme cannot be found, we use the System theme
+		 * 
 		 */
 		$this->setThemeSetup($this->options['THEME_ID']);
 		/*
@@ -135,6 +121,8 @@ class professor extends imagineer
 		 * 'code' => ID
 		 * This will be used to verify a control code before it is used
 		 */
+		
+		// DEPRECATE THIS FUNCTION WHEN NEW SKIP_CONTROL Project is finished.
 		$this->options['settings']['SITE_CODES'] = $this->getSiteControlList();
 
 		/*
@@ -151,11 +139,13 @@ class professor extends imagineer
 		$pages = array('LIST','PAGE','ARTICLE');
 		$page  = 'HOME';
 		
+		
+		// DEPRECATE THIS FUNCTION WHEN NEW SKIP_CONTROL Project is finished.
 		foreach ($clean_path['CALL_PARTS'] as $part=>$value)
 		{
 			if (!empty($value))
 			{
-				$page = $pages[$part];
+				$page = (isset($pages[$part])) ? $pages[$part] : 'ERROR';
 			}
 		}
 		
@@ -252,12 +242,15 @@ class professor extends imagineer
 	{
 		$sites      = wed_getDBObject('sites');
 		$var_prefix = ($site===SITE_DOMAIN) ? null : strtoupper($site).'_';
+		$settings   = array();
 		
 		if ($sites->loadSite($site))
 		{
-			$site_id       = $sites->getValue('id');
-			$site_name     = $sites->getValue('name');
-			$site_theme_id = $sites->getValue('theme');
+			$settings[$var_prefix.'SITE_ID']   = $sites->getValue('id');
+			$settings[$var_prefix.'SITE_NAME'] = $sites->getValue('name');
+			$settings[$var_prefix.'SITE_URL']  = $sites->getValue('url');
+			$settings[$var_prefix.'THEME_ID']  = $sites->getValue('themeid');
+			
 			$site_security = $sites->getDetail('SECURITY_LEVEL',array());
 			
 			if (!is_array($site_security))
@@ -266,15 +259,10 @@ class professor extends imagineer
 				$site_security = explode(',', $site_security);
 			}
 			
-			wed_addSystemValue($var_prefix.'SITE_ID',$site_id);
-			wed_addSystemValue($var_prefix.'SITE_NAME',$site_name);
-			wed_addSystemValue($var_prefix.'THEME_ID',$site_theme_id);
-			wed_addSystemValue($var_prefix.'SECURITY_LEVEL',$site_security);
-
-			$this->options[$var_prefix.'SITE_ID']         = $site_id;
-			$this->options[$var_prefix.'SITE_NAME']       = $site_name;
-			$this->options[$var_prefix.'THEME_ID']        = $site_theme_id;
-			$this->options[$var_prefix.'SECURITY_LEVEL']  = $site_security;
+			$settings[$var_prefix.'SECURITY_LEVEL']  = $site_security;
+			
+			wed_addSystemValueArray($settings);
+			$this->addOptions($settings);
 		}
 		else
 		{
@@ -301,30 +289,37 @@ class professor extends imagineer
     // ****  that was loaded in getSiteControlList  **********************
     // *******************************************************************
 	public function verifyControlCode($code=null)
-	{
+	{	
 		// This returns the ID or value of the array pair
 		return ( (!is_null($code)) && (isset($this->options['settings']['SITE_CODES'][$code])) ) ? $this->options['settings']['SITE_CODES'][$code] : false ;
 	}
 	
 	// *******************************************************************
     // ****  setThemeSetup - this loads the theme setup using the ********
-    // ****  theme_object class. Here several system wide settings are ***
-    // ****  changed such as the THEME_URL and this also lets us know ****
-    // ****  if a theme has a mobile or iPad version  ********************
+    // ****  Here several system wide settings are set globally **********
+    // ****  Also lets us know if a theme has a mobile or iPad version  **
+    // ****  If the theme does not exist we default to the System theme **
     // *******************************************************************
 	public function setThemeSetup($theme_id)
 	{
+		$themes   = wed_getDBObject('wed_themes');
 		$settings = array();
 		
-		// theme_id is found in the setup.php file in each theme
-		if ( (isset($this->theme_obj->theme_setups[$theme_id])) && (isset($this->theme_obj->theme_setups[$theme_id]['NAME'])) )
+		if ($themes->getRecordByID($theme_id))
 		{
-			$theme_name = $this->theme_obj->theme_setups[$theme_id]['NAME'];
+			$settings['THEME']          = $themes->getValue('name');
+			$settings['THEME_URL']      = THEME_BASE_WEB . $settings['THEME'] . DS;
+			$settings['MOBILE_VERSION'] = $themes->getDetail('MOBILE',false);
+			$settings['IPAD_VERSION']   = $themes->getDetail('IPAD',false);
 			
-			$settings['THEME']          = $theme_name;
-			$settings['THEME_URL']      = THEME_BASE_WEB . $theme_name . DS;
-			$settings['MOBILE_VERSION'] = (isset($this->theme_obj->theme_setups[$theme_id]['MOBILE'])) ? $this->theme_obj->theme_setups[$theme_id]['MOBILE'] : false;
-			$settings['IPAD_VERSION']   = (isset($this->theme_obj->theme_setups[$theme_id]['IPAD']))   ? $this->theme_obj->theme_setups[$theme_id]['IPAD']   : false;
+			wed_addSystemValueArray($settings);
+		}
+		elseif ($themes->getRecordByName('System'))  // default theme
+		{
+			$settings['THEME']          = $themes->getValue('name');
+			$settings['THEME_URL']      = THEME_BASE_WEB . $settings['THEME'] . DS;
+			$settings['MOBILE_VERSION'] = $themes->getDetail('MOBILE',false);
+			$settings['IPAD_VERSION']   = $themes->getDetail('IPAD',false);
 			
 			wed_addSystemValueArray($settings);
 		}

@@ -38,6 +38,7 @@ class animation_detail extends details
 		$this->options['SLIDER_ID']             = 'layerslider'; // this can change depending on how many sliders are on a page
 		$this->options['ANIMATION_TYPE']        = 'GRAB_FOLDER'; // Default is GRAB_FOLDER which will load a folder of images or CREATIVE (To be developed)
 		$this->options['IMAGE_FOLDER']          = null; // folder will usually be the group sysname like archery, basketball, openceremony, homepage, etc.
+		$this->options['DEFAULT_IMAGE_FOLDER']  = null; // You can specify a default image folder in case the called directory is empty
 		$this->options['IMAGE_SIZE']            = null; // example width_height like 900_400 means 900 pixels by 400 pixels
 		$this->options['CELLS']                 = array();
 		$this->options['CELL_OBJECTS']          = array();
@@ -170,9 +171,18 @@ class animation_detail extends details
 		
 		$options['CATEGORY'] = $this->options['IMAGE_FOLDER'];
 		$options['SIZE']     = $this->options['IMAGE_SIZE'];
-		$img_obj = wed_getImageObject($options);
+		$img_obj             = wed_getImageObject($options);
+		$imagelist           = $img_obj->getImages();
 		
-		return $img_obj->getImages();
+		if (empty($imagelist))
+		{
+			$options['CATEGORY'] = $this->options['DEFAULT_IMAGE_FOLDER'];
+			$options['SIZE']     = $this->options['IMAGE_SIZE'];
+			$img_obj_default     = wed_getImageObject($options);
+			$imagelist           = $img_obj_default->getImages();
+		}
+		
+		return $imagelist;
 	}
 	
 	private function loadJavascript()

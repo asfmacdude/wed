@@ -34,8 +34,11 @@ class Error
         {
 	        // Fatal Errors - proceed to really bad error screen
 	        $message = $number . '_' .$err_msg . '_' . $file . '_' . $line;
+	        header('Location: /sites/system/index.php?display=error&message='.$message);
+			exit();
 	        
-	        if (!file_exists(dirname(__FILE__) . DS . 'sites' . DS . 'site_setup.php'))
+	        /*
+if (!file_exists(dirname(__FILE__) . DS . 'sites' . DS . 'site_setup.php'))
 	        {
 		        include_once(dirname(__FILE__) . DS . 'sites' . DS . 'site_setup.php');
 				$site_setup = new site_setup();
@@ -47,7 +50,8 @@ class Error
 	        {
 		        header('Location: /sites/system/index.php?display=error&message='.$message);
 				exit();
-	        } 
+	        }
+*/ 
         }
     }
     
@@ -86,6 +90,10 @@ class Error
         
             $message = '<p>' . $message . '</p>';
             
+            $safe_error_msg = '[' . $error['type'] . substr($error['file'], -9) . $error['line'] . ']';
+            
+            echo '<h1>Sorry, an error occurred.</h1> <p>Our staff is working to fix the error. Thanks for your patience.</p><p style="font-size:8px;">' . $safe_error_msg . '</p>';
+            
             self::addMessage($message);
         }
         else
@@ -123,8 +131,12 @@ class Error
     }
 }
 
-ini_set( 'display_errors', 1 );
-error_reporting( E_ALL );
+error_reporting( E_ALL | E_STRICT);
+ini_set( 'display_errors', 0 );
+ini_set( 'log_errors' , 1 );
+ini_set( 'log_errors_max_len', 0 );
+ini_set( 'error_log', './wed_error_log.txt' );
+
 
 set_error_handler( array( 'Error', 'captureNormal' ) );
 set_exception_handler( array( 'Error', 'captureException' ) );

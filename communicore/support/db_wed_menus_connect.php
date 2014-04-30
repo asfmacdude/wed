@@ -126,6 +126,13 @@ class db_wed_menus_connect extends db_common
 			'SHOW_COLUMN' => 1,
 			'SHOW_FIELD'  => 1
 			);
+		
+		$fields['dropmenu'] = array(
+			'LABEL'    => 'Allow Drop Menu',
+			'DB_FIELD' => 'mnuc_allow_drop',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
+			);
 			
 		$fields['sort'] = array(
 			'LABEL'    => 'Menu Sort',
@@ -301,16 +308,23 @@ class db_wed_menus_connect extends db_common
 		    if (($data['mnuc_level']=='1') && ($data['mnub_active']=='Y'))
 		    {
 			    $menu_level = array();
-			    $menu_level['ID']          = $data['mnuc_id'];
+			    $menu_level['ID']          = $data['mnuc_menu_base_id'];
 			    $menu_level['PARENT_ID']   = $data['mnuc_parent_id'];
+			    $menu_level['ALLOW_DROP']  = $data['mnuc_allow_drop'];
 			    $menu_level['TITLE']       = $data['mnub_title'];
 			    $menu_level['LINK']        = $data['mnub_link'];
 			    $menu_level['SECURITY']    = $data['mnub_security'];
 			    $menu_level['LEVEL']       = $data['mnuc_level'];
 			    $menu_level['DESCRIPTION'] = $data['mnub_description'];
 			    $menu_level['DETAILS']     = wed_getOptionsFromString($data['mnub_details']);
+			    $menu_level['SUB_MENU']    = null;
 			    
-			    $menu_level['SUB_MENU'] = $this->buildSubMenuArray($menu_level['ID']);
+			    // the mnuc_allow_drop field helps to designate which fields can actually have
+			    // a drop down menu
+			    if ($data['mnuc_allow_drop'])
+			    {
+				    $menu_level['SUB_MENU'] = $this->buildSubMenuArray($menu_level['ID']);
+			    }
 
 			    $menu_build[] = $menu_level;
 		    }
@@ -414,7 +428,12 @@ class db_wed_menus_connect extends db_common
 	    	'RELATE_FROM'   => 'mnuc_menu_base_id', 
 	    	'RELATE_TABLE'  => 'wed_menus_base', 
 	    	'RELATE_TO'     => 'mnub_id', 
-	    	'DISPLAY_FIELD' => 'mnub_title');
+	    	'DISPLAY_FIELD' => 'mnub_list_title');
+	    $relations[] = array(
+	    	'RELATE_FROM'   => 'mnuc_parent_id', 
+	    	'RELATE_TABLE'  => 'wed_menus_base', 
+	    	'RELATE_TO'     => 'mnub_id', 
+	    	'DISPLAY_FIELD' => 'mnub_list_title');
 	    return $relations;
     }
 }

@@ -34,6 +34,7 @@ class faq_detail extends details
 	{
 		$this->options['CLASS_NAME']        = __CLASS__;
 		$this->options['LOCAL_PATH']        = dirname(__FILE__);
+		$this->options['ERROR_CODE']        = 27; // Unique error code assigned to this presentation
 		$this->options['COMPONENT']         = 'zozo_accordion';  // Components are system wide modules found in the components directory
 		$this->options['ID']                = 'tab1'; // this is assigned by Presentations
 		$this->options['KEYWORDS']          = null;   // faqs are searched by keywords, this should be an array

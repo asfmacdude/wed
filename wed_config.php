@@ -7,10 +7,10 @@ ob_start();
  * Load Necessary Config Files
  */
 $config_files = array(
-	'wed_error.php',
-	'wed_debug.php',
-	'wed_messages.php',
-	'wed_mobileDetect.php'
+	'support/wed_error.php',
+	'support/wed_debug.php',
+	'support/wed_messages.php',
+	'support/wed_mobileDetect.php'
 );
 
 foreach ($config_files as $file)

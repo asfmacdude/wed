@@ -36,7 +36,7 @@ class content_detail extends details
 		$this->options['CLASS_NAME']      = __CLASS__;
 		$this->options['LOCAL_PATH']      = dirname(__FILE__);
 		$this->options['ERROR_CODE']      = 10;
-		$this->options['SHOW_ERROR']      = false;
+		$this->options['SHOW_ERROR']      = true;
 		$this->options['ERROR_MSG']       = wed_getSystemValue('CONTENT_UNAVAILABLE');
 		$this->options['CONTENT_OBJ']     = null;
 		$this->options['CODE']            = null;
@@ -49,6 +49,7 @@ class content_detail extends details
 			'TITLE'    => wed_getSystemValue('THEME_TITLE','<h1>%TITLE%</h1>'),
 			'TITLE2'   => wed_getSystemValue('THEME_TITLE','<h2>%TITLE%</h2>'),
 			'SUBTITLE' => wed_getSystemValue('THEME_SUBTITLE','<h3>%SUBTITLE%</h3>'),
+			'LINK'     => wed_getSystemValue('THEME_LINK','<a href="%LINK%">%TITLE%</a>'),
 			'VIDEO'    => wed_getSystemValue('THEME_VIDEO','<iframe width="%WIDTH%" height="%HEIGHT%" src="//www.youtube.com/embed/%CODE%" frameborder="0" allowfullscreen></iframe>'),
 			'IMAGE'    => wed_getSystemValue('THEME_IMAGE','<img src="%IMAGE_PATH%" style="padding-bottom:20px;" />'),
 			'ARTICLE'  => wed_getSystemValue('THEME_ARTICLE','%ARTICLE%'),
@@ -75,7 +76,6 @@ class content_detail extends details
 		if ( ($this->options['CODE']==='URL') || ($this->options['CODE']==='URL-ID') || (substr($this->options['CODE'], 0, 4)==='URL_') )
 		{
 			$call_parts                  = wed_getSystemValue('CALL_PARTS');
-			$this->options['SHOW_ERROR'] = true;
 			
 			if ((isset($call_parts[1])) && (!empty($call_parts[1])))
 			{
@@ -160,6 +160,8 @@ class content_detail extends details
 	private function getFormatPAGE()
 	{
 		$this->updateHeader();
+		$this->updatePageTitle();
+		$this->updateGroupTitle();
 		$html  = str_replace('%TITLE%', $this->getTitle(), $this->options['HTML_FORMATS']['TITLE']);
 		$html .= $this->getMedia('LARGE');
 		$html .= str_replace('%ARTICLE%', $this->getFullArticle(), $this->options['HTML_FORMATS']['ARTICLE']);
@@ -179,8 +181,18 @@ class content_detail extends details
 	
 	private function getFormatEXCERPT()
 	{
-		$html = str_replace('%EXCERPT%', $this->getExcerpt(), $this->options['HTML_FORMATS']['EXCERPT']);
-		$html = wed_cleanItUp($html,'SC_BRACKETS');
+		if ($this->options['CODE']=='weee')
+		{
+			$html = $this->getExcerpt();
+			$html = wed_cleanItUp($html,'SC_BRACKETS');
+			$html = wed_cleanItUp($html,'NO_DOUBLE_P');
+		}
+		else
+		{
+			$html = str_replace('%EXCERPT%', $this->getExcerpt(), $this->options['HTML_FORMATS']['EXCERPT']);
+			$html = wed_cleanItUp($html,'SC_BRACKETS');
+		}
+
 		return $html;
 	}
 	
@@ -193,9 +205,23 @@ class content_detail extends details
 		return $html;
 	}
 	
+	private function getFormatFEATURE()
+	{
+		// Feature format is for teasers and the title is the link to the actual content
+		$html  = str_replace('%SUBTITLE%', $this->getTitle(true), $this->options['HTML_FORMATS']['SUBTITLE']);
+		// $html .= $this->getMedia('SMALL');
+		$html .= str_replace('%EXCERPT%', $this->getExcerpt(), $this->options['HTML_FORMATS']['EXCERPT']);
+		$html .= $this->learnMoreButton();
+		$html  = wed_cleanItUp($html,'SC_BRACKETS');
+		return $html;
+	}
+	
 	private function getFormatSNIPPET()
 	{
-		return $this->getFullArticle();
+		$html = $this->getFullArticle(false);
+		$html = wed_cleanItUp($html,'SC_BRACKETS');
+		// $html = wed_cleanItUp($html,'NO_P_TAGS');
+		return $html;
 	}
 	
 	private function getFormatTITLE()
@@ -211,6 +237,19 @@ class content_detail extends details
 	private function updateHeader()
 	{
 		wed_addSystemValue('HEADER_1',$this->getTitle());
+	}
+	
+	private function updatePageTitle()
+	{
+		$page_title = wed_getSystemValue('PAGE_TITLE');
+		$page_title = $page_title . '-' .$this->getTitle();
+		wed_addSystemValue('PAGE_TITLE',$page_title);
+	}
+	
+	private function updateGroupTitle()
+	{
+		$group_title = $this->getGroupTitle();
+		wed_addSystemValue('GROUP_TITLE',$group_title);
 	}
 	
 	
@@ -242,21 +281,51 @@ class content_detail extends details
 	}
 	
 	
-	private function getTitle()
+	private function getTitle($return_as_link=false)
 	{
 		$html = 'No Title Available';
 		
 		if ($this->loadContent())
 		{
 			$html = $this->options['CONTENT_OBJ']->getFormattedValue('TITLE');
+			
+			if ($return_as_link)
+			{
+				$html = $this->getLink($html);
+			}
 		}
 		
 		return $html;
 	}
 	
-	private function getFullArticle()
+	private function learnMoreButton($title='Learn more')
 	{
-		$html = 'Article not available.';
+		$html = '';
+		
+		if ($this->loadContent())
+		{
+			$link = $this->options['CONTENT_OBJ']->getFormattedValue('LINK');
+			$html = '<p><a class="btn btn-default" href="'.$link.'">'.$title.'</a></p>';
+		}
+		
+		return $html;
+	}
+	
+	private function getGroupTitle($show_not_available=true)
+	{
+		$html = null;
+		
+		if ($this->loadContent())
+		{
+			$html = $this->options['CONTENT_OBJ']->getFormattedValue('GROUPTITLE');
+		}
+		
+		return $html;
+	}
+	
+	private function getFullArticle($show_not_available=true)
+	{
+		$html = ($show_not_available) ? 'Article not available.' : null;
 		
 		if ($this->loadContent())
 		{
@@ -266,13 +335,27 @@ class content_detail extends details
 		return $html;
 	}
 	
-	private function getExcerpt()
+	private function getExcerpt($show_not_available=true)
 	{
-		$html = 'Excerpt not available.';
+		$html = ($show_not_available) ? 'Excerpt not available.' : null;
 		
 		if ($this->loadContent())
 		{
 			$html = $this->options['CONTENT_OBJ']->getFormattedValue('EXCERPT');
+		}
+		
+		return $html;
+	}
+	
+	private function getLink($title='Click here')
+	{
+		$html = '#';
+		
+		if ($this->loadContent())
+		{
+			$link = $this->options['CONTENT_OBJ']->getFormattedValue('LINK');
+			$html = str_replace('%LINK%',$link,$this->options['HTML_FORMATS']['LINK']);
+			$html = str_replace('%TITLE%',$title,$html);
 		}
 		
 		return $html;

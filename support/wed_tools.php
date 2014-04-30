@@ -17,6 +17,12 @@ function getImagineer($name=null)
 	
 	return $imagineer;	
 }
+
+function registerObject($object=null,$source=null)
+{
+	// Develop a system of registering the objects
+	// This would be extremely helpful in debugging
+}
 // *******************************************************************
 // ********  PROFESSOR OPTIONS ***************************************
 // *******************************************************************
@@ -120,13 +126,22 @@ function wed_parseURLPath()
 		{
 			$path['QUERY_UTF8'] = urldecode($request_path[1]);
 			$path['QUERY']      = utf8_decode(urldecode($request_path[1]));
-			$vars               = explode('&', $path['QUERY']);
 		
-			foreach ($vars as $var)
+			if (!empty($path['QUERY']))
 			{
-				$t = explode('=', $var);
-				$path['QUERY_VARS'][$t[0]] = $t[1];
+				$vars               = explode('&', $path['QUERY']);
+		
+				foreach ($vars as $var)
+				{
+					$t = explode('=', $var);
+					$path['QUERY_VARS'][$t[0]] = $t[1];
 				}
+			}
+			else
+			{
+				$path['QUERY_VARS'] = null;
+			}
+			
 		}
 		else
 		{
@@ -345,6 +360,29 @@ function wed_getJavascript($js_array=array())
 	$js = $walt->getImagineer('jsdirector');
 	$js->JS_ASSETS = $js_array;
 }
+
+// This function will eventually replace the loadJavascriptAssets
+function wed_registerJavascript($js_array=array())
+{
+	$js_director  = getImagineer('jsdirector');
+	
+	if (is_array($js_array))
+	{
+		if (isset($js_array['ID']))
+		{
+			// This would mean that this is a single asset
+			$js_director->addJSAsset($js_array);
+		}
+		else
+		{
+			// This is a collection of assets, load them all
+			foreach ($js_array as $key=>$asset)
+			{
+				$js_director->addJSAsset($asset);
+			}
+		}	
+	}
+}
 /*
  * wed_loadJavascriptAssets
  *
@@ -354,10 +392,10 @@ function wed_getJavascript($js_array=array())
  */
 function wed_loadJavascriptAssets($js_array=array())
 {
-	global $walt;
-	$js_director  = $walt->getImagineer('jsdirector');
+	$js_director  = getImagineer('jsdirector');
 	$js_director->loadJSAssets($js_array);
 }
+
 
 /*
  * wed_addNewJavascriptAsset
@@ -417,6 +455,16 @@ function wed_getKeysMerge($html)
 // *******************************************************************
 // ********  SHORTCODE OPTIONS ***************************************
 // *******************************************************************
+
+function wed_registerShortcodes($codes=array(),$precodes=false)
+{
+	// Register your shortcodes with the system. If $precodes
+	// is true, they are added to the precode list which only
+	// fires on page control data.
+	$short = getImagineer('shortcodes');
+	$short->add_shortcodes_array($codes,$precodes);
+}
+
 function wed_renderContent($content=null,$pre=false)
 {
 	$sc              = getImagineer('shortcodes');	
@@ -428,14 +476,19 @@ function wed_renderContent($content=null,$pre=false)
 	return wed_cleanItUp($sc->getHTML($options),'FINAL_HTML');
 }
 
-// *******************************************************************
-// ********  TRAFFIC_MANAGER OPTIONS *********************************
-// *******************************************************************
-function wed_trafficReports()
+function wed_callShortcode($shortcode,$options=array(),$content='')
 {
-	global $walt;
-	$traffic = $walt->getImagineer('traffic_manager');
-	$traffic->loadTrafficReport();
+	$html = null;
+	
+	$sc          = getImagineer('shortcodes');
+	$sc_function = $sc->getShortcodeFunction($shortcode);
+	
+	if (!is_null($sc_function))
+	{
+		$html = call_user_func($sc_function,$options,$content);
+	}
+	
+	return $html;
 }
 
 // *******************************************************************

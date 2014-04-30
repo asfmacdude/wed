@@ -1,6 +1,6 @@
 <?php
 /*
- * db_themes
+ * db_wed_themes
  *
  * Database object for the themes database
  *
@@ -9,7 +9,7 @@ defined( '_GOOFY' ) or die();
 
 include_once('db_common.php');
 
-class db_themes extends db_common
+class db_wed_themes extends db_common
 {
 	public $options;
 	public $db;
@@ -23,11 +23,10 @@ class db_themes extends db_common
 	{
 		$this->options['CLASS_NAME']     = __CLASS__;
 		$this->options['LOCAL_PATH']     = dirname(__FILE__);
-		$this->options['TABLE_NAME']     = 'themes';
-		$this->options['TABLE_ID_FIELD'] = 'theme_id';
-		
+		$this->options['TABLE_NAME']     = 'wed_themes';
+		$this->options['TABLE_DISPLAY']  = 'Themes';
+		$this->options['TABLE_ID_FIELD'] = 'theme_id';		
 		$this->options['FIELDS']         = $this->setFields();
-		$this->options['THEME_LIST']     = $this->getThemeList();
 		$this->addOptions($options);
 	}
 	
@@ -63,27 +62,35 @@ class db_themes extends db_common
 		$fields = array();
 		
 		$fields['id'] = array(
-			'TITLE'     => 'ID',
+			'LABEL'     => 'ID',
 			'DB_FIELD'  => 'theme_id',
-			'NO_UPDATE' => 1
+			'NO_UPDATE' => 1,
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 		
 		$fields['name'] = array(
-			'TITLE'    => 'Theme Name',
+			'LABEL'    => 'Theme Name',
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The theme name is a required field',
-			'DB_FIELD' => 'theme_name'
+			'DB_FIELD' => 'theme_name',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['description'] = array(
-			'TITLE'    => 'Theme Description',
+			'LABEL'    => 'Theme Description',
 			'DB_FIELD' => 'theme_description',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1		
 			);
 			
 		$fields['details'] = array(
 			'LABEL'    => 'Details',
 			'DB_FIELD' => 'theme_details',
-			'INSTRUCT' => 'Details are various options for this theme. Example:  COLOR| Outrageous Red;'
+			'INSTRUCT' => 'Details are various options for this theme. Example:  COLOR| Outrageous Red;',
+			'NO_EDITOR' => 1,
+			'SHOW_FIELD'  => 1
 			);	
 						
 		return $fields;
@@ -107,30 +114,27 @@ class db_themes extends db_common
 		return $list;
 	}
 	
-	public function loadThemeByID($id=null)
+	 // *******************************************************************
+    // ********  XCRUD Section *******************************************
+    // *******************************************************************
+    
+    // *******************************************************************
+    // ********  setupXCrud initial setup of XCrud Object ****************
+    // *******************************************************************
+    public function setupXCrud($code=null)
     {
-        if (is_null($id))
-        {
-            return null;
-        }
-	
-		$pairs = array( 'id' => $id );
-		$data  = $this->selectByPairs($pairs, null, false);
-		
-		if ($data)
-		{
-			$this->addValues_Data($data);
-		}
-		
-		return ($data) ? true : false;
-    }
-	
-	public function getDetail($detail,$default=null)
-    {
-	    $detail_field = $this->getValue('details');
-	    $detail_array = wed_getOptionsFromString($detail_field);
-	    
-	    return (isset($detail_array[$detail])) ? $detail_array[$detail] : $default;
+	    // Based on the code, we can present different views of the content_main
+	    // table with different settings.
+	    if ($code=='themes_100')
+	    {
+		    $xcrud = new db_xcrud_tools();
+		    $xcrud->initXCrud();
+		    $xcrud->setTable($this->options['TABLE_NAME'],$this->options['TABLE_DISPLAY']);
+		    $xcrud->configFields($this->setFields(false));
+		    
+		    return $xcrud->renderXCrud();
+
+	    }
     }
 }
 ?>

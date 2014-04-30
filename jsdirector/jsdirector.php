@@ -72,6 +72,8 @@ class jsdirector extends imagineer
 		}
 	}
 	
+	// This function simply 'turns on' an already loaded javascript element
+	// so it will load.
 	public function loadJSAssets($list=array())
 	{
 		foreach ($list as $asset)

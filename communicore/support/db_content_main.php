@@ -195,6 +195,14 @@ class db_content_main extends db_common
 			'SHOW_FIELD'  => 1,
 			'NO_EDITOR'   => 1
 			);
+			
+		$fields['searchable'] = array(
+			'LABEL'    => 'Searchable',
+			'DB_FIELD' => 'cnt_searchable',
+			'INSTRUCT' => 'Can this content be included in searches?',
+			'SHOW_FIELD'  => 1,
+			'SHOW_COLUMN' => 1
+			);
 		
 		return $fields;
 	}

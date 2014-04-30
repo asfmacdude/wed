@@ -80,6 +80,7 @@ class shortcodes extends imagineer
 	{
 		$this->setOptions();
 		$this->loadSupportFiles();
+		$this->loadSupportFiles('plugins');
 	}
 	
 	protected function setOptions()
@@ -134,6 +135,22 @@ class shortcodes extends imagineer
 	public function remove_all_shortcodes()
 	{
 		$this->options['SHORT_CODES'] = array();
+	}
+	
+	public function getShortcodeFunction($shortcode)
+	{
+		$function = null;
+		
+		if (isset($this->options['POST_SHORT_CODES'][$shortcode]))
+		{
+			$function = $this->options['POST_SHORT_CODES'][$shortcode];
+		}
+		elseif (isset($this->options['PRE_SHORT_CODES'][$shortcode]))
+		{
+			$function = $this->options['PRE_SHORT_CODES'][$shortcode];
+		}
+		
+		return $function;
 	}
 	
 	private function do_all_shortcodes($content)

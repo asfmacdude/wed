@@ -76,6 +76,13 @@ class db_content_control extends db_common
 			'SHOW_FIELD' => 1
 			);
 		
+		$fields['siteid'] = array(
+			'LABEL'     => 'Site',
+			'DB_FIELD'  => 'cnc_site_id',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'   => 1
+			);
+		
 		$fields['title'] = array(
 			'LABEL'    => 'Page Title',
 			'INSTRUCT' => 'Unique name or title for this page.',
@@ -114,11 +121,10 @@ class db_content_control extends db_common
 			'SHOW_COLUMN'  => 1,
 			'SHOW_FIELD'   => 1
 			);
-		
-		$fields['details'] = array(
-			'LABEL'    => 'Details',
-			'DB_FIELD' => 'cnc_details',
-			'INSTRUCT' => 'Details are various options for this page. Example:  PAGE_TITLE| Official Web Site;',
+			
+		$fields['themecontrol'] = array(
+			'LABEL'    => 'Theme Page Control',
+			'DB_FIELD' => 'cnc_theme_page_control',
 			'SHOW_FIELD'   => 1,
 			'NO_EDITOR'    => 1
 			);
@@ -140,10 +146,38 @@ class db_content_control extends db_common
 			'SHOW_COLUMN'  => 1,
 			'SHOW_FIELD'   => 1
 			);
+		
+		$fields['details'] = array(
+			'LABEL'    => 'Details',
+			'DB_FIELD' => 'cnc_details',
+			'INSTRUCT' => 'Details are various options for this page. Example:  PAGE_TITLE| Official Web Site;',
+			'SHOW_FIELD'   => 1,
+			'NO_EDITOR'    => 1
+			);
 			
 		
 		return $fields;
 	}
+	
+	public function getPageTemplate()
+	{
+		$template = $this->getValue('themepage');
+		$control  = $this->getValue('themecontrol');
+		
+		if ( (!is_null($control)) && (!empty($control)) )
+		{
+			$alt_template = null;
+			$short        = getImagineer('shortcodes');
+			$alt_template = $short->getHTML(array('HTML'=>$control,'PRE'=>true));
+			
+			if ( (!is_null($alt_template)) && (!empty($alt_template)) )
+			{
+				$template = $alt_template;
+			}
+		}
+		
+		return $template;
+	}	
 	
 	public function getControlID($name)
 	{
@@ -195,6 +229,20 @@ class db_content_control extends db_common
 		return $this->selectByPairs($pairs,null,false);
     }
     
+    public function selectByCodeSite($code=null)
+    {
+		$site_id  = wed_getSystemValue('SITE_ID');
+		$pairs    = array('code' => $code, 'siteid' => $site_id);
+		$data =  $this->selectByPairs($pairs,null,false);
+		
+		if ($data)
+		{	
+			$this->addValues_Data($data);
+		}
+		
+		return (!$data) ? false : true ;
+    }
+    
     public function getDetails()
     {
 	    return wed_getOptionsFromString($this->getValue('details'));
@@ -217,6 +265,13 @@ class db_content_control extends db_common
 		    $xcrud->initXCrud();
 		    $xcrud->setTable($this->options['TABLE_NAME'],$this->options['TABLE_DISPLAY']);
 		    $xcrud->configFields($this->setFields(false));  
+		    
+		    $local_relations = $this->getXCrudRelations();
+		    
+		    foreach ($local_relations as $key=>$data)
+		    {
+			    $xcrud->setRelation($data);
+		    }
 		    
 		    // Try Nested Table
 		    $nest_name1 = 'sites_connect';
@@ -244,6 +299,21 @@ class db_content_control extends db_common
 		    return $xcrud->renderXCrud();
 
 	    }
+    }
+    
+    public function getXCrudRelations()
+    {
+	    $relations[] = array(
+	    	'RELATE_FROM'   => 'cnc_theme_id', 
+	    	'RELATE_TABLE'  => 'wed_themes', 
+	    	'RELATE_TO'     => 'theme_id', 
+	    	'DISPLAY_FIELD' => 'theme_name');
+	    $relations[] = array(
+	    	'RELATE_FROM'   => 'cnc_site_id', 
+	    	'RELATE_TABLE'  => 'sites', 
+	    	'RELATE_TO'     => 'site_id', 
+	    	'DISPLAY_FIELD' => 'site_title');
+	    return $relations;
     }	
 }
 ?>

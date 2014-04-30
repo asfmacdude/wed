@@ -64,12 +64,12 @@ abstract class imagineer
     // *******************************************************************
     // ********  File Tools **********************************************
     // *******************************************************************
-    public function loadSupportFiles()
+    public function loadSupportFiles($local_path='support')
     {
     	// This will look to see if the Imagineer has a support folder and load all support files in that directory
-    	if (file_exists($this->options['LOCAL_PATH'] . DS . 'support'))
+    	if (file_exists($this->options['LOCAL_PATH'] . DS . $local_path))
     	{
-    		$support_path = $this->options['LOCAL_PATH'] . DS . 'support';
+    		$support_path = $this->options['LOCAL_PATH'] . DS . $local_path;
     		
     		$iterator = new DirectoryIterator($support_path);
 

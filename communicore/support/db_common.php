@@ -60,7 +60,7 @@ abstract class db_common extends db_xcrud
 	public function getValue($name,$default=null)
 	{
 		$name = strtolower($name);
-		return (isset($this->options['FIELDS'][$name]['VALUE'])) ? $this->options['FIELDS'][$name]['VALUE'] : $default ;
+		return ( (isset($this->options['FIELDS'][$name]['VALUE'])) && (!empty($this->options['FIELDS'][$name]['VALUE'])) ) ? $this->options['FIELDS'][$name]['VALUE'] : $default ;
 	}
 	
 	// *******************************************************************

@@ -578,11 +578,19 @@ class db_content_connect extends db_common
     }
     
     // *******************************************************************
-    // ********  getTITLE produces a description for this record ***
+    // ********  getTITLE produces the title for this record ***
     // *******************************************************************
     public function getTITLE()
     {
 		return $this->getValue('cnt_title');
+    }
+    
+    // *******************************************************************
+    // ********  getGROUPTITLE produces the group title for this record ***
+    // *******************************************************************
+    public function getGROUPTITLE()
+    {
+		return $this->getValue('cng_title');
     }
     
     // *******************************************************************
@@ -680,7 +688,7 @@ class db_content_connect extends db_common
 	    }
 	    else
 	    {
-		    $group = $this->getValue('cng_sysname');
+		    $group = $this->getValue('cng_name');
 	    
 			$options['CATEGORY'] = (is_null($details['CATEGORY'])) ? $group : $details['CATEGORY'];
 			$options['SIZE']     = (is_null($details['SIZE'])) ? '1200_500' : $details['SIZE']; 
@@ -702,12 +710,22 @@ class db_content_connect extends db_common
     // *******************************************************************
     public function getLINK()
     {
-	    $current_site_id = wed_getSystemValue('SITE_ID');
-	    $record_site_id  = $this->getValue('cnn_siteid');
-	    $type            = $this->getTYPE();
-	    $http_prefix     = 'http://';
+	    // Note: if the content record has a LINK detail value, then it
+	    // overrides everything else.
+	    $static_link      = $this->getDetail('LINK',null);
 	    
-	    $link = ($record_site_id===$current_site_id) ? null : $http_prefix . $this->getValue('site_url');
+	    if (!is_null($static_link))
+	    {
+		    return $static_link;
+	    }
+	    
+	    $current_site_id  = wed_getSystemValue('SITE_ID');
+	    $current_site_url = wed_getSystemValue('SITE_URL');
+	    $record_site_id   = $this->getValue('cnn_siteid');
+	    $type             = $this->getTYPE();
+	    $http_prefix      = 'http://';
+	    
+	    $link = ($record_site_id===$current_site_id) ? null : $http_prefix . $this->getValue('site_url',$current_site_url);
 	    
 	    if ($this->getValue('linktype')=='Article')
 	    {
@@ -717,12 +735,12 @@ class db_content_connect extends db_common
 	    elseif ($this->getValue('primary')=='Y')
 	    {
 		    // link is /control/group
-		    $link .= '/' . $this->getValue('cnc_code') . '/' . $this->getValue('cng_sysname');
+		    $link .= '/' . $this->getValue('cnc_code') . '/' . $this->getValue('cng_name');
 	    }
 	    else
 	    {
 		    // link is /control/group/id/title
-		    $link .= '/' . $this->getValue('cnc_code') . '/' . $this->getValue('cng_sysname') . '/' . $this->getValue('cnt_id') . '/' . wed_cleanURL($this->getValue('cnt_title'));
+		    $link .= '/' . $this->getValue('cnc_code') . '/' . $this->getValue('cng_name') . '/' . $this->getValue('cnt_id') . '/' . wed_cleanURL($this->getValue('cnt_title'));
 	    }
 	    
 	    return $link;
@@ -769,7 +787,7 @@ class db_content_connect extends db_common
     // *******************************************************************
     public function getITEM_CATEGORY()
     {
-	    $catg = $this->getValue('cng_sysname');
+	    $catg = $this->getValue('cng_name');
 	    $this->options['CATEGORY_LIST'][$catg] = $this->getValue('cng_title');
 	    return $catg;
     }

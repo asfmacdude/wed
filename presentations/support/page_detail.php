@@ -49,12 +49,13 @@ class page_detail extends details
 		$control = wed_getDBObject('content_control',$this->options['CLASS_NAME']);
 		
 		if ($control->loadPageID(wed_verifyControlCode($this->options['PAGE'])))
-		{
+		{			
 			$settings                 = $control->buildSettingPairs();
 			$settings['HEADER_1']     = $control->getValue('title');
 			$settings['CONTROL_ID']   = $control->getValue('id');
 			$details                  = $control->getDetails();	
 			$settings                 = array_merge($settings, $details);
+			
 			$this->options['CONTROL'] = $control;
 			/*
 			 * Theme Update
@@ -91,7 +92,7 @@ class page_detail extends details
 			if (!empty($page_title))
 			{
 				$page_title = $sys_page_title.' - '.$page_title;
-				wed_addSystemValue('PAGE_TITLE',$page_title);
+				// wed_addSystemValue('PAGE_TITLE',$page_title);
 			}
 			
 			wed_addSystemValue('GROUP_TITLE',$group_title);
@@ -213,12 +214,13 @@ class page_detail extends details
 			
 			// Load & Work Control Content
 			$html = wed_getSystemValue('STRUCTURE');
+				
 			// Run Shortcodes on structure html
 			$html = $this->loadTemplates($html);
 			
 			// Load theme page
 			if ($this->loadThemePage())
-			{
+			{	
 				// If we have a theme page, the CONTROL_CONTENT is inserted into the template html
 				$html = str_replace('[-BODY_CONTENT-]', $html, $this->options['THEME_PAGE']);
 			}
