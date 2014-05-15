@@ -86,9 +86,20 @@ class db_content_control extends db_common
 		$fields['title'] = array(
 			'LABEL'    => 'Page Title',
 			'INSTRUCT' => 'Unique name or title for this page.',
-			'VALIDATE' => 'isRequired',
+			'VALIDATE' => 'Required',
 			'MESSAGE'  => 'The title is a required field',
 			'DB_FIELD' => 'cnc_title',
+			'DEFAULT'  => '',
+			'SHOW_COLUMN'  => 1,
+			'SHOW_FIELD'   => 1
+			);
+		
+		$fields['listing'] = array(
+			'LABEL'    => 'List Display Title',
+			'INSTRUCT' => 'Title used in admin section for lists.',
+			'VALIDATE' => 'Required',
+			'MESSAGE'  => 'The list title is a required field',
+			'DB_FIELD' => 'cnc_list_title',
 			'DEFAULT'  => '',
 			'SHOW_COLUMN'  => 1,
 			'SHOW_FIELD'   => 1
@@ -97,7 +108,7 @@ class db_content_control extends db_common
 		$fields['code'] = array(
 			'LABEL'    => 'Page Code',
 			'INSTRUCT' => 'Unique code for calling this page. (Must be UNIQUE!)',
-			'VALIDATE' => 'isRequired',
+			'VALIDATE' => 'Required',
 			'MESSAGE'  => 'The code is a required field',
 			'DB_FIELD' => 'cnc_code',
 			'DEFAULT'  => 'code_xxxx',
@@ -114,7 +125,7 @@ class db_content_control extends db_common
 			
 		$fields['themepage'] = array(
 			'LABEL'    => 'Theme Page',
-			'VALIDATE' => 'isRequired',
+			'VALIDATE' => 'Required',
 			'MESSAGE'  => 'The theme page is a required field',
 			'DB_FIELD' => 'cnc_theme_page',
 			'DEFAULT'  => 'index',

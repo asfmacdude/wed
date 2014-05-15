@@ -141,6 +141,26 @@ abstract class imagineer
 		// can have different error codes
 		return (isset($this->options['ERROR_STATUS'])) ? $this->options['ERROR_STATUS'] : 0;
 	}
+	
+	// *******************************************************************
+    // ********  changeDetailObject **************************************
+    // *******************************************************************
+	public function changeDetailObject($object)
+	{
+		if ($object instanceof detail_object)
+		{
+			return $object;
+		}
+		else
+		{
+			// $object is array so convert to detail_object
+			if (!is_array($object))
+			{
+				$object = array();
+			}
+			return new detail_object($object,$this->options['CLASS_NAME']);
+		}
+	}
 }
 
 ?>

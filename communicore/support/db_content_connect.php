@@ -838,7 +838,7 @@ class db_content_connect extends db_common
 	    	'RELATE_FROM'   => 'cnn_control_id', 
 	    	'RELATE_TABLE'  => 'content_control', 
 	    	'RELATE_TO'     => 'cnc_id', 
-	    	'DISPLAY_FIELD' => 'cnc_title');
+	    	'DISPLAY_FIELD' => 'cnc_list_title');
 	    $relations[] = array(
 	    	'RELATE_FROM'   => 'cnn_content_id', 
 	    	'RELATE_TABLE'  => 'content_main', 

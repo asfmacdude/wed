@@ -1,8 +1,8 @@
 <?php
 /*
- * db_system_config
+ * db_wed_message_templates
  *
- * Database object for the online database system_config
+ * Database object for the online database wed_message_templates
  *
  *
  */
@@ -10,7 +10,7 @@ defined( '_GOOFY' ) or die();
 
 include_once('db_common.php');
 
-class db_system_config extends db_common
+class db_wed_message_templates extends db_common
 {
 	public $options;
 	public $db;
@@ -24,9 +24,9 @@ class db_system_config extends db_common
 	{
 		$this->options['CLASS_NAME']     = __CLASS__;
 		$this->options['LOCAL_PATH']     = dirname(__FILE__);
-		$this->options['TABLE_NAME']     = 'system_config';
-		$this->options['TABLE_DISPLAY']  = 'System Configuration Settings';
-		$this->options['TABLE_ID_FIELD'] = 'sys_cfg_id';
+		$this->options['TABLE_NAME']     = 'wed_message_templates';
+		$this->options['TABLE_DISPLAY']  = 'Message Templates';
+		$this->options['TABLE_ID_FIELD'] = 'msgt_id';
 		
 		$this->options['FIELDS']         = $this->setFields();
 		$this->addOptions($options);
@@ -65,146 +65,80 @@ class db_system_config extends db_common
 		
 		$fields['id'] = array(
 			'LABEL'     => 'ID',
-			'DB_FIELD'  => 'sys_cfg_id',
+			'DB_FIELD'  => 'msgt_id',
 			'NO_UPDATE' => 1
 			);
 		
 		$fields['modified'] = array(
 			'LABEL'     => 'Modified',
-			'DB_FIELD'  => 'sys_cfg_modify',
+			'DB_FIELD'  => 'msgt_modify',
 			'NO_UPDATE' => 1,
 			'SHOW_FIELD' => 1
 			);
 		
 		$fields['siteid'] = array(
-			'LABEL'    => 'Setting Site',
+			'LABEL'    => 'Message Site',
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The site is a required field',
 			'INSTRUCT' => 'Each setting is site specific so choose which site this will affect.',
-			'DB_FIELD' => 'sys_cfg_site_id',
+			'DB_FIELD' => 'msgt_site_id',
 			'DEFAULT'  => 4,
 			'SHOW_COLUMN' => 1,
 			'SHOW_FIELD'  => 1
 			);
 			
-		$fields['name'] = array(
-			'LABEL'    => 'Setting Name',
-			'INSTRUCT' => 'This is the name or key of the setting. Be sure it is in ALL CAPS!',
+		$fields['title'] = array(
+			'LABEL'    => 'Message Title',
+			'INSTRUCT' => 'This is the title for the setting.',
 			'VALIDATE' => 'isRequired',
 			'MESSAGE'  => 'The setting name is a required field',
-			'DB_FIELD' => 'sys_cfg_name',
-			'DEFAULT'  => 'ENTER_NAME',
+			'DB_FIELD' => 'msgt_title',
+			'DEFAULT'  => 'ENTER TITLE',
 			'SHOW_COLUMN' => 1,
 			'SHOW_FIELD'  => 1
 			);
-			
-		$fields['value'] = array(
-			'LABEL'    => 'Setting Value',
-			'INSTRUCT' => 'Insert the actual value of the setting here.',
-			'VALIDATE' => 'isRequired',
-			'MESSAGE'  => 'The setting value is a required field',
-			'DB_FIELD' => 'sys_cfg_value',
-			'DEFAULT'  => 'none',
-			'SHOW_COLUMN' => 1,
-			'SHOW_FIELD'  => 1,
-			'NO_EDITOR'   => 1
-			);
-			
-		$fields['convert'] = array(
-			'LABEL'    => 'Value Type',
-			'VALIDATE' => 'isRequired',
-			'MESSAGE'  => 'The value type is a required field',
-			'DB_FIELD' => 'sys_cfg_convert',
-			'DEFAULT'  => 'string',
-			'LIST_SELECT' => array('string','bool','array','encrypt'),
+		
+		$fields['code'] = array(
+			'LABEL'    => 'Message Code',
+			'VALIDATE' => 'Required',
+			'MESSAGE'  => 'The code is a required field',
+			'DB_FIELD' => 'msgt_code',
+			'INSTRUCT' => 'This is the unique code that the system uses to find this template.',
+			'DEFAULT'  => 'Enter a code',
 			'SHOW_COLUMN' => 1,
 			'SHOW_FIELD'  => 1
 			);
-			
+	
 		$fields['description'] = array(
 			'LABEL'    => 'Description',
-			'INSTRUCT' => 'Insert a description of this setting for others to understand.',
-			'DB_FIELD' => 'sys_cfg_description',
+			'INSTRUCT' => 'Insert a description of this template for others to understand.',
+			'DB_FIELD' => 'msgt_description',
 			'SHOW_COLUMN' => 1,
 			'SHOW_FIELD'  => 1
 			);
 			
 		$fields['message'] = array(
-			'LABEL'    => 'Error Message',
-			'DB_FIELD' => 'sys_cfg_message',
-			'SHOW_FIELD'  => 1,
-			'NO_EDITOR'   => 1
-			);
-			
-		$fields['validate'] = array(
-			'LABEL'    => 'Setting Validation',
-			'DB_FIELD' => 'sys_cfg_validate',
-			'SHOW_FIELD'  => 1,
-			'NO_EDITOR'   => 1
-			);
-			
-		$fields['access'] = array(
-			'LABEL'    => 'Setting Access',
+			'LABEL'    => 'Message Text',
+			'INSTRUCT' => 'Insert the actual text of the message here.',
 			'VALIDATE' => 'isRequired',
-			'MESSAGE'  => 'The setting access is a required field',
-			'DB_FIELD' => 'sys_cfg_access',
-			'DEFAULT'  => '50:50',
-			'SHOW_FIELD'  => 1
-			);
-			
-		$fields['edit'] = array(
-			'LABEL'    => 'Edit Options',
-			'DB_FIELD' => 'sys_cfg_edit',
+			'MESSAGE'  => 'The setting value is a required field',
+			'DB_FIELD' => 'msgt_value',
+			'DEFAULT'  => 'none',
+			'SHOW_COLUMN' => 1,
 			'SHOW_FIELD'  => 1,
 			'NO_EDITOR'   => 1
-			);
-			
-		$fields['replace'] = array(
-			'LABEL'    => 'Setting Replace',
-			'DB_FIELD' => 'sys_cfg_replaceable',
-			'DEFAULT'  => 'Y',
-			'LIST_SELECT' => array('Y','N'),
-			'SHOW_FIELD'  => 1
 			);
 		
+		$fields['details'] = array(
+			'LABEL'    => 'Details',
+			'DB_FIELD' => 'msgt_details',
+			'INSTRUCT' => 'Details are various options for this template. Example:  AUTHOR| William Shakespeare;',
+			'SHOW_FIELD'  => 1,
+			'NO_EDITOR'   => 1
+			);
+					
 		return $fields;
 	}
-	
-	public function loadAllForTable($order=null)
-	{
-		$data = $this->selectAllTable($order);	
-		return (!$data) ? false : $data ;
-	}
-	
-	public function loadConfigID($id=null)
-	{
-		$data = $this->selectByID($id);
-		$this->addValues_Data($data);	
-		return (!$data) ? false : true ; // let showdirector know
-	}
-    
-    public function getSettings($id=4)
-    {
-        if (is_null($id))
-        {
-            return null;
-        }
-        
-        $table     = $this->options['TABLE_NAME'];	
-		$pairs     = array('siteid' => $id);
-		$order_str = $this->options['FIELDS']['name']['DB_FIELD'];
-		$data      = $this->selectByPairs($pairs, $order_str);
-		$data      = $this->stripslashes_deep($data);
-		
-		$settings = array();
-				
-		foreach ($data as $key=>$value)
-		{
-			$settings[$value['sys_cfg_name']] = $this->convertValue($value['sys_cfg_convert'], $value['sys_cfg_value']);
-		}
-		
-		return $settings;
-    }
     
     // *******************************************************************
     // ********  XCRUD Section *******************************************
@@ -217,7 +151,7 @@ class db_system_config extends db_common
     {
 	    // Based on the code, we can present different views of the content_main
 	    // table with different settings.
-	    if ($code=='system_config')
+	    if ($code=='message_templates')
 	    {
 		    $xcrud = new db_xcrud_tools();
 		    $xcrud->initXCrud();
@@ -239,7 +173,7 @@ class db_system_config extends db_common
     public function getXCrudRelations()
     {
 	    $relations[] = array(
-	    	'RELATE_FROM'   => 'sys_cfg_site_id', 
+	    	'RELATE_FROM'   => 'msgt_site_id', 
 	    	'RELATE_TABLE'  => 'sites', 
 	    	'RELATE_TO'     => 'site_id', 
 	    	'DISPLAY_FIELD' => 'site_title');

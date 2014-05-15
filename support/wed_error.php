@@ -88,9 +88,12 @@ if (!file_exists(dirname(__FILE__) . DS . 'sites' . DS . 'site_setup.php'))
             $message .= 'FILE: ' . $error['file'] . '<br>';
             $message .= 'LINE: ' . $error['line'];
         
+			$safe_error_msg = $message;
+			
             $message = '<p>' . $message . '</p>';
             
-            $safe_error_msg = '[' . $error['type'] . substr($error['file'], -9) . $error['line'] . ']';
+            // $safe_error_msg = '[' . $error['type'] . substr($error['file'], -9) . $error['line'] . ']';
+            
             
             echo '<h1>Sorry, an error occurred.</h1> <p>Our staff is working to fix the error. Thanks for your patience.</p><p style="font-size:8px;">' . $safe_error_msg . '</p>';
             

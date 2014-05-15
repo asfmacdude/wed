@@ -62,38 +62,40 @@ class wizard extends imagineer
 	{
 		$this->options['CLASS_NAME']    = __CLASS__;
 		$this->options['LOCAL_PATH']    = dirname(__FILE__);
-		$this->options['SHOW_OBJECTS']  = array();
-		$this->options['DEFAULT_THEME'] = 'Wizard_';
-		$this->options['DEFAULT_FILE']  = 'wizard_apprentice';
+		$this->options['LIBRARY_PATH']  = $this->options['LOCAL_PATH'] . DS . 'library' . DS;
 	}
 	
 	private function buildPresentation()
 	{
-		$html       = '';
-		
+		$html       = '';	
 		$call_parts = wed_getSystemValue('CALL_PARTS'); // returns an array
-		$query_vars = wed_getSystemValue('QUERY_VARS'); // returns an array
+		$file       = (isset($call_parts[1]))  ? $call_parts[1] : null;
 		
-		$control    = (!empty($call_parts[0])) ? $call_parts[0] : null;
-		$dir        = ((isset($query_vars['dir'])) && (!empty($query_vars['dir']))) ? $query_vars['dir'] : $this->options['DEFAULT_THEME'];
-		$file       = (isset($call_parts[1]))  ? $call_parts[1] : $this->options['DEFAULT_FILE'];
-				
-		$dir  = str_replace('_', '/', $dir);
-		$path = THEME_BASE . $dir . $file . '.php';
-			
-		if (file_exists($path))
+		if (!is_null($file))
 		{
-			include_once $path;
+			$query_vars = wed_getSystemValue('QUERY_VARS'); // returns an array from the query string
+			$dir        = $this->options['LIBRARY_PATH'];
 			
-			if (class_exists($file))
+			if (isset($query_vars['dir']))
 			{
-				$wiz_obj = new $file();
-				$html    = $wiz_obj->getHTML();
+				// Here a directory is specified in the query string
+				$dir = $query_vars['dir'];
+				$dir = str_replace('_', '/', $dir) . DS;	
 			}
-		}
-		else
-		{
-			wed_changeSystemErrorCode('NO AJAX CALL FILE FOUND');
+			
+			$path = $dir . $file . '.php';
+			
+			if (file_exists($path))
+			{
+				ob_start();
+				@include $path;
+				$html = ob_get_contents();
+				ob_end_clean();
+			}
+			else
+			{
+				wed_changeSystemErrorCode('NO AJAX CALL FILE FOUND');
+			}
 		}
 		
 		return $html;

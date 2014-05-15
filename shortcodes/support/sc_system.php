@@ -375,6 +375,15 @@ function sys_fileDownload($options=array(), $content='')
 		return null;
 	}
 	
+	/*
+	 * SPECIAL NOTE
+	 * Remember to specify the category when the file is located in another directory other than
+	 * the category specified in the URL. For example: on the soocer register page, I wanted to download
+	 * rules a and rules b which are both found in the general folder 'forms'. Because I did not specify
+	 * the category="forms", it looked in the default folder 'soccer' whiahc is added below when there is not a
+	 * specified folder. Thus, it found the rules files, not the actual files that I was looking for.
+	 */
+	
 	if (is_null($options['CATEGORY']))
 	{
 		$call_parts = wed_getSystemValue('CALL_PARTS');

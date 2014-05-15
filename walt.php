@@ -150,7 +150,6 @@ class walt extends imagineer
 		// Checks for user cookies and/or sessions and loads user information
 		$this->greetUser();
 		
-		// Deprecate this part when switch is made
 		$call_parts = wed_getSystemValue('CALL_PARTS');
 		$call_page  = (!empty($call_parts[0])) ? $call_parts[0] : null ;
 		
@@ -167,7 +166,7 @@ class walt extends imagineer
 		 */
 		if ($call_page=='wizard')
 		{
-			$this->loadWizard();
+			$this->callWizard();
 		}
 		else
 		{
@@ -237,14 +236,14 @@ class walt extends imagineer
 		exit();
 	}
 	
-	public function loadWizard()
+	public function callWizard()
 	{
-		$this->loadImagineer('wizard');
+		$this->loadImagineer('wizard');	
 		$html = $this->wed_imagineers['wizard']->getHTML();
 
 		if ((is_null($html)) || (!is_null(wed_getSystemValue('SYSTEM_ERROR_CODE'))))
 		{
-			$html .= 'System Error: '.wed_getSystemValue('SYSTEM_ERROR_CODE','Unknown error occurred');
+			$html = 'System Error: '.wed_getSystemValue('SYSTEM_ERROR_CODE','Unknown error occurred');
 		}
 		
 		echo $html;

@@ -113,6 +113,21 @@ class db_wed_menus_base extends db_common
 			'SHOW_FIELD'  => 1
 			);
 		
+		$fields['megamenu'] = array(
+			'LABEL'    => 'Allow Mega Menu',
+			'DB_FIELD' => 'mnub_mega_menu',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
+			);
+		
+		$fields['megahtml'] = array(
+			'LABEL'    => 'Mega Menu HTML',
+			'DB_FIELD' => 'mnub_mega_html',
+			'INSTRUCT' => 'HTML code for the mega menu content.',
+			'SHOW_FIELD'  => 1,
+			'NO_EDITOR'   => 1
+			);
+		
 		$fields['details'] = array(
 			'LABEL'    => 'Details',
 			'DB_FIELD' => 'mnub_details',

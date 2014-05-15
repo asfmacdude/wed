@@ -84,16 +84,20 @@ class wed_menu_detail extends details
 			$li_array['%LINK%']       = ((isset($data['LINK'])) && (!empty($data['LINK']))) ? $data['LINK'] . $link_query : '#';
 			$li_array['%ICON_CLASS%'] = (isset($data['DETAILS']['ICON_CLASS'])) ? $data['DETAILS']['ICON_CLASS'] : null;
 			
-			if (is_null($data['SUB_MENU']))
+			
+			if ( ($data['MEGA_MENU']) && (!empty($data['MEGA_HTML'])) )
 			{
-				$menu_html .= str_replace(array_keys($li_array), array_values($li_array), $this->options['FORMATS']['TOP_NOSUB']);
+				$menu_html .= $data['MEGA_HTML'];
 			}
-			else
+			elseif ( ($data['ALLOW_DROP']) && (!empty($data['SUB_MENU'])) )
 			{
 				$li_array['%SUB_MENU%'] = $this->buildSubMenu($data['SUB_MENU']);
 				$menu_html .= str_replace(array_keys($li_array), array_values($li_array), $this->options['FORMATS']['TOP_SUB']);
 			}
-			
+			else
+			{
+				$menu_html .= str_replace(array_keys($li_array), array_values($li_array), $this->options['FORMATS']['TOP_NOSUB']);
+			}
 		
 			$start_item = false;
 		}

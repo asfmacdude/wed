@@ -216,6 +216,15 @@ class content_detail extends details
 		return $html;
 	}
 	
+	private function getFormatTITLE_BUTTON()
+	{
+		// Feature format is for teasers and the title is the link to the actual content
+		$html  = str_replace('%SUBTITLE%', $this->getTitle(true), $this->options['HTML_FORMATS']['SUBTITLE']);
+		$html .= $this->learnMoreButton();
+		$html  = wed_cleanItUp($html,'SC_BRACKETS');
+		return $html;
+	}
+	
 	private function getFormatSNIPPET()
 	{
 		$html = $this->getFullArticle(false);
@@ -298,14 +307,15 @@ class content_detail extends details
 		return $html;
 	}
 	
-	private function learnMoreButton($title='Learn more')
+	private function learnMoreButton($title='Learn more',$button_color='btn-default',$button_size='')
 	{
 		$html = '';
+		$class = 'btn '.$button_color.' '.$button_size;
 		
 		if ($this->loadContent())
 		{
 			$link = $this->options['CONTENT_OBJ']->getFormattedValue('LINK');
-			$html = '<p><a class="btn btn-default" href="'.$link.'">'.$title.'</a></p>';
+			$html = '<p><a class="'.$class.'" href="'.$link.'">'.$title.'</a></p>';
 		}
 		
 		return $html;

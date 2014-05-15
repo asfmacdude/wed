@@ -133,6 +133,13 @@ class db_wed_menus_connect extends db_common
 			'SHOW_COLUMN' => 1,
 			'SHOW_FIELD'  => 1
 			);
+		
+		$fields['megamenu'] = array(
+			'LABEL'    => 'Allow Mega Menu',
+			'DB_FIELD' => 'mnuc_mega_menu',
+			'SHOW_COLUMN' => 1,
+			'SHOW_FIELD'  => 1
+			);
 			
 		$fields['sort'] = array(
 			'LABEL'    => 'Menu Sort',
@@ -318,11 +325,18 @@ class db_wed_menus_connect extends db_common
 			    $menu_level['DESCRIPTION'] = $data['mnub_description'];
 			    $menu_level['DETAILS']     = wed_getOptionsFromString($data['mnub_details']);
 			    $menu_level['SUB_MENU']    = null;
+			    $menu_level['MEGA_MENU']   = $data['mnub_mega_menu'];
+			    $menu_level['MEGA_HTML']   = null;
 			    
-			    // the mnuc_allow_drop field helps to designate which fields can actually have
-			    // a drop down menu
-			    if ($data['mnuc_allow_drop'])
+			    if ($data['mnub_mega_menu'])
 			    {
+				    // A mega menu is possible here so load the megahtml from the base
+				    $menu_level['MEGA_HTML'] = $data['mnub_mega_html'];
+			    }
+			    elseif ($data['mnuc_allow_drop'])
+			    {
+				    // the mnuc_allow_drop field helps to designate which fields can actually have
+					// a drop down menu
 				    $menu_level['SUB_MENU'] = $this->buildSubMenuArray($menu_level['ID']);
 			    }
 
@@ -344,7 +358,7 @@ class db_wed_menus_connect extends db_common
 		    if (($data['mnuc_parent_id']==$parent_id) && ($data['mnub_active']=='Y'))
 		    {
 				$menu_level = array();
-			    $menu_level['ID']        = $data['mnuc_id'];
+			    $menu_level['ID']        = $data['mnuc_menu_base_id'];
 			    $menu_level['PARENT_ID'] = $data['mnuc_parent_id'];
 			    $menu_level['TITLE']     = $data['mnub_title'];
 			    $menu_level['LINK']      = $data['mnub_link'];

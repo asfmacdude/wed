@@ -3,7 +3,7 @@
 /*
  * email_hide.php
  *
- *
+ * This function requires the jquery.obfuscate.js file to work
  *
  */
 

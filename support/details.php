@@ -177,7 +177,7 @@ class detail_object
 	
 	public function setOptions($options,$source)
 	{
-		$this->options['CLASS_NAME'] = __CLASS__;
+		$this->options['SOURCE'] = $source;
 		$this->addOptions($options);
 		$this->registerObject($source);
 	}
@@ -186,6 +186,7 @@ class detail_object
 	{
 		if (is_array($options))
 		{
+			$options       = wed_standardKeys($options);
 			$this->options = array_merge( $this->options, $options);
 		}
 		else
