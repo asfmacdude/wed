@@ -1,6 +1,6 @@
 <?php
 /*
- * @version		$Id: image_detail.php 1.0 2009-03-03 $
+ * @version		$Id: media_detail.php 1.0 2009-03-03 $
  * @package		DreamWish
  * @subpackage	main
  * @copyright	Copyright (C) 2012 Medley Productions. All rights reserved.
@@ -14,13 +14,13 @@
  */
 defined( '_GOOFY' ) or die();
 /*
- * image_detail.php
+ * media_detail.php
  * 
  * This is the detail object for presentations that renders images
  * 
  */
 
-class image_detail extends details
+class media_detail extends details
 {
 	public $options  = array();
 	public $DetailObj = false;
@@ -38,90 +38,80 @@ class image_detail extends details
 		$this->options['LOCAL_PATH']      = dirname(__FILE__);
 		$this->options['SHOW_ERROR']      = true;
 		$this->options['ERROR_MSG']       = wed_getSystemValue('CONTENT_UNAVAILABLE');
-		$this->options['FILE_BASE']       = FILE_BASE . 'images' . DS;
-		$this->options['FILE_BASE_WEB']   = FILE_BASE_WEB . 'images' . DS;
-		$this->options['PATH']            = null; // path to the file minus /files/images/
-		$this->options['LINK']            = null; // if you want the image to be a link
-		$this->options['FILE']            = null; // actual name of the file
-		$this->options['GROUP']           = null;
-		$this->options['SIZE']            = null; // expressed like 100_50, 100px high, 50px wide
-		$this->options['WIDTH']           = null;
-		$this->options['HEIGHT']          = null;
-		$this->options['RESPONSIVE']      = true; // this will cause the width to be set to 100%
-		$this->options['MAKE_THUMB']      = false;
-		$this->options['STYLE']           = null;
-		$this->options['CLASS']           = null;
-		
-		if ($this->options['MAKE_THUMB']==strtoupper('YES'))
-		{
-			$this->options['MAKE_THUMB'] = true;
-		}
-		elseif ($this->options['MAKE_THUMB']==strtoupper('NO'))
-		{
-			$this->options['MAKE_THUMB'] = false;
-		}
+		$this->options['ACTUAL_CONTENT']  = null;
+		$this->options['MAIN_WRAP']       = '<div class="media">%CONTENT%</div>';
+		$this->options['BODY_WRAP']       = '<div class="media-body">%CONTENT%</div>';
+		$this->options['HEADING_WRAP']    = '<h4 class="media-heading">%CONTENT%</h4>';
+		$this->options['IMAGE_FORMAT']    = '<img class="media-object" src="%SOURCE%" >';
+		$this->options['LINK_FORMAT']     = '<a class="%CLASS%" href="%LINK%" >%CONTENT%</a>';
+		$this->options['IMAGE_SIDE']      = 'left';
+		$this->options['SIDE_CLASS']      = array('left' => 'pull-left', 'right' => 'pull-right');
+		$this->options['LIGHTBOX']        = true; 
+		$this->options['LIGHTBOX_CLASS']  = 'lightbox';
+		$this->options['LINK']            = null;
+		$this->options['YOUTUBE']         = null;
 		
 		$this->addOptions($options);
 	}
 	
-	private function setSize()
-	{
-		if (!is_null($this->options['SIZE']))
-	    {
-		    $sz = explode('_', $this->options['SIZE']);
-		    $this->options['WIDTH']  = (isset($sz[0])) ? $sz[0] : null;
-		    $this->options['HEIGHT'] = (isset($sz[1])) ? $sz[1] : null;
-	    }
-	}
+	<div class="media">
+  <a class="pull-left" href="#">
+    <img class="media-object" src="..." alt="...">
+  </a>
+  <div class="media-body">
+    <h4 class="media-heading">Media heading</h4>
+    ...
+  </div>
+</div>
 	
-	public function setClass()
-	{
-		if (!is_null($this->options['CLASS']))
-		{
-			return ' class="' . $this->options['CLASS'] . '"';
-		}
-	}
-	
-	public function setStyle()
-	{
-		if (is_null($this->options['STYLE']))
-		{
-			$style = null;
-			
-			if ($this->options['RESPONSIVE'])
-			{
-				$style .= 'width:100%;';
-			}
-			
-			if (!is_null($this->options['WIDTH']))
-			{
-				$style .= 'max-width:'.$this->options['WIDTH'].'px;';
-			}
-			
-			if (!is_null($this->options['HEIGHT']))
-			{
-				$style .= 'max-height:'.$this->options['HEIGHT'].'px;';
-			}
-			
-			if (!is_null($style))
-			{
-				$style = ' style="'.$style.'"';
-			}
-			
-			return $style;
-		}
-	}	
 	
 	public function buildPresentation()
 	{
-		$html = '<img src="' . $this->getImagePath() . '"' . $this->setStyle() . $this->setClass() . ' />';
+		$html = null;	
+		$html .= $this->buildLink();
+		$html .= $this->buildBody();
 		
-		if (!is_null($this->options['LINK']))
+		if (!is_null($html))
 		{
-			$html = '<a href="'.$this->options['LINK'].'" >'.$html.'</a>';
+			$html = str_replace('%CONTENT%',$html , $this->options['MAIN_WRAP']);
 		}
 		
 		return $html;
+	}
+	
+	
+	private function buildLink()
+	{
+		$html        = null;
+		$format      = $this->options['IMAGE_FORMAT']; // <img class="%CLASS%" src="%SOURCE%" >
+		$link        = $this->options['LINK'];
+		$class       = null;
+		
+		if (!is_null($link))
+		{
+			$html = $this->options['LINK_FORMAT']; // <a class="%CLASS%" href="%LINK%" >%CONTENT%</a>
+			
+			if (!is_null($this->options['IMAGE_SIDE']))
+			{
+				$class = $this->options['SIDE_CLASS'][$this->options['IMAGE_SIDE']];
+			}
+			
+			if ($this->options['LIGHTBOX']))
+			{
+				$class .= ' '.$this->options['LIGHTBOX_CLASS'];
+			}
+			
+			$html = str_replace(array('%CLASS%','%LINK%'), array($class,$link), $html);
+		}
+		
+		
+		
+		return str_replace(, , );
+	}
+	
+	public function buildBody()
+	{
+		
 	}
 	
 	public function getImagePath()

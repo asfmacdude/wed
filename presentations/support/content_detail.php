@@ -171,7 +171,7 @@ class content_detail extends details
 	
 	private function getFormatTAB()
 	{
-		$this->updateHeader();
+		// $this->updateHeader();
 		// $html  = str_replace('%TITLE%', $this->getTitle(), $this->options['HTML_FORMATS']['TITLE2']);
 		$html = $this->getMedia('SMALL');
 		$html .= str_replace('%ARTICLE%', $this->getFullArticle(), $this->options['HTML_FORMATS']['ARTICLE']);
